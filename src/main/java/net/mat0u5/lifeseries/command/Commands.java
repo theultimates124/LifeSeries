@@ -11,7 +11,7 @@ import net.minecraft.text.*;
 import static net.minecraft.server.command.CommandManager.*;
 
 
-public class Command {
+public class Commands {
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
@@ -19,7 +19,7 @@ public class Command {
 
         dispatcher.register(
             literal("test")
-                .executes(context -> Command.testCommand(
+                .executes(context -> Commands.testCommand(
                     context.getSource())
                 )
         );

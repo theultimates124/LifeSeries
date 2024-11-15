@@ -29,13 +29,9 @@ public class ServerPlayNetworkHandlerMixin {
         if (!originalContent.equals(formattedContent)) {
             Text playerNameWithFormatting = player.getDisplayName();
             Text formattedContentText = Text.literal(formattedContent).setStyle(originalText.getStyle());
-            Text finalMessage = Text.empty().append("<").append(playerNameWithFormatting).append("> ").append(formattedContentText);
+            Text finalMessage = Text.empty().append("<").append(playerNameWithFormatting).append(">").append(formattedContentText);
 
             OtherUtils.broadcastMessage(Objects.requireNonNull(player.getServer()), finalMessage);
-
-            //JsonObject json = DiscordUtils.getDefaultJSON();
-            //json.addProperty("content", "`[Server] "+player.getNameForScoreboard()+"` "+TextUtils.formatEmotesForDiscord(originalContent));
-            //DiscordUtils.sendMessageToDiscordFromAggroNet(json,DiscordUtils.getChatChannelId());
             ci.cancel();
         }
     }
