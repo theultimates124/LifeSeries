@@ -17,5 +17,6 @@ public class ModRegistries {
     }
     private static void registerEvents() {
         Events.register();
+        TaskScheduler.registerTickHandler();
     }
 }

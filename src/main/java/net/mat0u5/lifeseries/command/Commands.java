@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import net.mat0u5.lifeseries.series.SeriesList;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
@@ -8,6 +9,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.*;
 
+import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.minecraft.server.command.CommandManager.*;
 
 
@@ -16,7 +18,6 @@ public class Commands {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
-
         dispatcher.register(
             literal("test")
                 .executes(context -> Commands.testCommand(
