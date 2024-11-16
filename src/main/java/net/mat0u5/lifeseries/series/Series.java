@@ -51,25 +51,28 @@ public abstract class Series {
         return lives > 0;
     }
     public void removePlayerLife(MinecraftServer server, ServerPlayerEntity player) {
-        Integer currentLives = getPlayerLives(player);
-        if (currentLives != null) {
-            int lives = currentLives-1;
-            if (lives < 0) lives = 0;
-            if (lives == 0) {
-                playerLostAllLives(player);
-            }
-            setPlayerLives(server,player,lives);
-        }
+        addToPlayerLives(server,player,-1);
     }
     public void addPlayerLife(MinecraftServer server, ServerPlayerEntity player) {
+        addToPlayerLives(server,player,1);
+    }
+    public void addToPlayerLives(MinecraftServer server, ServerPlayerEntity player, int amount) {
         Integer currentLives = getPlayerLives(player);
-        if (currentLives != null) {
-            int lives = currentLives+1;
-            setPlayerLives(server,player,lives);
-        }
+        if (currentLives == null) currentLives = 0;
+        int lives = currentLives + amount;
+        if (lives < 0) lives = 0;
+        setPlayerLives(server,player,lives);
     }
     public void setPlayerLives(MinecraftServer server, ServerPlayerEntity player, int lives) {
         ScoreboardUtils.setScore(server, ScoreHolder.fromName(player.getNameForScoreboard()), "Lives", lives);
+        if (lives == 0) {
+            playerLostAllLives(player);
+        }
+        else {
+            if (player.isSpectator()) {
+                player.changeGameMode(GameMode.SURVIVAL);
+            }
+        }
         reloadPlayerTeam(server, player);
     }
     public void playerLostAllLives(ServerPlayerEntity player) {
