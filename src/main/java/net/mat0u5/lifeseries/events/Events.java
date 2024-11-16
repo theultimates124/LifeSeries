@@ -36,6 +36,13 @@ public class Events {
         currentSeries.initialize(server);
     }
     private static void onServerTickEnd(MinecraftServer server) {
+        try {
+            if (Main.currentSession != null) {
+                Main.currentSession.tick(server);
+            }
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
     }
     public static void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
         currentSeries.onPlayerDeath(player, source);

@@ -9,7 +9,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 
-public abstract class Series {
+public abstract class Series extends Session {
     public abstract SeriesList getSeries();
     public void initialize(MinecraftServer server) {
         createTeams(server);

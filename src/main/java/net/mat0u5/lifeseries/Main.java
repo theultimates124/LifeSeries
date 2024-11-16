@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.Series;
+import net.mat0u5.lifeseries.series.Session;
 import net.mat0u5.lifeseries.series.lastlife.LastLife;
 import net.mat0u5.lifeseries.utils.ModRegistries;
 import net.minecraft.server.MinecraftServer;
@@ -17,6 +18,7 @@ public class Main implements ModInitializer {
 	public static ConfigManager config;
 	public static MinecraftServer server;
 	public static Series currentSeries = new LastLife();
+	public static Session currentSession = new Session();
 
 	@Override
 	public void onInitialize() {

@@ -17,4 +17,17 @@ public class OtherUtils {
             player.sendMessage(message, false);
         }
     }
+
+    public static String formatTime(int totalTicks) {
+        int hours = totalTicks / 72000;
+        int minutes = (totalTicks % 72000) / 1200;
+        int seconds = (totalTicks % 1200) / 20;
+
+        return hours+":"+ formatTimeNumber(minutes)+":"+ formatTimeNumber(seconds);
+    }
+    public static String formatTimeNumber(int time) {
+        String value = String.valueOf(time);
+        while (value.length() < 2) value = "0"+value;
+        return value;
+    }
 }

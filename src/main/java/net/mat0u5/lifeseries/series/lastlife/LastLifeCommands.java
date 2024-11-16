@@ -46,7 +46,7 @@ public class LastLifeCommands {
                             context.getSource())
                         )
                     )
-                    .then(literal("give")
+                    .then(literal("add")
                         .then(argument("player", EntityArgumentType.player())
                             .executes(context -> lifeManager(
                                 context.getSource(), EntityArgumentType.getPlayer(context, "player"), 1, false)
