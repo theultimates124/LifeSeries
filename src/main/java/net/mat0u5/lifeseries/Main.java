@@ -3,6 +3,7 @@ package net.mat0u5.lifeseries;
 import net.fabricmc.api.ModInitializer;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
+import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.Session;
 import net.mat0u5.lifeseries.series.lastlife.LastLife;
@@ -19,6 +20,7 @@ public class Main implements ModInitializer {
 	public static MinecraftServer server;
 	public static Series currentSeries = new LastLife();
 	public static Session currentSession = currentSeries;
+	public static Blacklist blacklist = currentSeries.createBlacklist();
 
 	@Override
 	public void onInitialize() {

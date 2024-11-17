@@ -3,9 +3,7 @@ package net.mat0u5.lifeseries.series;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.ScoreboardUtils;
 import net.mat0u5.lifeseries.utils.TeamUtils;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -17,6 +15,7 @@ import static net.mat0u5.lifeseries.Main.server;
 
 public abstract class Series extends Session {
     public abstract SeriesList getSeries();
+    public abstract Blacklist createBlacklist();
     public void initialize() {
         createTeams();
         createScoreboards();

@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series.lastlife;
 
+import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.SessionAction;
@@ -23,6 +24,10 @@ public class LastLife extends Series {
     @Override
     public SeriesList getSeries() {
         return SeriesList.LAST_LIFE;
+    }
+    @Override
+    public Blacklist createBlacklist() {
+        return new LastLifeBlacklist();
     }
     @Override
     public void overrideTick() {
