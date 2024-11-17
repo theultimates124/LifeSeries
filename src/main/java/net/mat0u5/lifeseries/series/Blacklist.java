@@ -1,14 +1,18 @@
 package net.mat0u5.lifeseries.series;
 
-import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -18,12 +22,12 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
-
-import static net.mat0u5.lifeseries.Main.blacklist;
+import java.util.Optional;
 
 public abstract class Blacklist {
     public abstract List<Item> getItemBlacklist();
     public abstract List<Block> getBlockBlacklist();
+    public abstract List<RegistryKey<Enchantment>> getClampedEnchants();
 
     public ActionResult onBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
         processItemStack(player, player.getStackInHand(hand));
@@ -60,21 +64,32 @@ public abstract class Blacklist {
             }
         }
     }
-    public boolean isBlacklistedItem(Item item) {
-        return getItemBlacklist().contains(item);
+    public boolean isBlacklistedItem(ItemStack itemStack) {
+        return getItemBlacklist().contains(itemStack.getItem());
     }
 
     public ItemStack processItemStack(PlayerEntity player, ItemStack itemStack) {
         if (itemStack.isEmpty()) return itemStack;
         if (itemStack.getItem() == Items.AIR) return itemStack;
-        if (isBlacklistedItem(itemStack.getItem())) {
+        if (isBlacklistedItem(itemStack)) {
             itemStack.setCount(0);
             player.getInventory().updateItems();
             return ItemStack.EMPTY;
         }
-        return furtherItemProcessing(itemStack);
-    }
-    public ItemStack furtherItemProcessing(ItemStack itemStack) {
+        ItemEnchantmentsComponent enchants = itemStack.getComponents().get(DataComponentTypes.ENCHANTMENTS);
+        ItemEnchantmentsComponent enchantsStored = itemStack.getComponents().get(DataComponentTypes.STORED_ENCHANTMENTS);
+        if (enchants != null) clampEnchantments(enchants);
+        if (enchantsStored != null) clampEnchantments(enchantsStored);
         return itemStack;
+    }
+    public void clampEnchantments(ItemEnchantmentsComponent enchants) {
+        List<RegistryKey<Enchantment>> clamp = getClampedEnchants();
+        for (it.unimi.dsi.fastutil.objects.Object2IntMap.Entry<RegistryEntry<Enchantment>> enchant : enchants.getEnchantmentEntries()) {
+            Optional<RegistryKey<Enchantment>> enchantRegistry = enchant.getKey().getKey();
+            if (enchantRegistry.isEmpty()) continue;
+            if (clamp.contains(enchantRegistry.get())) {
+                enchant.setValue(1);
+            }
+        }
     }
 }
