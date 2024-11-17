@@ -6,7 +6,6 @@ import net.mat0u5.lifeseries.utils.AnimationUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.TitleCommand;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -57,7 +56,7 @@ public class LastLife extends Series {
             for (Map.Entry<ServerPlayerEntity, Integer> playerEntry : lives.entrySet()) {
                 Integer livesNum = playerEntry.getValue();
                 ServerPlayerEntity player = playerEntry.getKey();
-                Text textLives = Text.literal(String.valueOf(livesNum)).formatted(getColorForLivesNum(livesNum));
+                Text textLives = getFormattedLives(livesNum);
                 PlayerUtils.sendTitle(player, textLives, 0, 25, 0);
             }
             PlayerUtils.playSoundToPlayers(lives.keySet(), SoundEvents.UI_BUTTON_CLICK.value());
@@ -71,7 +70,7 @@ public class LastLife extends Series {
             for (Map.Entry<ServerPlayerEntity, Integer> playerEntry : lives.entrySet()) {
                 Integer livesNum = playerEntry.getValue();
                 ServerPlayerEntity player = playerEntry.getKey();
-                MutableText textLives = Text.literal(String.valueOf(livesNum)).formatted(getColorForLivesNum(livesNum));
+                MutableText textLives = getFormattedLives(livesNum).copy();
                 Text finalText = textLives.append(Text.literal(" lives.").formatted(Formatting.GREEN));
                 PlayerUtils.sendTitle(player, finalText, 0, 60, 20);
                 setPlayerLives(server,player, livesNum);
@@ -85,17 +84,10 @@ public class LastLife extends Series {
             displayLives = rnd.nextInt(5)+2;
         }
         int finalDisplayLives = displayLives;
-        PlayerUtils.sendTitleToPlayers(lives.keySet(), Text.literal(String.valueOf(finalDisplayLives)).formatted(getColorForLivesNum(finalDisplayLives)), 0, 25, 0);
+        PlayerUtils.sendTitleToPlayers(lives.keySet(), getFormattedLives(finalDisplayLives), 0, 25, 0);
         PlayerUtils.playSoundToPlayers(lives.keySet(), SoundEvents.UI_BUTTON_CLICK.value());
         TaskScheduler.scheduleTask(delay, ()->{
             lifeRoll(server, currentStep+1, finalDisplayLives, lives);
         });
-    }
-    public Formatting getColorForLivesNum(int lives) {
-        if (lives == 1) return Formatting.DARK_RED;
-        if (lives == 2) return Formatting.YELLOW;
-        if (lives == 3) return Formatting.GREEN;
-        if (lives >= 4) return Formatting.DARK_GREEN;
-        return Formatting.GRAY;
     }
 }

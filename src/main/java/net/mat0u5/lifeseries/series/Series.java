@@ -6,6 +6,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 
@@ -24,6 +25,19 @@ public abstract class Series extends Session {
         TeamUtils.createTeam(server, "Green", Formatting.GREEN);
         TeamUtils.createTeam(server, "DarkGreen", Formatting.DARK_GREEN);
 
+    }
+    public Formatting getColorForLives(Integer lives) {
+        if (lives == null) return Formatting.GRAY;
+        if (lives == 1) return Formatting.DARK_RED;
+        if (lives == 2) return Formatting.YELLOW;
+        if (lives == 3) return Formatting.GREEN;
+        if (lives >= 4) return Formatting.DARK_GREEN;
+        return Formatting.DARK_GRAY;
+    }
+    public Text getFormattedLives(Integer lives) {
+        if (lives == null) return Text.empty();
+        Formatting color = getColorForLives(lives);
+        return Text.literal(String.valueOf(lives)).formatted(color);
     }
     public void createScoreboards(MinecraftServer server) {
         ScoreboardUtils.createObjective(server, "Lives");
