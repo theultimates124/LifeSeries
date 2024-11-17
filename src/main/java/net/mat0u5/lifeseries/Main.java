@@ -18,7 +18,7 @@ public class Main implements ModInitializer {
 	public static ConfigManager config;
 	public static MinecraftServer server;
 	public static Series currentSeries = new LastLife();
-	public static Session currentSession = new Session();
+	public static Session currentSession = currentSeries;
 
 	@Override
 	public void onInitialize() {

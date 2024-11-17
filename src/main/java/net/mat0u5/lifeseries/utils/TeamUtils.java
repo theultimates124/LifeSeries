@@ -2,14 +2,15 @@ package net.mat0u5.lifeseries.utils;
 
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import static net.mat0u5.lifeseries.Main.server;
+
 public class TeamUtils {
 
-    public static Team createTeam(MinecraftServer server, String teamName, Formatting color) {
+    public static Team createTeam(String teamName, Formatting color) {
         Scoreboard scoreboard = server.getScoreboard();
         if (scoreboard.getTeam(teamName) != null) {
             // A team with this name already exists
@@ -21,7 +22,7 @@ public class TeamUtils {
         return team;
     }
 
-    public static boolean addPlayerToTeam(MinecraftServer server, String teamName, ServerPlayerEntity player) {
+    public static boolean addPlayerToTeam(String teamName, ServerPlayerEntity player) {
         Scoreboard scoreboard = server.getScoreboard();
         Team team = scoreboard.getTeam(teamName);
 
@@ -34,7 +35,7 @@ public class TeamUtils {
         return true;
     }
 
-    public static boolean removePlayerFromTeam(MinecraftServer server, ServerPlayerEntity player) {
+    public static boolean removePlayerFromTeam(ServerPlayerEntity player) {
         Scoreboard scoreboard = server.getScoreboard();
         String playerName = player.getNameForScoreboard();
 
@@ -48,7 +49,7 @@ public class TeamUtils {
         return true;
     }
 
-    public static boolean deleteTeam(MinecraftServer server, String teamName) {
+    public static boolean deleteTeam(String teamName) {
         Scoreboard scoreboard = server.getScoreboard();
         Team team = scoreboard.getTeam(teamName);
 
@@ -61,7 +62,7 @@ public class TeamUtils {
         return true;
     }
 
-    public static Team getPlayerTeam(MinecraftServer server, ServerPlayerEntity player) {
+    public static Team getPlayerTeam(ServerPlayerEntity player) {
         Scoreboard scoreboard = server.getScoreboard();
         return scoreboard.getScoreHolderTeam(player.getNameForScoreboard());
     }

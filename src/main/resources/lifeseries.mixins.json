@@ -3,7 +3,6 @@
 	"package": "net.mat0u5.lifeseries.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ServerPlayerEntityMixin",
 		"ServerPlayNetworkHandlerMixin"
 	],
 	"injectors": {

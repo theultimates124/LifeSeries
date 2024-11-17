@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.events;
 
 
 
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -23,17 +24,23 @@ public class Events {
         //UseBlockCallback.EVENT.register(Events::onBlockUse);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> onPlayerJoin(server, handler.getPlayer()));
         ServerTickEvents.END_SERVER_TICK.register(Events::onServerTickEnd);
+
+        ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
+            if (entity instanceof ServerPlayerEntity) {
+                Events.onPlayerDeath((ServerPlayerEntity) entity, damageSource);
+            }
+        });
     }
 
     private static void onPlayerJoin(MinecraftServer server, ServerPlayerEntity player) {
-        currentSeries.onPlayerJoin(server, player);
+        currentSeries.onPlayerJoin(player);
     }
     private static void onServerStopping(MinecraftServer server) {
     }
     private static void onServerStart(MinecraftServer server) {
         Main.server = server;
         System.out.println("MinecraftServer instance captured.");
-        currentSeries.initialize(server);
+        currentSeries.initialize();
     }
     private static void onServerTickEnd(MinecraftServer server) {
         try {

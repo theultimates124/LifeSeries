@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.AnimationUtils;
+import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -13,8 +14,9 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
+import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.utils.PermissionManager.isAdmin;
@@ -33,7 +35,7 @@ public class LastLifeCommands {
                 .then(literal("lives")
                     .then(literal("setToRandom")
                         .executes(context -> LastLifeCommands.assignRandomLives(
-                            context.getSource(), context.getSource().getServer().getPlayerManager().getPlayerList()
+                            context.getSource(), PlayerUtils.getAllPlayers()
                         ))
                         .then(argument("players",EntityArgumentType.players())
                             .executes(context -> LastLifeCommands.assignRandomLives(
@@ -80,6 +82,33 @@ public class LastLifeCommands {
                         )
                     )
                 )
+                .then(literal("boogeyman")
+                    .then(literal("clear")
+                        .executes(context -> boogeyClear(
+                            context.getSource()
+                        ))
+                    )
+                    .then(literal("list")
+                        .executes(context -> boogeyList(
+                            context.getSource()
+                        ))
+                    )
+                    .then(literal("add")
+                        .then(argument("player", EntityArgumentType.player())
+                            .executes(context -> addBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+                        )
+                    )
+                    .then(literal("remove")
+                        .then(argument("player", EntityArgumentType.player())
+                            .executes(context -> removeBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+                        )
+                    )
+                    .then(literal("chooseRandom")
+                        .executes(context -> boogeyChooseRandom(
+                            context.getSource()
+                        ))
+                    )
+                )
         );
         dispatcher.register(
             literal("givelife")
@@ -94,6 +123,62 @@ public class LastLifeCommands {
                 ))
         );
     }
+    public static int addBoogey(ServerCommandSource source, ServerPlayerEntity target) {
+        if (!isValidCommand(source)) return -1;
+
+        if (target == null) return -1;
+
+        if (((LastLife) currentSeries).boogeymanManager.isBoogeyman(target)) {
+            source.sendError(Text.of("That player is already a boogeyman!"));
+            return -1;
+        }
+        ((LastLife) currentSeries).boogeymanManager.addBoogeymanManually(target);
+
+        source.sendMessage(Text.of(target.getNameForScoreboard()+" is now a boogeyman."));
+
+        return 1;
+    }
+    public static int removeBoogey(ServerCommandSource source, ServerPlayerEntity target) {
+        if (!isValidCommand(source)) return -1;
+
+        if (target == null) return -1;
+
+        if (!((LastLife) currentSeries).boogeymanManager.isBoogeyman(target)) {
+            source.sendError(Text.of("That player is not a boogeyman!"));
+            return -1;
+        }
+        ((LastLife) currentSeries).boogeymanManager.removeBoogeymanManually(target);
+
+        source.sendMessage(Text.of(target.getNameForScoreboard()+" is no longer a boogeyman."));
+
+        return 1;
+    }
+    public static int boogeyList(ServerCommandSource source) {
+        if (!isValidCommand(source)) return -1;
+
+        List<String> boogeymen = new ArrayList<>();
+        for (Boogeyman boogeyman : ((LastLife) currentSeries).boogeymanManager.boogeymen) {
+            boogeymen.add(boogeyman.name);
+        }
+        source.sendMessage(Text.of("Current boogeymen: ["+String.join(", ",boogeymen)+"]"));
+
+        return 1;
+    }
+    public static int boogeyClear(ServerCommandSource source) {
+        if (!isValidCommand(source)) return -1;
+
+        ((LastLife) currentSeries).boogeymanManager.resetBoogeymen();
+        source.sendMessage(Text.of("All boogeymen have been cleared"));
+
+        return 1;
+    }
+    public static int boogeyChooseRandom(ServerCommandSource source) {
+        if (!isValidCommand(source)) return -1;
+
+        ((LastLife) currentSeries).boogeymanManager.chooseBoogeymen();
+
+        return 1;
+    }
     public static int showLives(ServerCommandSource source) {
         if (!isValidCommand(source)) return -1;
 
@@ -101,12 +186,12 @@ public class LastLifeCommands {
         final ServerPlayerEntity self = source.getPlayer();
 
         if (self == null) return -1;
-        Integer playerLives = currentSeries.getPlayerLives(self);
-        if (playerLives == null) {
+        if (currentSeries.hasAssignedLives(self)) {
             self.sendMessage(Text.of("You have not been assigned any lives yet."));
             return 1;
         }
 
+        Integer playerLives = currentSeries.getPlayerLives(self);
         self.sendMessage(Text.literal("You have ").append(currentSeries.getFormattedLives(playerLives)).append(Text.of((playerLives==1?" life.":" lives."))));
         if (playerLives <= 0) {
             self.sendMessage(Text.of("Womp womp."));
@@ -118,14 +203,14 @@ public class LastLifeCommands {
         if (!isValidCommand(source)) return -1;
 
         MinecraftServer server = source.getServer();
-        ((LastLife) currentSeries).assignRandomLives(server, players);
+        ((LastLife) currentSeries).livesManager.assignRandomLives(players);
         return 1;
     }
     public static int reloadLives(ServerCommandSource source) {
         if (!isValidCommand(source)) return -1;
 
         MinecraftServer server = source.getServer();
-        currentSeries.reloadAllPlayerTeams(server);
+        currentSeries.reloadAllPlayerTeams();
         return 1;
     }
     public static int lifeManager(ServerCommandSource source, ServerPlayerEntity target, int amount, boolean setNotGive) {
@@ -135,10 +220,10 @@ public class LastLifeCommands {
         if (target == null) return -1;
 
         if (setNotGive) {
-            currentSeries.setPlayerLives(server,target,amount);
+            currentSeries.setPlayerLives(target,amount);
         }
         else {
-            currentSeries.addToPlayerLives(server,target,amount);
+            currentSeries.addToPlayerLives(target,amount);
         }
         source.sendMessage(Text.of(
         (amount >= 0 ? "Added" : "Removed")+" "+Math.abs(amount)+" "+
@@ -171,10 +256,10 @@ public class LastLifeCommands {
             return -1;
         }
         Text currentPlayerName = self.getStyledDisplayName();
-        currentSeries.removePlayerLife(server,self);
+        currentSeries.removePlayerLife(self);
         AnimationUtils.playTotemAnimation(self);
         TaskScheduler.scheduleTask(40, () -> {
-            ((LastLife)currentSeries).receiveLifeFromOtherPlayer(server,currentPlayerName,target);
+            ((LastLife)currentSeries).livesManager.receiveLifeFromOtherPlayer(currentPlayerName,target);
         });
 
         return 1;

@@ -29,10 +29,12 @@ public class Session {
         OtherUtils.broadcastMessage(firstLine);
         OtherUtils.broadcastMessage(infoText1);
         OtherUtils.broadcastMessage(infoText2);
+        sessionStart();
     }
     public void stop() {
         status = SessionStatus.FINISHED;
         OtherUtils.broadcastMessage(Text.literal("Session stopped!").formatted(Formatting.GOLD));
+        sessionEnd();
     }
     public void pause() {
         if (status == SessionStatus.PAUSED) {
@@ -90,8 +92,10 @@ public class Session {
         passedTime++;
         if (passedTime >= sessionLength) {
             status = SessionStatus.FINISHED;
+            sessionEnd();
             OtherUtils.broadcastMessage(Text.literal("The session has ended!").formatted(Formatting.GOLD));
         }
+        overrideTick();
     }
     public void displayTimers(MinecraftServer server) {
         String message = "";
@@ -112,5 +116,11 @@ public class Session {
             if (player == null) continue;
             player.sendMessage(Text.literal(message).formatted(Formatting.GRAY), true);
         }
+    }
+
+    public void overrideTick() {}
+    public void sessionStart() {}
+    public void sessionEnd() {
+        System.out.println("DefaultSessEnd");
     }
 }
