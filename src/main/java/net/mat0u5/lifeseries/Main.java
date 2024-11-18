@@ -44,7 +44,7 @@ public class Main implements ModInitializer {
 			currentSeries = new LastLife();
 		}
 		currentSession = currentSeries;
-		currentSeries.createBlacklist();
+		blacklist = currentSeries.createBlacklist();
 	}
 	public void seriesUnassigned(String series) {
 		LOGGER.error("Life Series is not chosen, shutting down server!");
