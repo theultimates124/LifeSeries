@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.AnimationUtils;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.command.CommandRegistryAccess;
@@ -103,6 +104,11 @@ public class LastLifeCommands {
                             .executes(context -> removeBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
                         )
                     )
+                    .then(literal("cure")
+                            .then(argument("player", EntityArgumentType.player())
+                                    .executes(context -> cureBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+                            )
+                    )
                     .then(literal("chooseRandom")
                         .executes(context -> boogeyChooseRandom(
                             context.getSource()
@@ -123,6 +129,21 @@ public class LastLifeCommands {
                 ))
         );
     }
+    public static int cureBoogey(ServerCommandSource source, ServerPlayerEntity target) {
+        if (!isValidCommand(source)) return -1;
+
+        if (target == null) return -1;
+
+        if (!((LastLife) currentSeries).boogeymanManager.isBoogeyman(target)) {
+            source.sendError(Text.of("That player is not a boogeyman!"));
+            return -1;
+        }
+        ((LastLife) currentSeries).boogeymanManager.cure(target);
+
+        OtherUtils.broadcastMessageToAdmins(Text.of(target.getNameForScoreboard()+" is now cured."));
+
+        return 1;
+    }
     public static int addBoogey(ServerCommandSource source, ServerPlayerEntity target) {
         if (!isValidCommand(source)) return -1;
 
@@ -134,7 +155,7 @@ public class LastLifeCommands {
         }
         ((LastLife) currentSeries).boogeymanManager.addBoogeymanManually(target);
 
-        source.sendMessage(Text.of(target.getNameForScoreboard()+" is now a boogeyman."));
+        OtherUtils.broadcastMessageToAdmins(Text.of(target.getNameForScoreboard()+" is now a boogeyman."));
 
         return 1;
     }
@@ -149,7 +170,7 @@ public class LastLifeCommands {
         }
         ((LastLife) currentSeries).boogeymanManager.removeBoogeymanManually(target);
 
-        source.sendMessage(Text.of(target.getNameForScoreboard()+" is no longer a boogeyman."));
+        OtherUtils.broadcastMessageToAdmins(Text.of(target.getNameForScoreboard()+" is no longer a boogeyman."));
 
         return 1;
     }
@@ -168,7 +189,7 @@ public class LastLifeCommands {
         if (!isValidCommand(source)) return -1;
 
         ((LastLife) currentSeries).boogeymanManager.resetBoogeymen();
-        source.sendMessage(Text.of("All boogeymen have been cleared"));
+        OtherUtils.broadcastMessageToAdmins(Text.of("All boogeymen have been cleared"));
 
         return 1;
     }

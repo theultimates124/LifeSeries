@@ -1,6 +1,8 @@
 package net.mat0u5.lifeseries.series.lastlife;
 
+import com.google.common.collect.Lists;
 import net.mat0u5.lifeseries.series.Blacklist;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
@@ -15,6 +17,8 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKey;
 
 import java.util.List;
+
+import static net.mat0u5.lifeseries.Main.server;
 
 public class LastLifeBlacklist extends Blacklist {
     public static final List<Item> BLACKLISTED_ITEMS = List.of(
@@ -42,7 +46,6 @@ public class LastLifeBlacklist extends Blacklist {
             Enchantments.SMITE,
             Enchantments.BANE_OF_ARTHROPODS,
             Enchantments.FIRE_ASPECT,
-            Enchantments.FIRE_ASPECT,
             Enchantments.KNOCKBACK,
             Enchantments.SWEEPING_EDGE,
 
@@ -53,6 +56,7 @@ public class LastLifeBlacklist extends Blacklist {
             Enchantments.PROJECTILE_PROTECTION,
             Enchantments.BLAST_PROTECTION,
             Enchantments.FIRE_PROTECTION,
+            Enchantments.FEATHER_FALLING,
             Enchantments.THORNS,
 
             Enchantments.BREACH,
@@ -77,6 +81,7 @@ public class LastLifeBlacklist extends Blacklist {
     public List<RegistryKey<Enchantment>> getClampedEnchants() {
         return LIMITED_ENCHANTMENTS;
     }
+
     @Override
     public boolean isBlacklistedItem(ItemStack itemStack) {
         Item item = itemStack.getItem();

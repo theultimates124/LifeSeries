@@ -66,6 +66,7 @@ public class LastLife extends Series {
         Boogeyman boogeyman  = boogeymanManager.getBoogeyman(killer);
         if (boogeyman == null || boogeyman.cured) {
             if (isOnLastLife(killer)) return;
+            if (killer.getPrimeAdversary() == victim) return;
             OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + " was killed by "+killer.getNameForScoreboard() +
                     ", who is not §cred name§f, and is not a §cboogeyman§f!"));
             return;

@@ -50,19 +50,27 @@ public class SessionCommand {
                 .then(literal("timer")
                     .then(literal("set")
                         .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                            .then(argument("time", StringArgumentType.string())
-                                    .executes(context -> SessionCommand.setTime(
-                                            context.getSource(), StringArgumentType.getString(context, "time")
-                                    ))
-                            )
+                        .then(argument("time", StringArgumentType.string())
+                            .executes(context -> SessionCommand.setTime(
+                                context.getSource(), StringArgumentType.getString(context, "time")
+                            ))
+                        )
                     )
                     .then(literal("add")
                         .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                            .then(argument("time", StringArgumentType.string())
-                                    .executes(context -> SessionCommand.addTime(
-                                            context.getSource(), StringArgumentType.getString(context, "time")
-                                    ))
-                            )
+                        .then(argument("time", StringArgumentType.string())
+                            .executes(context -> SessionCommand.addTime(
+                                context.getSource(), StringArgumentType.getString(context, "time")
+                            ))
+                        )
+                    )
+                    .then(literal("fastforward")
+                        .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                        .then(argument("time", StringArgumentType.string())
+                            .executes(context -> SessionCommand.skipTime(
+                                context.getSource(), StringArgumentType.getString(context, "time")
+                            ))
+                        )
                     )
                     .then(literal("remove")
                         .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
@@ -149,6 +157,17 @@ public class SessionCommand {
         }
 
         currentSession.pause();
+
+        return 1;
+    }
+    public static int skipTime(ServerCommandSource source, String timeArgument) {
+
+        int totalTicks = parseTime(timeArgument);
+        if (totalTicks == -1) {
+            source.sendError(Text.literal("Invalid time format. Use h, m, s for hours, minutes, and seconds."));
+            return -1;
+        }
+        currentSession.passedTime+=totalTicks;
 
         return 1;
     }

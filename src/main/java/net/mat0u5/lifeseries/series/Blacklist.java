@@ -29,6 +29,8 @@ public abstract class Blacklist {
     public abstract List<Block> getBlockBlacklist();
     public abstract List<RegistryKey<Enchantment>> getClampedEnchants();
 
+
+
     public ActionResult onBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
         processItemStack(player, player.getStackInHand(hand));
         BlockPos blockPos = hitResult.getBlockPos();

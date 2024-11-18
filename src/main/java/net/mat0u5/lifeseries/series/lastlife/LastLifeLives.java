@@ -43,11 +43,6 @@ public class LastLifeLives {
         assignRandomLives(assignTo);
     }
     public void assignRandomLives(Collection<ServerPlayerEntity> players) {
-        // TEMP
-        for (ServerPlayerEntity player : players) {
-            OtherUtils.broadcastMessage(Text.of("Assigning random lives to "+player.getNameForScoreboard()));
-        }
-        // TEMP
         HashMap<ServerPlayerEntity, Integer> lives = new HashMap<>();
         for (ServerPlayerEntity player : players) {
             int playerLives = rnd.nextInt(5)+2;// Random number from 2->6

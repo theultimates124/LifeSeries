@@ -7,6 +7,9 @@ public abstract class SessionAction {
         this.triggerAtTicks = triggerAtTicks;
     }
     public boolean tick(int currentTick) {
+        if (hasTriggered && triggerAtTicks > currentTick) {
+            hasTriggered = false;
+        }
         if (hasTriggered) return true;
         if (triggerAtTicks <= currentTick) {
             hasTriggered = true;

@@ -93,19 +93,19 @@ public class LastLifeBoogeymen {
     }
     public void chooseBoogeymen() {
         resetBoogeymen();
-        PlayerUtils.playSoundToPlayers(((LastLife)currentSeries).getNonRedPlayers(), SoundEvents.UI_BUTTON_CLICK.value());
-        PlayerUtils.sendTitleToPlayers(((LastLife)currentSeries).getNonRedPlayers(), Text.literal("3").formatted(Formatting.GREEN),0,35,0);
+        PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.UI_BUTTON_CLICK.value());
+        PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal("3").formatted(Formatting.GREEN),0,35,0);
 
         TaskScheduler.scheduleTask(30, () -> {
-            PlayerUtils.playSoundToPlayers(((LastLife)currentSeries).getNonRedPlayers(), SoundEvents.UI_BUTTON_CLICK.value());
-            PlayerUtils.sendTitleToPlayers(((LastLife)currentSeries).getNonRedPlayers(), Text.literal("2").formatted(Formatting.YELLOW),0,35,0);
+            PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.UI_BUTTON_CLICK.value());
+            PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal("2").formatted(Formatting.YELLOW),0,35,0);
         });
         TaskScheduler.scheduleTask(60, () -> {
-            PlayerUtils.playSoundToPlayers(((LastLife)currentSeries).getNonRedPlayers(), SoundEvents.UI_BUTTON_CLICK.value());
-            PlayerUtils.sendTitleToPlayers(((LastLife)currentSeries).getNonRedPlayers(), Text.literal("1").formatted(Formatting.RED),0,35,0);
+            PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.UI_BUTTON_CLICK.value());
+            PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal("1").formatted(Formatting.RED),0,35,0);
         });
         TaskScheduler.scheduleTask(90, () -> {
-            PlayerUtils.sendTitleToPlayers(((LastLife)currentSeries).getNonRedPlayers(), Text.literal("You are...").formatted(Formatting.YELLOW),10,50,20);
+            PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal("You are...").formatted(Formatting.YELLOW),10,50,20);
         });
         TaskScheduler.scheduleTask(180, this::boogeymenChooseRandom);
     }
@@ -131,11 +131,16 @@ public class LastLifeBoogeymen {
                 currentChance/=2;
             }
         }
-        PlayerUtils.sendTitleToPlayers(normalPlayers, Text.literal("NOT the Boogeyman").formatted(Formatting.GREEN),10,50,20);
-        PlayerUtils.sendTitleToPlayers(boogeyPlayers, Text.literal("The Boogeyman").formatted(Formatting.RED),10,50,20);
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            if (boogeyPlayers.contains(player)) continue;
+            normalPlayers.add(player);
+        }
+
+        PlayerUtils.sendTitleToPlayers(normalPlayers, Text.literal("NOT the Boogeyman.").formatted(Formatting.GREEN),10,50,20);
+        PlayerUtils.sendTitleToPlayers(boogeyPlayers, Text.literal("The Boogeyman.").formatted(Formatting.RED),10,50,20);
         for (ServerPlayerEntity boogey : boogeyPlayers) {
             addBoogeyman(boogey);
-            boogey.sendMessage(Text.of("You are the boogeyman. You must by any means necessary kill a §2dark green§7, §agreen§7 or §eyellow§7 name by direct action to be cured of the curse. " +
+            boogey.sendMessage(Text.of("§7You are the boogeyman. You must by any means necessary kill a §2dark green§7, §agreen§7 or §eyellow§7 name by direct action to be cured of the curse. " +
                     "If you fail, next session you will become a §cred name§7. All loyalties and friendships are removed while you are the boogeyman."));
         }
     }
