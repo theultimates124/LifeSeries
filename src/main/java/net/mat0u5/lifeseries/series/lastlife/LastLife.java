@@ -31,7 +31,6 @@ public class LastLife extends Series {
     }
     @Override
     public void overrideTick() {
-        System.out.println("test_"+activeActions.size());
         if (activeActions == null) return;
         if (activeActions.isEmpty()) return;
         List<SessionAction> remaining = new ArrayList<>();
@@ -45,6 +44,7 @@ public class LastLife extends Series {
     }
     @Override
     public void sessionStart() {
+        boogeymanManager.resetBoogeymen();
         activeActions = List.of(
             livesManager.actionChooseLives,
             boogeymanManager.actionBoogeymanWarn1,

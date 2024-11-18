@@ -11,7 +11,7 @@ import java.util.Properties;
 public class ConfigManager {
 
     private Properties properties = new Properties();
-    private String filePath;
+    public String filePath;
 
     public ConfigManager(String filePath) {
         this.filePath = filePath;
@@ -25,7 +25,7 @@ public class ConfigManager {
             try {
                 configFile.createNewFile();
                 try (OutputStream output = new FileOutputStream(configFile)) {
-                    properties.setProperty("test","test1");
+                    properties.setProperty("currentSeries","unassigned");
 
                     properties.store(output, null);
                 }

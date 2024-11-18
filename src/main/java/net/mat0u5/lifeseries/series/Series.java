@@ -75,6 +75,10 @@ public abstract class Series extends Session {
     public void removePlayerLife(ServerPlayerEntity player) {
         addToPlayerLives(player,-1);
     }
+    public void resetPlayerLife(ServerPlayerEntity player) {
+        ScoreboardUtils.resetScore(ScoreHolder.fromName(player.getNameForScoreboard()), "Lives");
+        reloadPlayerTeam(player);
+    }
     public void addPlayerLife(ServerPlayerEntity player) {
         addToPlayerLives(player,1);
     }

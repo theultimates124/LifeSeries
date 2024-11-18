@@ -16,21 +16,21 @@ import static net.mat0u5.lifeseries.Main.server;
 
 public class LastLifeBoogeymen {
 
-    public SessionAction actionBoogeymanWarn1 = new SessionAction(OtherUtils.minutesToTicks(2)) {
+    public SessionAction actionBoogeymanWarn1 = new SessionAction(OtherUtils.minutesToTicks(3)) {
         @Override
         public void trigger() {
             if (boogeymanChosen) return;
-            OtherUtils.broadcastMessage(Text.literal("The boogeyman is being chosen in 3 minutes.").formatted(Formatting.RED));
+            OtherUtils.broadcastMessage(Text.literal("The boogeyman is being chosen in 5 minutes.").formatted(Formatting.RED));
         }
     };
-    public SessionAction actionBoogeymanWarn2 = new SessionAction(OtherUtils.minutesToTicks(4)) {
+    public SessionAction actionBoogeymanWarn2 = new SessionAction(OtherUtils.minutesToTicks(7)) {
         @Override
         public void trigger() {
             if (boogeymanChosen) return;
             OtherUtils.broadcastMessage(Text.literal("The boogeyman is being chosen in 1 minute.").formatted(Formatting.RED));
         }
     };
-    public SessionAction actionBoogeymanChoose = new SessionAction(OtherUtils.minutesToTicks(5)) {
+    public SessionAction actionBoogeymanChoose = new SessionAction(OtherUtils.minutesToTicks(8)) {
         @Override
         public void trigger() {
             if (boogeymanChosen) return;
@@ -112,7 +112,6 @@ public class LastLifeBoogeymen {
     public void boogeymenChooseRandom() {
         List<ServerPlayerEntity> nonRedPlayers = ((LastLife)currentSeries).getNonRedPlayers();
         Collections.shuffle(nonRedPlayers);
-        if (nonRedPlayers.isEmpty()) return;
 
         List<ServerPlayerEntity> normalPlayers = new ArrayList<>();
         List<ServerPlayerEntity> boogeyPlayers = new ArrayList<>();
@@ -123,7 +122,6 @@ public class LastLifeBoogeymen {
                 boogeyPlayers.add(player);
             }
             else {
-                normalPlayers.add(player);
                 currentChance = 0;
             }
 

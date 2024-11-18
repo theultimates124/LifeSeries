@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.utils;
 
+import net.mat0u5.lifeseries.Main;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -20,6 +21,7 @@ public class OtherUtils {
             if (!PermissionManager.isAdmin(player)) continue;
             player.sendMessage(message, false);
         }
+        Main.LOGGER.info(message.getString());
     }
 
     public static String formatTime(int totalTicks) {

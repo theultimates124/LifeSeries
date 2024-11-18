@@ -82,6 +82,13 @@ public class LastLifeCommands {
                             )
                         )
                     )
+                    .then(literal("reset")
+                        .then(argument("player", EntityArgumentType.player())
+                            .executes(context -> resetLives(
+                                context.getSource(), EntityArgumentType.getPlayer(context, "player"))
+                            )
+                        )
+                    )
                 )
                 .then(literal("boogeyman")
                     .then(literal("clear")
@@ -200,6 +207,19 @@ public class LastLifeCommands {
 
         return 1;
     }
+
+
+    public static int resetLives(ServerCommandSource source, ServerPlayerEntity target) {
+        if (!isValidCommand(source)) return -1;
+
+        MinecraftServer server = source.getServer();
+        if (target == null) return -1;
+
+        currentSeries.resetPlayerLife(target);
+
+        source.sendMessage(Text.of("Reset " + target.getNameForScoreboard() + "'s lives."));
+        return 1;
+    }
     public static int showLives(ServerCommandSource source) {
         if (!isValidCommand(source)) return -1;
 
@@ -207,7 +227,7 @@ public class LastLifeCommands {
         final ServerPlayerEntity self = source.getPlayer();
 
         if (self == null) return -1;
-        if (currentSeries.hasAssignedLives(self)) {
+        if (!currentSeries.hasAssignedLives(self)) {
             self.sendMessage(Text.of("You have not been assigned any lives yet."));
             return 1;
         }
@@ -246,10 +266,13 @@ public class LastLifeCommands {
         else {
             currentSeries.addToPlayerLives(target,amount);
         }
-        source.sendMessage(Text.of(
-        (amount >= 0 ? "Added" : "Removed")+" "+Math.abs(amount)+" "+
-              (Math.abs(amount)==1?"life":"lives")+(amount >= 0 ? " to " : " from ") + target.getNameForScoreboard() + ".")
-        );
+        String pt1 = amount >= 0 ? "Added" : "Removed";
+        String pt2 = " "+Math.abs(amount)+" ";
+        String pt3 = Math.abs(amount)==1?"life":"lives";
+        String pt4 = amount >= 0 ? " to " : " from ";
+        String pt5 = target.getNameForScoreboard() + ".";
+
+        source.sendMessage(Text.of(pt1+pt2+pt3+pt4+pt5));
         return 1;
     }
     public static int giftLife(ServerCommandSource source, ServerPlayerEntity target) {

@@ -82,6 +82,7 @@ public class LastLifeLives {
                 MutableText textLives = currentSeries.getFormattedLives(livesNum).copy();
                 Text finalText = textLives.append(Text.literal(" lives.").formatted(Formatting.GREEN));
                 PlayerUtils.sendTitle(player, finalText, 0, 60, 20);
+                if (currentSeries.hasAssignedLives(player)) continue;
                 currentSeries.setPlayerLives(player, livesNum);
             }
             PlayerUtils.playSoundToPlayers(lives.keySet(), SoundEvents.BLOCK_END_PORTAL_SPAWN);
