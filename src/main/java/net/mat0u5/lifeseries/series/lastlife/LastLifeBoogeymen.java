@@ -5,9 +5,11 @@ import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 
 import java.util.*;
 
@@ -105,6 +107,7 @@ public class LastLifeBoogeymen {
             PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal("1").formatted(Formatting.RED),0,35,0);
         });
         TaskScheduler.scheduleTask(90, () -> {
+            PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvent.of(Identifier.of("minecraft","lastlife_boogeyman_wait")));
             PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal("You are...").formatted(Formatting.YELLOW),10,50,20);
         });
         TaskScheduler.scheduleTask(180, this::boogeymenChooseRandom);
@@ -134,6 +137,8 @@ public class LastLifeBoogeymen {
             normalPlayers.add(player);
         }
 
+        PlayerUtils.playSoundToPlayers(normalPlayers, SoundEvent.of(Identifier.of("minecraft","lastlife_boogeyman_no")));
+        PlayerUtils.playSoundToPlayers(boogeyPlayers, SoundEvent.of(Identifier.of("minecraft","lastlife_boogeyman_yes")));
         PlayerUtils.sendTitleToPlayers(normalPlayers, Text.literal("NOT the Boogeyman.").formatted(Formatting.GREEN),10,50,20);
         PlayerUtils.sendTitleToPlayers(boogeyPlayers, Text.literal("The Boogeyman.").formatted(Formatting.RED),10,50,20);
         for (ServerPlayerEntity boogey : boogeyPlayers) {
