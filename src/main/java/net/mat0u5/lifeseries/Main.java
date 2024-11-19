@@ -7,6 +7,7 @@ import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.Session;
 import net.mat0u5.lifeseries.series.lastlife.LastLife;
+import net.mat0u5.lifeseries.series.thirdlife.ThirdLife;
 import net.mat0u5.lifeseries.utils.ModRegistries;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ public class Main implements ModInitializer {
 	public static Session currentSession;
 	public static Blacklist blacklist;
 
-	public static final List<String> ALLOWED_SERIES_NAMES = List.of("lastlife");
+	public static final List<String> ALLOWED_SERIES_NAMES = List.of("lastlife", "thirdlife");
 
 	@Override
 	public void onInitialize() {
@@ -42,6 +43,9 @@ public class Main implements ModInitializer {
 		}
 		if (series.equalsIgnoreCase("lastlife")) {
 			currentSeries = new LastLife();
+		}
+		if (series.equalsIgnoreCase("thirdlife")) {
+			currentSeries = new ThirdLife();
 		}
 		currentSession = currentSeries;
 		blacklist = currentSeries.createBlacklist();
