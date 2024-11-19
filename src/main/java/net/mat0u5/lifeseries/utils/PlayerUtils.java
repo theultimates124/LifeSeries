@@ -28,7 +28,6 @@ public class PlayerUtils {
         playSoundToPlayers(players,sound,SoundCategory.MASTER,1,1);
     }
     public static void playSoundToPlayers(Collection<ServerPlayerEntity> players, SoundEvent sound, SoundCategory soundCategory, int volume, int pitch) {
-        System.out.println("Playing sound_"+sound.getId());
         for (ServerPlayerEntity player : players) {
             player.playSoundToPlayer(sound, soundCategory, volume, pitch);
         }

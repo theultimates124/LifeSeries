@@ -66,13 +66,19 @@ public class LastLife extends Series {
         Boogeyman boogeyman  = boogeymanManager.getBoogeyman(killer);
         if (boogeyman == null || boogeyman.cured) {
             if (isOnLastLife(killer)) return;
-            if (killer.getPrimeAdversary() == victim) return;
+            if (killer.getPrimeAdversary() == victim && (isOnLastLife(victim) || boogeymanManager.isBoogeyman(victim))) return;
             OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + " was killed by "+killer.getNameForScoreboard() +
                     ", who is not §cred name§f, and is not a §cboogeyman§f!"));
             return;
         }
         boogeymanManager.cure(killer);
     }
+    @Override
+    public void onPlayerJoin(ServerPlayerEntity player) {
+        reloadPlayerTeam(player);
+        boogeymanManager.onPlayerJoin(player);
+    }
+
     public List<ServerPlayerEntity> getNonRedPlayers() {
         List<ServerPlayerEntity> players = PlayerUtils.getAllPlayers();
         if (players == null) return new ArrayList<>();

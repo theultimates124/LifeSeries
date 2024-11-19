@@ -11,6 +11,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.*;
 
@@ -44,7 +45,17 @@ public class LastLifeLives {
     }
     public void assignRandomLives(Collection<ServerPlayerEntity> players) {
         HashMap<ServerPlayerEntity, Integer> lives = new HashMap<>();
+        if (players.size() > 5) {
+            List<ServerPlayerEntity> playersCopy = new ArrayList<>(players.stream().toList());
+            Collections.shuffle(playersCopy);
+            lives.put(playersCopy.get(0), 2);
+            lives.put(playersCopy.get(1), 3);
+            lives.put(playersCopy.get(2), 4);
+            lives.put(playersCopy.get(3), 5);
+            lives.put(playersCopy.get(4), 6);
+        }
         for (ServerPlayerEntity player : players) {
+            if (lives.containsKey(player)) continue;
             int playerLives = rnd.nextInt(5)+2;// Random number from 2->6
             lives.put(player,playerLives);
         }

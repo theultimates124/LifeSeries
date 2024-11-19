@@ -38,11 +38,13 @@ public class LastLifeBoogeymen {
             if (boogeymanChosen) return;
             OtherUtils.broadcastMessage(Text.literal("The boogeyman is about to be chosen.").formatted(Formatting.RED));
             TaskScheduler.scheduleTask(100, () -> {
-                chooseBoogeymen();
+                resetBoogeymen();
+                chooseBoogeymen(PlayerUtils.getAllPlayers(), 100);
             });
         }
     };
     public List<Boogeyman> boogeymen = new ArrayList<>();
+    public List<UUID> rolledPlayers = new ArrayList<>();
     public boolean boogeymanChosen = false;
     public boolean isBoogeyman(ServerPlayerEntity player) {
         if (player == null) return false;
@@ -63,6 +65,9 @@ public class LastLifeBoogeymen {
         return null;
     }
     public void addBoogeyman(ServerPlayerEntity player) {
+        if (!rolledPlayers.contains(player.getUuid())) {
+            rolledPlayers.add(player.getUuid());
+        }
         Boogeyman newBoogeyman = new Boogeyman(player);
         boogeymen.add(newBoogeyman);
         boogeymanChosen = true;
@@ -86,6 +91,7 @@ public class LastLifeBoogeymen {
         }
         boogeymen = new ArrayList<>();
         boogeymanChosen = false;
+        rolledPlayers = new ArrayList<>();
     }
     public void cure(ServerPlayerEntity player) {
         Boogeyman boogeyman = getBoogeyman(player);
@@ -93,33 +99,35 @@ public class LastLifeBoogeymen {
         boogeyman.cured = true;
         PlayerUtils.sendTitle(player,Text.of("§aYou are cured!"), 20, 30, 20);
     }
-    public void chooseBoogeymen() {
-        resetBoogeymen();
-        PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.UI_BUTTON_CLICK.value());
-        PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal("3").formatted(Formatting.GREEN),0,35,0);
+    public void chooseBoogeymen(List<ServerPlayerEntity> allowedPlayers, double currentChance) {
+        PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvents.UI_BUTTON_CLICK.value());
+        PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("3").formatted(Formatting.GREEN),0,35,0);
 
         TaskScheduler.scheduleTask(30, () -> {
-            PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.UI_BUTTON_CLICK.value());
-            PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal("2").formatted(Formatting.YELLOW),0,35,0);
+            PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvents.UI_BUTTON_CLICK.value());
+            PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("2").formatted(Formatting.YELLOW),0,35,0);
         });
         TaskScheduler.scheduleTask(60, () -> {
-            PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.UI_BUTTON_CLICK.value());
-            PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal("1").formatted(Formatting.RED),0,35,0);
+            PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvents.UI_BUTTON_CLICK.value());
+            PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("1").formatted(Formatting.RED),0,35,0);
         });
         TaskScheduler.scheduleTask(90, () -> {
-            PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvent.of(Identifier.of("minecraft","lastlife_boogeyman_wait")));
-            PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal("You are...").formatted(Formatting.YELLOW),10,50,20);
+            PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvent.of(Identifier.of("minecraft","lastlife_boogeyman_wait")));
+            PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("You are...").formatted(Formatting.YELLOW),10,50,20);
         });
-        TaskScheduler.scheduleTask(180, this::boogeymenChooseRandom);
+        TaskScheduler.scheduleTask(180, () -> {
+            boogeymenChooseRandom(allowedPlayers, currentChance);
+        });
     }
-    public void boogeymenChooseRandom() {
+    public void boogeymenChooseRandom(List<ServerPlayerEntity> allowedPlayers, double currentChance) {
         List<ServerPlayerEntity> nonRedPlayers = ((LastLife)currentSeries).getNonRedPlayers();
         Collections.shuffle(nonRedPlayers);
 
         List<ServerPlayerEntity> normalPlayers = new ArrayList<>();
         List<ServerPlayerEntity> boogeyPlayers = new ArrayList<>();
-        double currentChance = 100;
         for (ServerPlayerEntity player : nonRedPlayers) {
+            if (!allowedPlayers.contains(player)) continue;
+            if (rolledPlayers.contains(player.getUuid())) continue;
             double currentRoll = Math.random()*100;
             if (currentChance >= currentRoll && currentChance != 0) {
                 boogeyPlayers.add(player);
@@ -133,10 +141,12 @@ public class LastLifeBoogeymen {
             }
         }
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            if (rolledPlayers.contains(player.getUuid())) continue;
+            rolledPlayers.add(player.getUuid());
+            if (!allowedPlayers.contains(player)) continue;
             if (boogeyPlayers.contains(player)) continue;
             normalPlayers.add(player);
         }
-
         PlayerUtils.playSoundToPlayers(normalPlayers, SoundEvent.of(Identifier.of("minecraft","lastlife_boogeyman_no")));
         PlayerUtils.playSoundToPlayers(boogeyPlayers, SoundEvent.of(Identifier.of("minecraft","lastlife_boogeyman_yes")));
         PlayerUtils.sendTitleToPlayers(normalPlayers, Text.literal("NOT the Boogeyman.").formatted(Formatting.GREEN),10,50,20);
@@ -161,6 +171,7 @@ public class LastLifeBoogeymen {
                 currentSeries.setPlayerLives(player, 1);
                 player.sendMessage(Text.of("§7You failed to kill a green or yellow name last session as the boogeyman. As punishment, you have dropped to your §cLast Life§7. " +
                         "All alliances are severed and you are now hostile to all players. You may team with others on their Last Life if you wish."));
+                OtherUtils.broadcastMessage(player.getStyledDisplayName().copy().append(Text.of("§7 failed to kill a player while being the §cBoogeyman§7. They have been been dropped to their §cLast Life§7")));
             }
         }
     }
@@ -168,5 +179,12 @@ public class LastLifeBoogeymen {
         Boogeyman boogeyman = getBoogeyman(player);
         if (boogeyman == null) return;
         boogeyman.died = true;
+    }
+
+    public void onPlayerJoin(ServerPlayerEntity player) {
+        if (!boogeymanChosen) return;
+        if (rolledPlayers.contains(player.getUuid())) return;
+        double chanceForBoogey = 100.0 /PlayerUtils.getAllPlayers().size();
+        chooseBoogeymen(List.of(player), chanceForBoogey);
     }
 }

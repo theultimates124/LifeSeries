@@ -203,7 +203,8 @@ public class LastLifeCommands {
     public static int boogeyChooseRandom(ServerCommandSource source) {
         if (!isValidCommand(source)) return -1;
 
-        ((LastLife) currentSeries).boogeymanManager.chooseBoogeymen();
+        ((LastLife) currentSeries).boogeymanManager.resetBoogeymen();
+        ((LastLife) currentSeries).boogeymanManager.chooseBoogeymen(PlayerUtils.getAllPlayers(), 100);
 
         return 1;
     }
