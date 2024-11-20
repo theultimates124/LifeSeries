@@ -1,5 +1,7 @@
 package net.mat0u5.lifeseries.config;
 
+import net.mat0u5.lifeseries.series.SeriesList;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,9 +14,11 @@ public class ConfigManager {
 
     private Properties properties = new Properties();
     public String filePath;
+    public SeriesList series;
 
-    public ConfigManager(String filePath) {
+    public ConfigManager(String filePath, SeriesList series) {
         this.filePath = filePath;
+        this.series = series;
         createFileIfNotExists();
         loadProperties();
     }
@@ -25,7 +29,10 @@ public class ConfigManager {
             try {
                 configFile.createNewFile();
                 try (OutputStream output = new FileOutputStream(configFile)) {
-                    properties.setProperty("currentSeries","unassigned");
+                    if (series == null) {
+                        //Main config
+                        properties.setProperty("currentSeries","unassigned");
+                    }
 
                     properties.store(output, null);
                 }

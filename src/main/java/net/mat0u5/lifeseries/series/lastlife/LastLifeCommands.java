@@ -33,61 +33,14 @@ public class LastLifeCommands {
         dispatcher.register(
             literal("lastlife")
                 .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                .then(literal("lives")
-                    .then(literal("setToRandom")
+                .then(literal("rollLives")
+                    .executes(context -> LastLifeCommands.assignRandomLives(
+                        context.getSource(), PlayerUtils.getAllPlayers()
+                    ))
+                    .then(argument("players", EntityArgumentType.players())
                         .executes(context -> LastLifeCommands.assignRandomLives(
-                            context.getSource(), PlayerUtils.getAllPlayers()
+                            context.getSource(), EntityArgumentType.getPlayers(context, "players")
                         ))
-                        .then(argument("players",EntityArgumentType.players())
-                            .executes(context -> LastLifeCommands.assignRandomLives(
-                                context.getSource(), EntityArgumentType.getPlayers(context, "players")
-                            ))
-                        )
-                    )
-                    .then(literal("reload")
-                        .executes(context -> LastLifeCommands.reloadLives(
-                            context.getSource())
-                        )
-                    )
-                    .then(literal("add")
-                        .then(argument("player", EntityArgumentType.player())
-                            .executes(context -> lifeManager(
-                                context.getSource(), EntityArgumentType.getPlayer(context, "player"), 1, false)
-                            )
-                            .then(argument("amount", IntegerArgumentType.integer(1))
-                                .executes(context -> lifeManager(
-                                    context.getSource(), EntityArgumentType.getPlayer(context, "player"), IntegerArgumentType.getInteger(context, "amount"), false)
-                                )
-                            )
-                        )
-                    )
-                    .then(literal("remove")
-                        .then(argument("player", EntityArgumentType.player())
-                            .executes(context -> lifeManager(
-                                context.getSource(), EntityArgumentType.getPlayer(context, "player"), -1, false)
-                            )
-                            .then(argument("amount", IntegerArgumentType.integer(1))
-                                .executes(context -> lifeManager(
-                                    context.getSource(), EntityArgumentType.getPlayer(context, "player"), -IntegerArgumentType.getInteger(context, "amount"), false)
-                                )
-                            )
-                        )
-                    )
-                    .then(literal("set")
-                        .then(argument("player", EntityArgumentType.player())
-                            .then(argument("amount", IntegerArgumentType.integer(0))
-                                .executes(context -> lifeManager(
-                                    context.getSource(), EntityArgumentType.getPlayer(context, "player"), IntegerArgumentType.getInteger(context, "amount"), true)
-                                )
-                            )
-                        )
-                    )
-                    .then(literal("reset")
-                        .then(argument("player", EntityArgumentType.player())
-                            .executes(context -> resetLives(
-                                context.getSource(), EntityArgumentType.getPlayer(context, "player"))
-                            )
-                        )
                     )
                 )
                 .then(literal("boogeyman")
@@ -208,19 +161,6 @@ public class LastLifeCommands {
 
         return 1;
     }
-
-
-    public static int resetLives(ServerCommandSource source, ServerPlayerEntity target) {
-        if (!isValidCommand(source)) return -1;
-
-        MinecraftServer server = source.getServer();
-        if (target == null) return -1;
-
-        currentSeries.resetPlayerLife(target);
-
-        source.sendMessage(Text.of("Reset " + target.getNameForScoreboard() + "'s lives."));
-        return 1;
-    }
     public static int showLives(ServerCommandSource source) {
         if (!isValidCommand(source)) return -1;
 
@@ -246,34 +186,6 @@ public class LastLifeCommands {
 
         MinecraftServer server = source.getServer();
         ((LastLife) currentSeries).livesManager.assignRandomLives(players);
-        return 1;
-    }
-    public static int reloadLives(ServerCommandSource source) {
-        if (!isValidCommand(source)) return -1;
-
-        MinecraftServer server = source.getServer();
-        currentSeries.reloadAllPlayerTeams();
-        return 1;
-    }
-    public static int lifeManager(ServerCommandSource source, ServerPlayerEntity target, int amount, boolean setNotGive) {
-        if (!isValidCommand(source)) return -1;
-
-        MinecraftServer server = source.getServer();
-        if (target == null) return -1;
-
-        if (setNotGive) {
-            currentSeries.setPlayerLives(target,amount);
-        }
-        else {
-            currentSeries.addToPlayerLives(target,amount);
-        }
-        String pt1 = amount >= 0 ? "Added" : "Removed";
-        String pt2 = " "+Math.abs(amount)+" ";
-        String pt3 = Math.abs(amount)==1?"life":"lives";
-        String pt4 = amount >= 0 ? " to " : " from ";
-        String pt5 = target.getNameForScoreboard() + ".";
-
-        source.sendMessage(Text.of(pt1+pt2+pt3+pt4+pt5));
         return 1;
     }
     public static int giftLife(ServerCommandSource source, ServerPlayerEntity target) {

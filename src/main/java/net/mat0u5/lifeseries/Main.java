@@ -5,7 +5,9 @@ import net.fabricmc.api.ModInitializer;
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
+import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.Session;
+import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.mat0u5.lifeseries.series.lastlife.LastLife;
 import net.mat0u5.lifeseries.series.thirdlife.ThirdLife;
 import net.mat0u5.lifeseries.utils.ModRegistries;
@@ -20,17 +22,21 @@ public class Main implements ModInitializer {
 	public static final String MOD_ID = "lifeseries";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ConfigManager config;
+	public static ConfigManager configDoubleLife;
 	public static MinecraftServer server;
 	public static Series currentSeries;
 	public static Session currentSession;
 	public static Blacklist blacklist;
 
-	public static final List<String> ALLOWED_SERIES_NAMES = List.of("lastlife", "thirdlife");
+	public static final List<String> ALLOWED_SERIES_NAMES = List.of("thirdlife", "lastlife", "doublelife");
 
 	@Override
 	public void onInitialize() {
-		config = new ConfigManager("./config/"+MOD_ID+".properties");
+		config = new ConfigManager("./config/"+MOD_ID+".properties", null);
+		configDoubleLife = new ConfigManager("./config/"+MOD_ID+"_doublelife.properties", SeriesList.DOUBLE_LIFE);
+
 		String series = config.getProperty("currentSeries");
+		if (series == null) seriesUnassigned("");
 		parseSeries(series);
 
 		ModRegistries.registerModStuff();
@@ -41,11 +47,14 @@ public class Main implements ModInitializer {
 			seriesUnassigned(series);
 			return;
 		}
+		if (series.equalsIgnoreCase("thirdlife")) {
+			currentSeries = new ThirdLife();
+		}
 		if (series.equalsIgnoreCase("lastlife")) {
 			currentSeries = new LastLife();
 		}
-		if (series.equalsIgnoreCase("thirdlife")) {
-			currentSeries = new ThirdLife();
+		if (series.equalsIgnoreCase("doublelife")) {
+			currentSeries = new DoubleLife();
 		}
 		currentSession = currentSeries;
 		blacklist = currentSeries.createBlacklist();
