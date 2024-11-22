@@ -41,7 +41,7 @@ public class DoubleLifeCommands {
                     )
                     .then(literal("list")
                     )
-                    .then(literal("resetAll")
+                    .then(literal("reset")
                     )
                     .then(literal("chooseRandom")
                     )
