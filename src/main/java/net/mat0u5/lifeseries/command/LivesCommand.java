@@ -86,7 +86,7 @@ public class LivesCommand {
             return -1;
         }
         Integer lives = currentSeries.getPlayerLives(target);
-        MutableText pt1 = Text.literal(target.getNameForScoreboard() + " has ");
+        MutableText pt1 = Text.literal("").append(target.getStyledDisplayName()).append(Text.literal(" has "));
         Text pt2 = currentSeries.getFormattedLives(lives);
         Text pt3 = Text.of(" "+(Math.abs(lives)==1?"life":"lives")+".");
         source.sendMessage(pt1.append(pt2).append(pt3));
@@ -103,7 +103,7 @@ public class LivesCommand {
 
         if (setNotGive) {
             currentSeries.setPlayerLives(target,amount);
-            source.sendMessage(Text.of("Set " + target.getNameForScoreboard() + "'s lives to " + amount + "."));
+            source.sendMessage(Text.literal("Set ").append(target.getStyledDisplayName()).append(Text.of("'s lives to " + amount + ".")));
         }
         else {
             currentSeries.addToPlayerLives(target,amount);
@@ -111,8 +111,7 @@ public class LivesCommand {
             String pt2 = " "+Math.abs(amount)+" ";
             String pt3 = Math.abs(amount)==1?"life":"lives";
             String pt4 = amount >= 0 ? " to " : " from ";
-            String pt5 = target.getNameForScoreboard() + ".";
-            source.sendMessage(Text.of(pt1+pt2+pt3+pt4+pt5));
+            source.sendMessage(Text.of(pt1+pt2+pt3+pt4).copy().append(target.getStyledDisplayName()).append("."));
         }
         return 1;
     }
@@ -122,7 +121,7 @@ public class LivesCommand {
 
         currentSeries.resetPlayerLife(target);
 
-        source.sendMessage(Text.of("Reset " + target.getNameForScoreboard() + "'s lives."));
+        source.sendMessage(Text.literal("Reset ").append(target.getStyledDisplayName()).append(Text.of("'s lives.")));
         return 1;
     }
 }

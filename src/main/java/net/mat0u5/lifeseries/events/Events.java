@@ -9,6 +9,9 @@ import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.mat0u5.lifeseries.Main;
+import net.mat0u5.lifeseries.config.DatabaseManager;
+import net.mat0u5.lifeseries.series.SeriesList;
+import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.minecraft.block.Block;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -52,6 +55,10 @@ public class Events {
         Main.server = server;
         System.out.println("MinecraftServer instance captured.");
         currentSeries.initialize();
+        DatabaseManager.initialize();
+        if (currentSeries.getSeries() == SeriesList.DOUBLE_LIFE) {
+            ((DoubleLife) currentSeries).loadSoulmates();
+        }
     }
     private static void onServerTickEnd(MinecraftServer server) {
         try {

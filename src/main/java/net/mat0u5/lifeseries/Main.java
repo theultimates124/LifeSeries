@@ -20,11 +20,10 @@ import java.util.List;
 
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "1.0.7";
+	public static final String MOD_VERSION = "1.0.8";
 	public static final String MOD_ID = "lifeseries";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ConfigManager config;
-	public static ConfigManager configDoubleLife;
 	public static MinecraftServer server;
 	public static Series currentSeries;
 	public static Session currentSession;
@@ -35,7 +34,6 @@ public class Main implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		config = new ConfigManager("./config/"+MOD_ID+".properties", null);
-		configDoubleLife = new ConfigManager("./config/"+MOD_ID+"_doublelife.properties", SeriesList.DOUBLE_LIFE);
 
 		String series = config.getProperty("currentSeries");
 		if (series == null) seriesUnassigned("");

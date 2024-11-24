@@ -24,6 +24,11 @@ public class ConfigManager {
     }
 
     private void createFileIfNotExists() {
+        File configDir = new File("./config");
+        if (!configDir.exists()) {
+            if (!configDir.mkdir()) return;
+        }
+
         File configFile = new File(filePath);
         if (!configFile.exists()) {
             try {

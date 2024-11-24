@@ -6,6 +6,7 @@ import net.mat0u5.lifeseries.command.LifeSeriesCommand;
 import net.mat0u5.lifeseries.command.LivesCommand;
 import net.mat0u5.lifeseries.command.SessionCommand;
 import net.mat0u5.lifeseries.events.Events;
+import net.mat0u5.lifeseries.series.doublelife.DoubleLifeCommands;
 import net.mat0u5.lifeseries.series.lastlife.LastLifeCommands;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -23,8 +24,9 @@ public class ModRegistries {
         TextUtils.setEmotes();
     }
     private static void registerCommands() {
-        CommandRegistrationCallback.EVENT.register(LivesCommand::register);
         CommandRegistrationCallback.EVENT.register(LastLifeCommands::register);
+        CommandRegistrationCallback.EVENT.register(DoubleLifeCommands::register);
+        CommandRegistrationCallback.EVENT.register(LivesCommand::register);
         CommandRegistrationCallback.EVENT.register(SessionCommand::register);
         CommandRegistrationCallback.EVENT.register(LifeSeriesCommand::register);
     }
