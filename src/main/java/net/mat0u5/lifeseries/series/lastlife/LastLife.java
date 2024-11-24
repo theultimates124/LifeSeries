@@ -8,6 +8,7 @@ import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
 
@@ -59,6 +60,7 @@ public class LastLife extends Series {
     @Override
     public void playerLostAllLives(ServerPlayerEntity player) {
         player.changeGameMode(GameMode.SPECTATOR);
+        PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER);
         boogeymanManager.playerLostAllLives(player);
     }
     @Override

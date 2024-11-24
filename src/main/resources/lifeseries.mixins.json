@@ -5,7 +5,9 @@
 	"mixins": [
 		"ItemEntityMixin",
 		"PlayerInventoryMixin",
-		"ServerPlayNetworkHandlerMixin"
+		"ServerPlayNetworkHandlerMixin",
+		"MobEntityMixin",
+		"SpawnEggItemMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -3,9 +3,21 @@ package net.mat0u5.lifeseries.series;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.ScoreboardUtils;
 import net.mat0u5.lifeseries.utils.TeamUtils;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.boss.WitherEntity;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.mob.ElderGuardianEntity;
+import net.minecraft.entity.mob.WardenEntity;
+import net.minecraft.entity.passive.CowEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.SpawnEggItem;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
@@ -108,6 +120,7 @@ public abstract class Series extends Session {
     }
     public void playerLostAllLives(ServerPlayerEntity player) {
         player.changeGameMode(GameMode.SPECTATOR);
+        PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER);
     }
 
     /*
@@ -125,6 +138,30 @@ public abstract class Series extends Session {
             if (player.getPrimeAdversary() instanceof ServerPlayerEntity) {
                 onPlayerKilledByPlayer(player, (ServerPlayerEntity) player.getPrimeAdversary());
             }
+        }
+    }
+    public void onMobDeath(LivingEntity entity, DamageSource damageSource) {
+        if (entity.getEntityWorld().isClient() || !(damageSource.getAttacker() instanceof ServerPlayerEntity)) {
+            return;
+        }
+        if (entity instanceof EnderDragonEntity) return;
+        if (entity instanceof WitherEntity) return;
+        if (entity instanceof WardenEntity) return;
+        if (entity instanceof ElderGuardianEntity) return;
+        if (entity.getCommandTags().contains("notNatural")) return;
+
+        EntityType<?> entityType = entity.getType();
+        SpawnEggItem spawnEgg = SpawnEggItem.forEntity(entityType);
+
+
+        if (spawnEgg == null) return;
+        ItemStack spawnEggItem = spawnEgg.getDefaultStack();
+        if (spawnEggItem == null) return;
+        if (spawnEggItem.isEmpty()) return;
+
+        // Drop the spawn egg with a 3% chance
+        if (Math.random() <= 0.0333d) {
+            entity.dropStack(spawnEggItem);
         }
     }
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {

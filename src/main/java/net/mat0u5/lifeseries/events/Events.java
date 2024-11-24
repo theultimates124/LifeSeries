@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.mat0u5.lifeseries.Main;
 import net.minecraft.block.Block;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
@@ -39,11 +40,7 @@ public class Events {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> onPlayerJoin(server, handler.getPlayer()));
         ServerTickEvents.END_SERVER_TICK.register(Events::onServerTickEnd);
 
-        ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
-            if (entity instanceof ServerPlayerEntity) {
-                Events.onPlayerDeath((ServerPlayerEntity) entity, damageSource);
-            }
-        });
+        ServerLivingEntityEvents.AFTER_DEATH.register(Events::onEntityDeath);
     }
 
     private static void onPlayerJoin(MinecraftServer server, ServerPlayerEntity player) {
@@ -64,6 +61,16 @@ public class Events {
         }catch(Exception e) {
             e.printStackTrace();
         }
+    }
+    public static void onEntityDeath(LivingEntity entity, DamageSource source) {
+        if (entity instanceof ServerPlayerEntity) {
+            Events.onPlayerDeath((ServerPlayerEntity) entity, source);
+            return;
+        }
+        onMobDeath(entity, source);
+    }
+    public static void onMobDeath(LivingEntity entity, DamageSource source) {
+        currentSeries.onMobDeath(entity, source);
     }
     public static void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
         currentSeries.onPlayerDeath(player, source);

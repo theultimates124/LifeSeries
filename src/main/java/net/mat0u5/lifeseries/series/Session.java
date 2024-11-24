@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static net.mat0u5.lifeseries.Main.currentSession;
+
 public class Session {
     List<UUID> displayTimer = new ArrayList<>();
     public int DISPLAY_TIMER_INTERVAL = 20;
@@ -20,6 +22,7 @@ public class Session {
     public int passedTime;
     public SessionStatus status = SessionStatus.NOT_STARTED;
     public void start() {
+        if (!canStartSession()) return;
         status = SessionStatus.STARTED;
         passedTime = 0;
         MutableText sessionStartedText = Text.literal("Session started!").formatted(Formatting.GOLD);
@@ -46,7 +49,12 @@ public class Session {
             status = SessionStatus.PAUSED;
         }
     }
-
+    public boolean canStartSession() {
+        if (!validTime()) return false;
+        if (status == SessionStatus.STARTED) return false;
+        if (status == SessionStatus.PAUSED) return false;
+        return true;
+    }
     public void setSessionLength(int lengthTicks) {
         sessionLength = lengthTicks;
     }
