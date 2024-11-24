@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series.doublelife;
 
+import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.config.DatabaseManager;
 import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
@@ -7,19 +8,31 @@ import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
+import net.mat0u5.lifeseries.utils.ScoreboardUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.GameMode;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.*;
 
 import static net.mat0u5.lifeseries.Main.server;
 
 public class DoubleLife extends Series {
+    public static final RegistryKey<DamageType> SOULMATE_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(Main.MOD_ID, "soulmate"));
+
     public SessionAction actionChooseSoulmates = new SessionAction(OtherUtils.minutesToTicks(1)) {
         @Override
         public void trigger() {
@@ -43,6 +56,13 @@ public class DoubleLife extends Series {
             setPlayerLives(player,4);
         }
         reloadPlayerTeam(player);
+
+        if (player == null) return;
+        if (!hasSoulmate(player)) return;
+        if (!isSoulmateOnline(player)) return;
+
+        ServerPlayerEntity soulmate = getSoulmate(player);
+        syncPlayers(player, soulmate);
     }
     @Override
     public void sessionStart() {
@@ -76,6 +96,7 @@ public class DoubleLife extends Series {
     public void setSoulmate(ServerPlayerEntity player1, ServerPlayerEntity player2) {
         soulmates.put(player1.getUuid(), player2.getUuid());
         soulmates.put(player2.getUuid(), player1.getUuid());
+        syncPlayers(player1, player2);
     }
     public void resetSoulmate(ServerPlayerEntity player) {
         UUID playerUUID = player.getUuid();
@@ -138,5 +159,47 @@ public class DoubleLife extends Series {
             playersToRoll.removeFirst();
         }
         saveSoulmates();
+    }
+    public void onPlayerHeal(ServerPlayerEntity player, float amount) {
+        if (player == null) return;
+        if (!hasSoulmate(player)) return;
+        if (!isSoulmateOnline(player)) return;
+
+        ServerPlayerEntity soulmate = getSoulmate(player);
+        if (soulmate == null) return;
+
+        syncPlayers(player, soulmate);
+
+        float newHealth = Math.min(soulmate.getHealth() + amount, soulmate.getMaxHealth());
+        soulmate.setHealth(newHealth);
+    }
+    public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
+        if (source.getType().msgId().equalsIgnoreCase("soulmate")) return;
+
+        if (player == null) return;
+        if (!hasSoulmate(player)) return;
+        if (!isSoulmateOnline(player)) return;
+
+        ServerPlayerEntity soulmate = getSoulmate(player);
+        if (soulmate == null) return;
+
+        syncPlayers(player, soulmate);
+
+        DamageSource damageSource = new DamageSource( player.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE), soulmate.getPos());
+        TaskScheduler.scheduleTask(1,()-> soulmate.damage(damageSource, amount));
+    }
+    public void syncPlayers(ServerPlayerEntity player, ServerPlayerEntity soulmate) {
+        float sharedHealth = Math.min(player.getHealth(), soulmate.getHealth());
+        player.setHealth(sharedHealth);
+        soulmate.setHealth(sharedHealth);
+        if (!hasSoulmate(player)) return;
+        
+        Integer soulmateLives = getPlayerLives(soulmate);
+        Integer playerLives = getPlayerLives(player);
+        if (soulmateLives == null || playerLives ==null) return;
+        if (soulmateLives.equals(playerLives)) return;
+        int minLives = Math.min(soulmateLives,playerLives);
+        setPlayerLives(player, minLives);
+        setPlayerLives(soulmate, minLives);
     }
 }

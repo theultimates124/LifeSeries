@@ -12,7 +12,6 @@ import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.config.DatabaseManager;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
-import net.minecraft.block.Block;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
