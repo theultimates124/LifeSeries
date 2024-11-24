@@ -97,6 +97,7 @@ public class LastLifeLives {
                 currentSeries.setPlayerLives(player, livesNum);
             }
             PlayerUtils.playSoundToPlayers(lives.keySet(), SoundEvents.BLOCK_END_PORTAL_SPAWN);
+            currentSeries. reloadAllPlayerTeams();
             return;
         }
         int displayLives = rnd.nextInt(5)+2;// Random number from 2->6

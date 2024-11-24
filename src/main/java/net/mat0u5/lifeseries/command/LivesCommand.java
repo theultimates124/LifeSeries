@@ -103,17 +103,17 @@ public class LivesCommand {
 
         if (setNotGive) {
             currentSeries.setPlayerLives(target,amount);
+            source.sendMessage(Text.of("Set " + target.getNameForScoreboard() + "'s lives to " + amount + "."));
         }
         else {
             currentSeries.addToPlayerLives(target,amount);
+            String pt1 = amount >= 0 ? "Added" : "Removed";
+            String pt2 = " "+Math.abs(amount)+" ";
+            String pt3 = Math.abs(amount)==1?"life":"lives";
+            String pt4 = amount >= 0 ? " to " : " from ";
+            String pt5 = target.getNameForScoreboard() + ".";
+            source.sendMessage(Text.of(pt1+pt2+pt3+pt4+pt5));
         }
-        String pt1 = amount >= 0 ? "Added" : "Removed";
-        String pt2 = " "+Math.abs(amount)+" ";
-        String pt3 = Math.abs(amount)==1?"life":"lives";
-        String pt4 = amount >= 0 ? " to " : " from ";
-        String pt5 = target.getNameForScoreboard() + ".";
-
-        source.sendMessage(Text.of(pt1+pt2+pt3+pt4+pt5));
         return 1;
     }
     public static int resetLives(ServerCommandSource source, ServerPlayerEntity target) {

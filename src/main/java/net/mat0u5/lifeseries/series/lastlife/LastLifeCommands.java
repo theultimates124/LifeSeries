@@ -100,7 +100,7 @@ public class LastLifeCommands {
         }
         ((LastLife) currentSeries).boogeymanManager.cure(target);
 
-        OtherUtils.broadcastMessageToAdmins(Text.of(target.getNameForScoreboard()+" is now cured."));
+        source.sendMessage(Text.of(target.getNameForScoreboard()+" is now cured."));
 
         return 1;
     }
@@ -115,7 +115,7 @@ public class LastLifeCommands {
         }
         ((LastLife) currentSeries).boogeymanManager.addBoogeymanManually(target);
 
-        OtherUtils.broadcastMessageToAdmins(Text.of(target.getNameForScoreboard()+" is now a boogeyman."));
+        source.sendMessage(Text.of(target.getNameForScoreboard()+" is now a boogeyman."));
 
         return 1;
     }
@@ -130,7 +130,7 @@ public class LastLifeCommands {
         }
         ((LastLife) currentSeries).boogeymanManager.removeBoogeymanManually(target);
 
-        OtherUtils.broadcastMessageToAdmins(Text.of(target.getNameForScoreboard()+" is no longer a boogeyman."));
+        source.sendMessage(Text.of(target.getNameForScoreboard()+" is no longer a boogeyman."));
 
         return 1;
     }
@@ -149,7 +149,7 @@ public class LastLifeCommands {
         if (!isValidCommand(source)) return -1;
 
         ((LastLife) currentSeries).boogeymanManager.resetBoogeymen();
-        OtherUtils.broadcastMessageToAdmins(Text.of("All boogeymen have been cleared"));
+        source.sendMessage(Text.of("All boogeymen have been cleared"));
 
         return 1;
     }
