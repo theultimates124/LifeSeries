@@ -17,7 +17,6 @@ import java.util.*;
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
 public class LastLife extends Series {
-    List<SessionAction> activeActions = new ArrayList<>();
 
     public LastLifeLives livesManager = new LastLifeLives();
     public LastLifeBoogeymen boogeymanManager = new LastLifeBoogeymen();
@@ -29,19 +28,6 @@ public class LastLife extends Series {
     @Override
     public Blacklist createBlacklist() {
         return new LastLifeBlacklist();
-    }
-    @Override
-    public void overrideTick() {
-        if (activeActions == null) return;
-        if (activeActions.isEmpty()) return;
-        List<SessionAction> remaining = new ArrayList<>();
-        for (SessionAction action : activeActions) {
-            boolean triggered = action.tick(passedTime);
-            if (!triggered) {
-                remaining.add(action);
-            }
-        }
-        activeActions = remaining;
     }
     @Override
     public void sessionStart() {

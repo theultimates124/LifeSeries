@@ -45,19 +45,9 @@ public class LastLifeLives {
     }
     public void assignRandomLives(Collection<ServerPlayerEntity> players) {
         HashMap<ServerPlayerEntity, Integer> lives = new HashMap<>();
-        if (players.size() > 5) {
-            List<ServerPlayerEntity> playersCopy = new ArrayList<>(players.stream().toList());
-            Collections.shuffle(playersCopy);
-            lives.put(playersCopy.get(0), 2);
-            lives.put(playersCopy.get(1), 3);
-            lives.put(playersCopy.get(2), 4);
-            lives.put(playersCopy.get(3), 5);
-            lives.put(playersCopy.get(4), 6);
-        }
         for (ServerPlayerEntity player : players) {
             if (lives.containsKey(player)) continue;
-            int playerLives = rnd.nextInt(5)+2;// Random number from 2->6
-            lives.put(player,playerLives);
+            lives.put(player,-1);
         }
         PlayerUtils.sendTitleToPlayers(players, Text.literal("You will have...").formatted(Formatting.GRAY), 10, 40, 10);
         int delay = 60;
@@ -72,6 +62,26 @@ public class LastLifeLives {
         if (currentStep >= 65) delay = 8;
         if (currentStep >= 75) delay = 20;
         if (currentStep == 80) {
+            //Choose the amount of lives a player will have
+
+            int totalSize = lives.size();
+            int chosenNotRandomly = 1;
+            for (ServerPlayerEntity player : lives.keySet()) {
+                Integer currentLives = currentSeries.getPlayerLives(player);
+                if (currentLives != null) {
+                    lives.put(player, currentLives);
+                    continue;
+                }
+                if (chosenNotRandomly < 6 && totalSize > 6) {
+                    chosenNotRandomly++;
+                    lives.put(player, chosenNotRandomly);
+                    continue;
+                }
+                int randomLives = rnd.nextInt(5)+2;// Random number from 2->6
+                lives.put(player, randomLives);
+            }
+
+
             //Show the actual amount of lives for one cycle
             for (Map.Entry<ServerPlayerEntity, Integer> playerEntry : lives.entrySet()) {
                 Integer livesNum = playerEntry.getValue();

@@ -11,9 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static net.mat0u5.lifeseries.Main.currentSession;
-
 public class Session {
+    public List<SessionAction> activeActions = new ArrayList<>();
     List<UUID> displayTimer = new ArrayList<>();
     public int DISPLAY_TIMER_INTERVAL = 20;
     public int currentTimer = 20;
@@ -103,7 +102,7 @@ public class Session {
             sessionEnd();
             OtherUtils.broadcastMessage(Text.literal("The session has ended!").formatted(Formatting.GOLD));
         }
-        overrideTick();
+        actionsTick();
     }
     public void displayTimers(MinecraftServer server) {
         String message = "";
@@ -126,7 +125,18 @@ public class Session {
         }
     }
 
-    public void overrideTick() {}
+    public void actionsTick() {
+        if (activeActions == null) return;
+        if (activeActions.isEmpty()) return;
+        List<SessionAction> remaining = new ArrayList<>();
+        for (SessionAction action : activeActions) {
+            boolean triggered = action.tick(passedTime);
+            if (!triggered) {
+                remaining.add(action);
+            }
+        }
+        activeActions = remaining;
+    }
     public void sessionStart() {}
     public void sessionEnd() {
         System.out.println("DefaultSessEnd");

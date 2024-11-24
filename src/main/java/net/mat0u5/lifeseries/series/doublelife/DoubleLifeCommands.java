@@ -48,9 +48,9 @@ public class DoubleLifeCommands {
                         .then(argument("player", EntityArgumentType.player())
                             .then(argument("soulmate", EntityArgumentType.player())
                                 .executes(context -> setSoulmate(
-                                        context.getSource(),
-                                        EntityArgumentType.getPlayer(context, "player"),
-                                        EntityArgumentType.getPlayer(context, "soulmate")
+                                    context.getSource(),
+                                    EntityArgumentType.getPlayer(context, "player"),
+                                    EntityArgumentType.getPlayer(context, "soulmate")
                                 ))
                             )
                         )
@@ -67,6 +67,7 @@ public class DoubleLifeCommands {
                         .executes(context -> resetAllSoulmates(context.getSource()))
                     )
                     .then(literal("rollRandom")
+                        .executes(context -> rollSoulmates(context.getSource()))
                     )
                 )
         );
@@ -167,6 +168,15 @@ public class DoubleLifeCommands {
             source.sendMessage(pt1.append(pt2).append(pt3));
         }
 
+
+        return 1;
+    }
+    public static int rollSoulmates(ServerCommandSource source) {
+        if (!isValidCommand(source)) return -1;
+
+        DoubleLife series = ((DoubleLife) currentSeries);
+
+        series.rollSoulmates();
 
         return 1;
     }

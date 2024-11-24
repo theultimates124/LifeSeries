@@ -4,15 +4,28 @@ import net.mat0u5.lifeseries.config.DatabaseManager;
 import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
+import net.mat0u5.lifeseries.series.SessionAction;
+import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.utils.PlayerUtils;
+import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static net.mat0u5.lifeseries.Main.server;
 
 public class DoubleLife extends Series {
+    public SessionAction actionChooseSoulmates = new SessionAction(OtherUtils.minutesToTicks(1)) {
+        @Override
+        public void trigger() {
+            rollSoulmates();
+        }
+    };
 
     public Map<UUID, UUID> soulmates = new HashMap<>();
 
@@ -31,6 +44,12 @@ public class DoubleLife extends Series {
         }
         reloadPlayerTeam(player);
     }
+    @Override
+    public void sessionStart() {
+        activeActions = List.of(actionChooseSoulmates);
+    }
+
+
     public void loadSoulmates() {
         soulmates = DatabaseManager.getAllSoulmates();
     }
@@ -70,5 +89,54 @@ public class DoubleLife extends Series {
     }
     public void resetAllSoulmates() {
         soulmates = new HashMap<>();
+    }
+
+    public void rollSoulmates() {
+        List<ServerPlayerEntity> playersToRoll = getNonAssignedPlayers();
+        PlayerUtils.playSoundToPlayers(playersToRoll, SoundEvents.UI_BUTTON_CLICK.value());
+        PlayerUtils.sendTitleToPlayers(playersToRoll, Text.literal("3").formatted(Formatting.GREEN),5,20,5);
+        TaskScheduler.scheduleTask(25, () -> {
+            PlayerUtils.playSoundToPlayers(playersToRoll, SoundEvents.UI_BUTTON_CLICK.value());
+            PlayerUtils.sendTitleToPlayers(playersToRoll, Text.literal("2").formatted(Formatting.GREEN),5,20,5);
+        });
+        TaskScheduler.scheduleTask(50, () -> {
+            PlayerUtils.playSoundToPlayers(playersToRoll, SoundEvents.UI_BUTTON_CLICK.value());
+            PlayerUtils.sendTitleToPlayers(playersToRoll, Text.literal("1").formatted(Formatting.GREEN),5,20,5);
+        });
+        TaskScheduler.scheduleTask(75, () -> {
+            PlayerUtils.sendTitleToPlayers(playersToRoll, Text.literal("Your soulmate is...").formatted(Formatting.GREEN),10,50,20);
+            PlayerUtils.playSoundToPlayers(playersToRoll, SoundEvent.of(Identifier.of("minecraft","doublelife_soulmate_wait")));
+        });
+        TaskScheduler.scheduleTask(165, () -> {
+            PlayerUtils.sendTitleToPlayers(playersToRoll, Text.literal("????").formatted(Formatting.GREEN),20,60,20);
+            PlayerUtils.playSoundToPlayers(playersToRoll, SoundEvent.of(Identifier.of("minecraft","doublelife_soulmate_chosen")));
+            chooseRandomSoulmates();
+        });
+    }
+    public List<ServerPlayerEntity> getNonAssignedPlayers() {
+        List<ServerPlayerEntity> playersToRoll = new ArrayList<>();
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            if (hasSoulmate(player)) continue;
+            playersToRoll.add(player);
+        }
+        return playersToRoll;
+    }
+
+    public void chooseRandomSoulmates() {
+        List<ServerPlayerEntity> playersToRoll = getNonAssignedPlayers();
+        Collections.shuffle(playersToRoll);
+        if (playersToRoll.size()%2 != 0) {
+            ServerPlayerEntity remove = playersToRoll.getFirst();
+            playersToRoll.remove(remove);
+            OtherUtils.broadcastMessageToAdmins(Text.literal(" [DoubleLife] ").append(remove.getStyledDisplayName()).append(" was not paired with anyone, as there is an odd number of players online."));
+        }
+        while(!playersToRoll.isEmpty()) {
+            ServerPlayerEntity player1 = playersToRoll.get(0);
+            ServerPlayerEntity player2 = playersToRoll.get(1);
+            setSoulmate(player1,player2);
+            playersToRoll.removeFirst();
+            playersToRoll.removeFirst();
+        }
+        saveSoulmates();
     }
 }
