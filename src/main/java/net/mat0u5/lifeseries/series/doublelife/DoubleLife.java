@@ -8,23 +8,21 @@ import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
-import net.mat0u5.lifeseries.utils.ScoreboardUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.damage.DamageType;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.damage.DamageTypes;
+import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.scoreboard.ScoreHolder;
+import net.minecraft.server.command.DamageCommand;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.GameMode;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.*;
 
@@ -32,6 +30,7 @@ import static net.mat0u5.lifeseries.Main.server;
 
 public class DoubleLife extends Series {
     public static final RegistryKey<DamageType> SOULMATE_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(Main.MOD_ID, "soulmate"));
+
 
     public SessionAction actionChooseSoulmates = new SessionAction(OtherUtils.minutesToTicks(1)) {
         @Override
@@ -160,6 +159,7 @@ public class DoubleLife extends Series {
         }
         saveSoulmates();
     }
+    @Override
     public void onPlayerHeal(ServerPlayerEntity player, float amount) {
         if (player == null) return;
         if (!hasSoulmate(player)) return;
@@ -168,11 +168,11 @@ public class DoubleLife extends Series {
         ServerPlayerEntity soulmate = getSoulmate(player);
         if (soulmate == null) return;
 
-        syncPlayers(player, soulmate);
-
         float newHealth = Math.min(soulmate.getHealth() + amount, soulmate.getMaxHealth());
         soulmate.setHealth(newHealth);
+        TaskScheduler.scheduleTask(1,()-> syncPlayers(player, soulmate));
     }
+    @Override
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
         if (source.getType().msgId().equalsIgnoreCase("soulmate")) return;
 
@@ -183,23 +183,45 @@ public class DoubleLife extends Series {
         ServerPlayerEntity soulmate = getSoulmate(player);
         if (soulmate == null) return;
 
-        syncPlayers(player, soulmate);
-
-        DamageSource damageSource = new DamageSource( player.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE), soulmate.getPos());
-        TaskScheduler.scheduleTask(1,()-> soulmate.damage(damageSource, amount));
+        DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.FALL), soulmate.getPos());
+        soulmate.damage(damageSource, 0.0000001F);
+        float newHealth =player.getHealth() - amount;
+        if (newHealth < 0.0F) newHealth = 0.01F;
+        soulmate.setHealth(newHealth);
+        TaskScheduler.scheduleTask(1,()-> syncPlayers(player, soulmate));
     }
-    public void syncPlayers(ServerPlayerEntity player, ServerPlayerEntity soulmate) {
-        float sharedHealth = Math.min(player.getHealth(), soulmate.getHealth());
-        player.setHealth(sharedHealth);
-        soulmate.setHealth(sharedHealth);
+    @Override
+    public void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
+        super.onPlayerDeath(player, source);
+
+        if (player == null) return;
         if (!hasSoulmate(player)) return;
+        if (!isSoulmateOnline(player)) return;
+
+        ServerPlayerEntity soulmate = getSoulmate(player);
+        if (soulmate == null) return;
+        DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE), soulmate.getPos());
+        soulmate.damage(damageSource, 100000000);
+    }
+
+    public void syncPlayers(ServerPlayerEntity player, ServerPlayerEntity soulmate) {
+        if (player.isDead() || soulmate.isDead()) return;
+        if (player.getHealth() != soulmate.getHealth()) {
+            float sharedHealth = Math.min(player.getHealth(), soulmate.getHealth());
+            if (sharedHealth != 0.0F) {
+                player.setHealth(sharedHealth);
+                soulmate.setHealth(sharedHealth);
+            }
+        }
         
         Integer soulmateLives = getPlayerLives(soulmate);
         Integer playerLives = getPlayerLives(player);
-        if (soulmateLives == null || playerLives ==null) return;
-        if (soulmateLives.equals(playerLives)) return;
-        int minLives = Math.min(soulmateLives,playerLives);
-        setPlayerLives(player, minLives);
-        setPlayerLives(soulmate, minLives);
+        if (soulmateLives != null && playerLives != null)  {
+            if (soulmateLives != playerLives) {
+                int minLives = Math.min(soulmateLives,playerLives);
+                setPlayerLives(player, minLives);
+                setPlayerLives(soulmate, minLives);
+            }
+        }
     }
 }

@@ -82,12 +82,6 @@ public class LastLifeCommands {
                     .executes(context -> giftLife(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
                 )
         );
-        dispatcher.register(
-            literal("lives")
-                .executes(context -> showLives(
-                    context.getSource()
-                ))
-        );
     }
     public static int cureBoogey(ServerCommandSource source, ServerPlayerEntity target) {
         if (!isValidCommand(source)) return -1;
@@ -158,26 +152,6 @@ public class LastLifeCommands {
 
         ((LastLife) currentSeries).boogeymanManager.resetBoogeymen();
         ((LastLife) currentSeries).boogeymanManager.chooseBoogeymen(PlayerUtils.getAllPlayers(), 100);
-
-        return 1;
-    }
-    public static int showLives(ServerCommandSource source) {
-        if (!isValidCommand(source)) return -1;
-
-        MinecraftServer server = source.getServer();
-        final ServerPlayerEntity self = source.getPlayer();
-
-        if (self == null) return -1;
-        if (!currentSeries.hasAssignedLives(self)) {
-            self.sendMessage(Text.of("You have not been assigned any lives yet."));
-            return 1;
-        }
-
-        Integer playerLives = currentSeries.getPlayerLives(self);
-        self.sendMessage(Text.literal("You have ").append(currentSeries.getFormattedLives(playerLives)).append(Text.of((playerLives==1?" life.":" lives."))));
-        if (playerLives <= 0) {
-            self.sendMessage(Text.of("Womp womp."));
-        }
 
         return 1;
     }

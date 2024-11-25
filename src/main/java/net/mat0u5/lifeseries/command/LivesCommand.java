@@ -22,13 +22,15 @@ public class LivesCommand {
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
         dispatcher.register(
             literal("lives")
-            .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+            .executes(context -> showLives(context.getSource()))
             .then(literal("reload")
+                .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                 .executes(context -> reloadLives(
                     context.getSource())
                 )
             )
             .then(literal("add")
+                .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                 .then(argument("player", EntityArgumentType.player())
                     .executes(context -> lifeManager(
                         context.getSource(), EntityArgumentType.getPlayer(context, "player"), 1, false)
@@ -41,6 +43,7 @@ public class LivesCommand {
                 )
             )
             .then(literal("remove")
+                .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                 .then(argument("player", EntityArgumentType.player())
                     .executes(context -> lifeManager(
                         context.getSource(), EntityArgumentType.getPlayer(context, "player"), -1, false)
@@ -53,6 +56,7 @@ public class LivesCommand {
                 )
             )
             .then(literal("set")
+                .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                 .then(argument("player", EntityArgumentType.player())
                     .then(argument("amount", IntegerArgumentType.integer(0))
                         .executes(context -> lifeManager(
@@ -62,6 +66,7 @@ public class LivesCommand {
                 )
             )
             .then(literal("get")
+                .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                 .then(argument("player", EntityArgumentType.player())
                     .executes(context -> getLivesFor(
                         context.getSource(), EntityArgumentType.getPlayer(context, "player"))
@@ -69,6 +74,7 @@ public class LivesCommand {
                 )
             )
             .then(literal("reset")
+                .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                 .then(argument("player", EntityArgumentType.player())
                     .executes(context -> resetLives(
                         context.getSource(), EntityArgumentType.getPlayer(context, "player"))
@@ -76,6 +82,25 @@ public class LivesCommand {
                 )
             )
         );
+    }
+    public static int showLives(ServerCommandSource source) {
+
+        MinecraftServer server = source.getServer();
+        final ServerPlayerEntity self = source.getPlayer();
+
+        if (self == null) return -1;
+        if (!currentSeries.hasAssignedLives(self)) {
+            self.sendMessage(Text.of("You have not been assigned any lives yet."));
+            return 1;
+        }
+
+        Integer playerLives = currentSeries.getPlayerLives(self);
+        self.sendMessage(Text.literal("You have ").append(currentSeries.getFormattedLives(playerLives)).append(Text.of((playerLives==1?" life.":" lives."))));
+        if (playerLives <= 0) {
+            self.sendMessage(Text.of("Womp womp."));
+        }
+
+        return 1;
     }
     public static int getLivesFor(ServerCommandSource source, ServerPlayerEntity target) {
         if (target == null) return -1;

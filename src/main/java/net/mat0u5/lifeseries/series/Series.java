@@ -140,6 +140,12 @@ public abstract class Series extends Session {
             }
         }
     }
+    public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
+
+    }
+    public void onPlayerHeal(ServerPlayerEntity player, float amount) {
+
+    }
     public void onMobDeath(LivingEntity entity, DamageSource damageSource) {
         if (entity.getEntityWorld().isClient() || !(damageSource.getAttacker() instanceof ServerPlayerEntity)) {
             return;
