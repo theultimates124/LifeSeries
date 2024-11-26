@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.utils;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.mat0u5.lifeseries.command.BoogeymanCommand;
 import net.mat0u5.lifeseries.command.LifeSeriesCommand;
 import net.mat0u5.lifeseries.command.LivesCommand;
 import net.mat0u5.lifeseries.command.SessionCommand;
@@ -28,6 +29,7 @@ public class ModRegistries {
         CommandRegistrationCallback.EVENT.register(DoubleLifeCommands::register);
         CommandRegistrationCallback.EVENT.register(LivesCommand::register);
         CommandRegistrationCallback.EVENT.register(SessionCommand::register);
+        CommandRegistrationCallback.EVENT.register(BoogeymanCommand::register);
         CommandRegistrationCallback.EVENT.register(LifeSeriesCommand::register);
     }
     private static void registerEvents() {

@@ -1,6 +1,5 @@
-package net.mat0u5.lifeseries.series.lastlife;
+package net.mat0u5.lifeseries.series;
 
-import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
@@ -16,23 +15,23 @@ import java.util.*;
 import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
 
-public class LastLifeBoogeymen {
+public class BoogeymanManager {
 
-    public SessionAction actionBoogeymanWarn1 = new SessionAction(OtherUtils.minutesToTicks(3)) {
+    public SessionAction actionBoogeymanWarn1 = new SessionAction(OtherUtils.minutesToTicks(5)) {
         @Override
         public void trigger() {
             if (boogeymanChosen) return;
             OtherUtils.broadcastMessage(Text.literal("The boogeyman is being chosen in 5 minutes.").formatted(Formatting.RED));
         }
     };
-    public SessionAction actionBoogeymanWarn2 = new SessionAction(OtherUtils.minutesToTicks(7)) {
+    public SessionAction actionBoogeymanWarn2 = new SessionAction(OtherUtils.minutesToTicks(9)) {
         @Override
         public void trigger() {
             if (boogeymanChosen) return;
             OtherUtils.broadcastMessage(Text.literal("The boogeyman is being chosen in 1 minute.").formatted(Formatting.RED));
         }
     };
-    public SessionAction actionBoogeymanChoose = new SessionAction(OtherUtils.minutesToTicks(8)) {
+    public SessionAction actionBoogeymanChoose = new SessionAction(OtherUtils.minutesToTicks(10)) {
         @Override
         public void trigger() {
             if (boogeymanChosen) return;
@@ -123,7 +122,7 @@ public class LastLifeBoogeymen {
         });
     }
     public void boogeymenChooseRandom(List<ServerPlayerEntity> allowedPlayers, double currentChance) {
-        List<ServerPlayerEntity> nonRedPlayers = ((LastLife)currentSeries).getNonRedPlayers();
+        List<ServerPlayerEntity> nonRedPlayers = currentSeries.getNonRedPlayers();
         Collections.shuffle(nonRedPlayers);
 
         List<ServerPlayerEntity> normalPlayers = new ArrayList<>();
@@ -167,7 +166,7 @@ public class LastLifeBoogeymen {
             if (!boogeyman.cured) {
                 ServerPlayerEntity player = server.getPlayerManager().getPlayer(boogeyman.uuid);
                 if (player == null) {
-                    OtherUtils.broadcastMessageToAdmins(Text.of("§c[LastLife] The boogeyman ("+boogeyman.name+") has failed to kill a person, and is offline at session end. " +
+                    OtherUtils.broadcastMessageToAdmins(Text.of("§c[BoogeymanManager] The boogeyman ("+boogeyman.name+") has failed to kill a person, and is offline at session end. " +
                             "That means their lives have not been set to 1. You must do this manually once they are online again."));
                     return;
                 }
@@ -187,7 +186,10 @@ public class LastLifeBoogeymen {
     public void onPlayerJoin(ServerPlayerEntity player) {
         if (!boogeymanChosen) return;
         if (rolledPlayers.contains(player.getUuid())) return;
-        double chanceForBoogey = 100.0 /PlayerUtils.getAllPlayers().size();
-        chooseBoogeymen(List.of(player), chanceForBoogey);
+        TaskScheduler.scheduleTask(200, () -> {
+            player.sendMessage(Text.of("§cSince you were not present when the Boogeyman was being chosen, your chance to become the Boogeyman is now. Good luck!"));
+            double chanceForBoogey = 100.0 /PlayerUtils.getAllPlayers().size();
+            chooseBoogeymen(List.of(player), chanceForBoogey);
+        });
     }
 }

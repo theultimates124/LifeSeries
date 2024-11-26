@@ -3,6 +3,7 @@ package net.mat0u5.lifeseries.series;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.ScoreboardUtils;
 import net.mat0u5.lifeseries.utils.TeamUtils;
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
@@ -11,8 +12,6 @@ import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.ElderGuardianEntity;
 import net.minecraft.entity.mob.WardenEntity;
-import net.minecraft.entity.passive.CowEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.scoreboard.ScoreHolder;
@@ -21,6 +20,9 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
@@ -175,5 +177,18 @@ public abstract class Series extends Session {
     }
     public void onPlayerJoin(ServerPlayerEntity player) {
         reloadPlayerTeam(player);
+    }
+    public List<ServerPlayerEntity> getNonRedPlayers() {
+        List<ServerPlayerEntity> players = PlayerUtils.getAllPlayers();
+        if (players == null) return new ArrayList<>();
+        if (players.isEmpty()) return new ArrayList<>();
+        List<ServerPlayerEntity> nonRedPlayers = new ArrayList<>();
+        for (ServerPlayerEntity player : players) {
+            Boolean isOnLastLife = currentSeries.isOnLastLife(player);
+            if (isOnLastLife == null) continue;
+            if (isOnLastLife) continue;
+            nonRedPlayers.add(player);
+        }
+        return nonRedPlayers;
     }
 }

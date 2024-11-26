@@ -1,4 +1,4 @@
-package net.mat0u5.lifeseries.series.lastlife;
+package net.mat0u5.lifeseries.series;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 

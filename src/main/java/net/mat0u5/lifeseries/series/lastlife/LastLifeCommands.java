@@ -1,10 +1,9 @@
 package net.mat0u5.lifeseries.series.lastlife;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
+import net.mat0u5.lifeseries.series.Boogeyman;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.AnimationUtils;
-import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.command.CommandRegistryAccess;
@@ -43,38 +42,6 @@ public class LastLifeCommands {
                         ))
                     )
                 )
-                .then(literal("boogeyman")
-                    .then(literal("clear")
-                        .executes(context -> boogeyClear(
-                            context.getSource()
-                        ))
-                    )
-                    .then(literal("list")
-                        .executes(context -> boogeyList(
-                            context.getSource()
-                        ))
-                    )
-                    .then(literal("add")
-                        .then(argument("player", EntityArgumentType.player())
-                            .executes(context -> addBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
-                        )
-                    )
-                    .then(literal("remove")
-                        .then(argument("player", EntityArgumentType.player())
-                            .executes(context -> removeBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
-                        )
-                    )
-                    .then(literal("cure")
-                            .then(argument("player", EntityArgumentType.player())
-                                    .executes(context -> cureBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
-                            )
-                    )
-                    .then(literal("chooseRandom")
-                        .executes(context -> boogeyChooseRandom(
-                            context.getSource()
-                        ))
-                    )
-                )
         );
         dispatcher.register(
             literal("givelife")
@@ -82,78 +49,6 @@ public class LastLifeCommands {
                     .executes(context -> giftLife(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
                 )
         );
-    }
-    public static int cureBoogey(ServerCommandSource source, ServerPlayerEntity target) {
-        if (!isValidCommand(source)) return -1;
-
-        if (target == null) return -1;
-
-        if (!((LastLife) currentSeries).boogeymanManager.isBoogeyman(target)) {
-            source.sendError(Text.of("That player is not a boogeyman!"));
-            return -1;
-        }
-        ((LastLife) currentSeries).boogeymanManager.cure(target);
-
-        source.sendMessage(Text.literal("").append(target.getStyledDisplayName()).append(Text.of(" is now cured.")));
-
-        return 1;
-    }
-    public static int addBoogey(ServerCommandSource source, ServerPlayerEntity target) {
-        if (!isValidCommand(source)) return -1;
-
-        if (target == null) return -1;
-
-        if (((LastLife) currentSeries).boogeymanManager.isBoogeyman(target)) {
-            source.sendError(Text.of("That player is already a boogeyman!"));
-            return -1;
-        }
-        ((LastLife) currentSeries).boogeymanManager.addBoogeymanManually(target);
-
-        source.sendMessage(Text.literal("").append(target.getStyledDisplayName()).append(Text.of(" is now a boogeyman.")));
-
-        return 1;
-    }
-    public static int removeBoogey(ServerCommandSource source, ServerPlayerEntity target) {
-        if (!isValidCommand(source)) return -1;
-
-        if (target == null) return -1;
-
-        if (!((LastLife) currentSeries).boogeymanManager.isBoogeyman(target)) {
-            source.sendError(Text.of("That player is not a boogeyman!"));
-            return -1;
-        }
-        ((LastLife) currentSeries).boogeymanManager.removeBoogeymanManually(target);
-
-        source.sendMessage(Text.literal("").append(target.getStyledDisplayName()).append(Text.of(" is no longer a boogeyman.")));
-
-        return 1;
-    }
-    public static int boogeyList(ServerCommandSource source) {
-        if (!isValidCommand(source)) return -1;
-
-        List<String> boogeymen = new ArrayList<>();
-        for (Boogeyman boogeyman : ((LastLife) currentSeries).boogeymanManager.boogeymen) {
-            boogeymen.add(boogeyman.name);
-        }
-        source.sendMessage(Text.of("Current boogeymen: ["+String.join(", ",boogeymen)+"]"));
-
-        return 1;
-    }
-    public static int boogeyClear(ServerCommandSource source) {
-        if (!isValidCommand(source)) return -1;
-
-        ((LastLife) currentSeries).boogeymanManager.resetBoogeymen();
-        source.sendMessage(Text.of("All boogeymen have been cleared"));
-
-        return 1;
-    }
-    public static int boogeyChooseRandom(ServerCommandSource source) {
-        if (!isValidCommand(source)) return -1;
-
-        ((LastLife) currentSeries).boogeymanManager.resetBoogeymen();
-        ((LastLife) currentSeries).boogeymanManager.prepareToChooseBoogeymen();
-
-        return 1;
     }
     public static int assignRandomLives(ServerCommandSource source, Collection<ServerPlayerEntity> players) {
         if (!isValidCommand(source)) return -1;

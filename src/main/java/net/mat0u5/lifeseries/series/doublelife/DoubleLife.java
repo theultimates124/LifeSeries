@@ -9,10 +9,12 @@ import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.damage.DamageTypes;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -23,6 +25,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 
 import java.util.*;
 
@@ -40,6 +43,7 @@ public class DoubleLife extends Series {
     };
 
     public Map<UUID, UUID> soulmates = new HashMap<>();
+    public Map<UUID, UUID> soulmatesOrdered = new HashMap<>();
 
     @Override
     public SeriesList getSeries() {
@@ -71,10 +75,22 @@ public class DoubleLife extends Series {
 
     public void loadSoulmates() {
         soulmates = DatabaseManager.getAllSoulmates();
+        updateOrderedSoulmates();
+    }
+    public void updateOrderedSoulmates() {
+        soulmatesOrdered = new HashMap<>();
+        for (Map.Entry<UUID, UUID> entry : soulmates.entrySet()) {
+            if (soulmatesOrdered.containsKey(entry.getKey()) || soulmatesOrdered.containsValue(entry.getKey())) continue;
+            if (soulmatesOrdered.containsKey(entry.getValue()) || soulmatesOrdered.containsValue(entry.getValue())) continue;
+            soulmatesOrdered.put(entry.getKey(),entry.getValue());
+        }
     }
     public void saveSoulmates() {
         DatabaseManager.deleteDoubleLifeSoulmates();
         DatabaseManager.setAllSoulmates(soulmates);
+    }
+    public boolean isMainSoulmate(ServerPlayerEntity player) {
+        return soulmatesOrdered.containsKey(player.getUuid());
     }
     public boolean hasSoulmate(ServerPlayerEntity player) {
         if (player == null) return false;
@@ -106,9 +122,11 @@ public class DoubleLife extends Series {
             newSoulmates.put(entry.getKey(), entry.getValue());
         }
         soulmates = newSoulmates;
+        updateOrderedSoulmates();
     }
     public void resetAllSoulmates() {
         soulmates = new HashMap<>();
+        soulmatesOrdered = new HashMap<>();
     }
 
     public void rollSoulmates() {

@@ -1,29 +1,19 @@
 package net.mat0u5.lifeseries.series.doublelife;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.mat0u5.lifeseries.series.SeriesList;
-import net.mat0u5.lifeseries.series.lastlife.Boogeyman;
-import net.mat0u5.lifeseries.series.lastlife.LastLife;
-import net.mat0u5.lifeseries.utils.AnimationUtils;
-import net.mat0u5.lifeseries.utils.OtherUtils;
-import net.mat0u5.lifeseries.utils.PlayerUtils;
-import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.*;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
-import static net.mat0u5.lifeseries.Main.currentSession;
 import static net.mat0u5.lifeseries.utils.PermissionManager.isAdmin;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;

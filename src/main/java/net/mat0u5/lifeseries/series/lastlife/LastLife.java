@@ -1,12 +1,8 @@
 package net.mat0u5.lifeseries.series.lastlife;
 
-import net.mat0u5.lifeseries.series.Blacklist;
-import net.mat0u5.lifeseries.series.Series;
-import net.mat0u5.lifeseries.series.SeriesList;
-import net.mat0u5.lifeseries.series.SessionAction;
+import net.mat0u5.lifeseries.series.*;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -19,7 +15,7 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 public class LastLife extends Series {
 
     public LastLifeLives livesManager = new LastLifeLives();
-    public LastLifeBoogeymen boogeymanManager = new LastLifeBoogeymen();
+    public BoogeymanManager boogeymanManager = new BoogeymanManager();
 
     @Override
     public SeriesList getSeries() {
@@ -65,19 +61,5 @@ public class LastLife extends Series {
     public void onPlayerJoin(ServerPlayerEntity player) {
         reloadPlayerTeam(player);
         boogeymanManager.onPlayerJoin(player);
-    }
-
-    public List<ServerPlayerEntity> getNonRedPlayers() {
-        List<ServerPlayerEntity> players = PlayerUtils.getAllPlayers();
-        if (players == null) return new ArrayList<>();
-        if (players.isEmpty()) return new ArrayList<>();
-        List<ServerPlayerEntity> nonRedPlayers = new ArrayList<>();
-        for (ServerPlayerEntity player : players) {
-            Boolean isOnLastLife = currentSeries.isOnLastLife(player);
-            if (isOnLastLife == null) continue;
-            if (isOnLastLife) continue;
-            nonRedPlayers.add(player);
-        }
-        return nonRedPlayers;
     }
 }
