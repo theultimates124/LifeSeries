@@ -151,7 +151,7 @@ public class LastLifeCommands {
         if (!isValidCommand(source)) return -1;
 
         ((LastLife) currentSeries).boogeymanManager.resetBoogeymen();
-        ((LastLife) currentSeries).boogeymanManager.chooseBoogeymen(PlayerUtils.getAllPlayers(), 100);
+        ((LastLife) currentSeries).boogeymanManager.prepareToChooseBoogeymen();
 
         return 1;
     }

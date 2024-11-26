@@ -167,6 +167,7 @@ public class DoubleLife extends Series {
 
         ServerPlayerEntity soulmate = getSoulmate(player);
         if (soulmate == null) return;
+        if (soulmate.isDead()) return;
 
         float newHealth = Math.min(soulmate.getHealth() + amount, soulmate.getMaxHealth());
         soulmate.setHealth(newHealth);
@@ -182,8 +183,9 @@ public class DoubleLife extends Series {
 
         ServerPlayerEntity soulmate = getSoulmate(player);
         if (soulmate == null) return;
+        if (soulmate.isDead()) return;
 
-        DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.FALL), soulmate.getPos());
+        DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE), soulmate.getPos());
         soulmate.damage(damageSource, 0.0000001F);
         float newHealth =player.getHealth() - amount;
         if (newHealth < 0.0F) newHealth = 0.01F;
@@ -200,8 +202,10 @@ public class DoubleLife extends Series {
 
         ServerPlayerEntity soulmate = getSoulmate(player);
         if (soulmate == null) return;
+        if (soulmate.isDead()) return;
+        
         DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE), soulmate.getPos());
-        soulmate.damage(damageSource, 100000000);
+        soulmate.damage(damageSource, 1000);
     }
 
     public void syncPlayers(ServerPlayerEntity player, ServerPlayerEntity soulmate) {

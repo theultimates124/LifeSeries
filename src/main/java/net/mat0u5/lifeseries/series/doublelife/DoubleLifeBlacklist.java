@@ -30,8 +30,7 @@ public class DoubleLifeBlacklist extends Blacklist {
             Items.DIAMOND_HELMET,
             Items.NETHERITE_HELMET,
             Items.TURTLE_HELMET,
-            Items.ELYTRA,
-            Items.TOTEM_OF_UNDYING
+            Items.ELYTRA
     );
 
     public static final List<Block> BLACKLISTED_BLOCKS = List.of(

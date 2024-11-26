@@ -36,11 +36,7 @@ public class LastLifeBoogeymen {
         @Override
         public void trigger() {
             if (boogeymanChosen) return;
-            OtherUtils.broadcastMessage(Text.literal("The boogeyman is about to be chosen.").formatted(Formatting.RED));
-            TaskScheduler.scheduleTask(100, () -> {
-                resetBoogeymen();
-                chooseBoogeymen(PlayerUtils.getAllPlayers(), 100);
-            });
+            prepareToChooseBoogeymen();
         }
     };
     public List<Boogeyman> boogeymen = new ArrayList<>();
@@ -98,6 +94,13 @@ public class LastLifeBoogeymen {
         if (boogeymen == null) return;
         boogeyman.cured = true;
         PlayerUtils.sendTitle(player,Text.of("§aYou are cured!"), 20, 30, 20);
+    }
+    public void prepareToChooseBoogeymen() {
+        OtherUtils.broadcastMessage(Text.literal("The boogeyman is about to be chosen.").formatted(Formatting.RED));
+        TaskScheduler.scheduleTask(100, () -> {
+            resetBoogeymen();
+            chooseBoogeymen(PlayerUtils.getAllPlayers(), 100);
+        });
     }
     public void chooseBoogeymen(List<ServerPlayerEntity> allowedPlayers, double currentChance) {
         PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvents.UI_BUTTON_CLICK.value());
