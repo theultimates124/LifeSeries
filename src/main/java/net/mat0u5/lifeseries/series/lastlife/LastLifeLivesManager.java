@@ -11,14 +11,12 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.*;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
-import static net.mat0u5.lifeseries.Main.server;
 
-public class LastLifeLives {
+public class LastLifeLivesManager {
     public SessionAction actionChooseLives = new SessionAction(OtherUtils.minutesToTicks(1)) {
         @Override
         public void trigger() {

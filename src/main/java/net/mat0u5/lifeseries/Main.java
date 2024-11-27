@@ -5,10 +5,10 @@ import net.fabricmc.api.ModInitializer;
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
-import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.Session;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.mat0u5.lifeseries.series.lastlife.LastLife;
+import net.mat0u5.lifeseries.series.limitedlife.LimitedLife;
 import net.mat0u5.lifeseries.series.thirdlife.ThirdLife;
 import net.mat0u5.lifeseries.utils.ModRegistries;
 import net.minecraft.server.MinecraftServer;
@@ -20,7 +20,7 @@ import java.util.List;
 
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "1.1.2";
+	public static final String MOD_VERSION = "1.1.3";
 	public static final String MOD_ID = "lifeseries";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ConfigManager config;
@@ -29,7 +29,7 @@ public class Main implements ModInitializer {
 	public static Session currentSession;
 	public static Blacklist blacklist;
 
-	public static final List<String> ALLOWED_SERIES_NAMES = List.of("thirdlife", "lastlife", "doublelife");
+	public static final List<String> ALLOWED_SERIES_NAMES = List.of("thirdlife", "lastlife", "doublelife", "limitedlife");
 
 	@Override
 	public void onInitialize() {
@@ -55,6 +55,9 @@ public class Main implements ModInitializer {
 		}
 		if (series.equalsIgnoreCase("doublelife")) {
 			currentSeries = new DoubleLife();
+		}
+		if (series.equalsIgnoreCase("limitedlife")) {
+			currentSeries = new LimitedLife();
 		}
 		currentSession = currentSeries;
 		blacklist = currentSeries.createBlacklist();

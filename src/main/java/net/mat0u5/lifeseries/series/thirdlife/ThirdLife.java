@@ -18,15 +18,15 @@ public class ThirdLife extends Series {
     }
     @Override
     public void onPlayerJoin(ServerPlayerEntity player) {
+        super.onPlayerJoin(player);
+
         if (!hasAssignedLives(player)) {
             setPlayerLives(player,3);
         }
-        reloadPlayerTeam(player);
     }
     @Override
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
-        if (isOnLastLife(killer)) return;
-        if (killer.getPrimeAdversary() == victim && isOnLastLife(victim)) return;
+        if (isAllowedToAttack(killer, victim)) return;
         OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + " was killed by "
                 +killer.getNameForScoreboard() + ", who is not §cred name§f."));
     }

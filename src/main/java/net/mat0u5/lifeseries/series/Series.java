@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.series;
 
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.ScoreboardUtils;
+import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.mat0u5.lifeseries.utils.TeamUtils;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.EntityType;
@@ -42,7 +43,6 @@ public abstract class Series extends Session {
         TeamUtils.createTeam("Yellow", Formatting.YELLOW);
         TeamUtils.createTeam("Green", Formatting.GREEN);
         TeamUtils.createTeam("DarkGreen", Formatting.DARK_GREEN);
-
     }
     public Formatting getColorForLives(Integer lives) {
         if (lives == null) return Formatting.GRAY;
@@ -66,9 +66,17 @@ public abstract class Series extends Session {
         }
     }
     public void reloadPlayerTeam(ServerPlayerEntity player) {
+        if (!player.isDead()) {
+            reloadPlayerTeamActual(player);
+        }
+        else {
+            TaskScheduler.scheduleTask(2, () -> reloadPlayerTeamActual(player));
+        }
+    }
+    public void reloadPlayerTeamActual(ServerPlayerEntity player) {
         Integer lives = getPlayerLives(player);
         if (lives == null) TeamUtils.addPlayerToTeam("Unassigned",player);
-        else if (lives == 0) TeamUtils.addPlayerToTeam("Dead",player);
+        else if (lives <= 0) TeamUtils.addPlayerToTeam("Dead",player);
         else if (lives == 1) TeamUtils.addPlayerToTeam("Red",player);
         else if (lives == 2) TeamUtils.addPlayerToTeam("Yellow",player);
         else if (lives == 3) TeamUtils.addPlayerToTeam("Green",player);
@@ -105,13 +113,11 @@ public abstract class Series extends Session {
     }
     public void setPlayerLives(ServerPlayerEntity player, int lives) {
         ScoreboardUtils.setScore(ScoreHolder.fromName(player.getNameForScoreboard()), "Lives", lives);
-        if (lives == 0) {
+        if (lives <= 0) {
             playerLostAllLives(player);
         }
-        else {
-            if (player.isSpectator()) {
-                player.changeGameMode(GameMode.SURVIVAL);
-            }
+        else if (player.isSpectator()) {
+            player.changeGameMode(GameMode.SURVIVAL);
         }
         reloadPlayerTeam(player);
     }
@@ -120,11 +126,25 @@ public abstract class Series extends Session {
         Integer lives = currentSeries.getPlayerLives(player);
         return lives == 1;
     }
+    public boolean isOnLastLife(ServerPlayerEntity player, boolean fallback) {
+        Boolean isOnLastLife = isOnLastLife(player);
+        if (isOnLastLife == null) return fallback;
+        return isOnLastLife;
+    }
+    public Boolean isOnSpecificLives(ServerPlayerEntity player, int check) {
+        if (!isAlive(player)) return null;
+        Integer lives = currentSeries.getPlayerLives(player);
+        return lives == check;
+    }
     public void playerLostAllLives(ServerPlayerEntity player) {
         player.changeGameMode(GameMode.SPECTATOR);
         PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER);
     }
-
+    public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
+        if (isOnLastLife(attacker, false)) return true;
+        if (attacker.getPrimeAdversary() == victim && (isOnLastLife(victim, true))) return true;
+        return false;
+    }
     /*
         Events
      */

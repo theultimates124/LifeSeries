@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import net.mat0u5.lifeseries.series.SeriesList;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.MinecraftServer;
@@ -20,6 +21,8 @@ public class LivesCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
+        //if (currentSeries.getSeries() == SeriesList.LIMITED_LIFE) return;
+
         dispatcher.register(
             literal("lives")
             .executes(context -> showLives(context.getSource()))

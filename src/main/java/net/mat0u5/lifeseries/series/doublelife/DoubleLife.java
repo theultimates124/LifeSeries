@@ -55,10 +55,11 @@ public class DoubleLife extends Series {
     }
     @Override
     public void onPlayerJoin(ServerPlayerEntity player) {
+        super.onPlayerJoin(player);
+
         if (!hasAssignedLives(player)) {
             setPlayerLives(player,4);
         }
-        reloadPlayerTeam(player);
 
         if (player == null) return;
         if (!hasSoulmate(player)) return;
@@ -69,6 +70,7 @@ public class DoubleLife extends Series {
     }
     @Override
     public void sessionStart() {
+        super.sessionStart();
         activeActions = List.of(actionChooseSoulmates);
     }
 
@@ -203,8 +205,9 @@ public class DoubleLife extends Series {
         if (soulmate == null) return;
         if (soulmate.isDead()) return;
 
-        DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE), soulmate.getPos());
+        DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE));
         soulmate.damage(damageSource, 0.0000001F);
+
         float newHealth =player.getHealth() - amount;
         if (newHealth < 0.0F) newHealth = 0.01F;
         soulmate.setHealth(newHealth);
@@ -222,7 +225,9 @@ public class DoubleLife extends Series {
         if (soulmate == null) return;
         if (soulmate.isDead()) return;
         
-        DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE), soulmate.getPos());
+        DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE));
+        soulmate.setAttacker(player);
+        soulmate.setAttacking(player);
         soulmate.damage(damageSource, 1000);
     }
 

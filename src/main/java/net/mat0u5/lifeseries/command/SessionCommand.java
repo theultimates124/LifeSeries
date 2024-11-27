@@ -129,10 +129,10 @@ public class SessionCommand {
             return -1;
         }
         if (currentSession.status == SessionStatus.PAUSED) {
-            currentSession.pause();
+            currentSession.sessionPause();
             return 1;
         }
-        currentSession.start();
+        currentSession.sessionStart();
 
         return 1;
     }
@@ -144,7 +144,7 @@ public class SessionCommand {
             return -1;
         }
 
-        currentSession.stop();
+        currentSession.sessionEnd();
 
         return 1;
     }
@@ -156,7 +156,7 @@ public class SessionCommand {
             return -1;
         }
 
-        currentSession.pause();
+        currentSession.sessionPause();
 
         return 1;
     }

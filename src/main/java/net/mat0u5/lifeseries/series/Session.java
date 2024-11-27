@@ -20,7 +20,7 @@ public class Session {
     public Integer sessionLength = null;
     public int passedTime;
     public SessionStatus status = SessionStatus.NOT_STARTED;
-    public void start() {
+    public void sessionStart() {
         if (!canStartSession()) return;
         status = SessionStatus.STARTED;
         passedTime = 0;
@@ -31,14 +31,12 @@ public class Session {
         OtherUtils.broadcastMessage(firstLine);
         OtherUtils.broadcastMessage(infoText1);
         OtherUtils.broadcastMessage(infoText2);
-        sessionStart();
     }
-    public void stop() {
+    public void sessionEnd() {
         status = SessionStatus.FINISHED;
         OtherUtils.broadcastMessage(Text.literal("Session stopped!").formatted(Formatting.GOLD));
-        sessionEnd();
     }
-    public void pause() {
+    public void sessionPause() {
         if (status == SessionStatus.PAUSED) {
             OtherUtils.broadcastMessage(Text.literal("Session unpaused!").formatted(Formatting.GOLD));
             status = SessionStatus.STARTED;
@@ -96,13 +94,27 @@ public class Session {
 
         if (!validTime()) return;
         if (status != SessionStatus.STARTED) return;
+        tickSessionOn();
+    }
+    public void tickSessionOn() {
         passedTime++;
         if (passedTime >= sessionLength) {
             status = SessionStatus.FINISHED;
             sessionEnd();
             OtherUtils.broadcastMessage(Text.literal("The session has ended!").formatted(Formatting.GOLD));
         }
-        actionsTick();
+
+        //Actions
+        if (activeActions == null) return;
+        if (activeActions.isEmpty()) return;
+        List<SessionAction> remaining = new ArrayList<>();
+        for (SessionAction action : activeActions) {
+            boolean triggered = action.tick(passedTime);
+            if (!triggered) {
+                remaining.add(action);
+            }
+        }
+        activeActions = remaining;
     }
     public void displayTimers(MinecraftServer server) {
         String message = "";
@@ -123,22 +135,5 @@ public class Session {
             if (player == null) continue;
             player.sendMessage(Text.literal(message).formatted(Formatting.GRAY), true);
         }
-    }
-
-    public void actionsTick() {
-        if (activeActions == null) return;
-        if (activeActions.isEmpty()) return;
-        List<SessionAction> remaining = new ArrayList<>();
-        for (SessionAction action : activeActions) {
-            boolean triggered = action.tick(passedTime);
-            if (!triggered) {
-                remaining.add(action);
-            }
-        }
-        activeActions = remaining;
-    }
-    public void sessionStart() {}
-    public void sessionEnd() {
-        System.out.println("DefaultSessEnd");
     }
 }

@@ -5,6 +5,7 @@ import net.mat0u5.lifeseries.series.Boogeyman;
 import net.mat0u5.lifeseries.series.BoogeymanManager;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.lastlife.LastLife;
+import net.mat0u5.lifeseries.series.limitedlife.LimitedLife;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
@@ -63,7 +64,7 @@ public class BoogeymanCommand {
     }
     public static BoogeymanManager getBM() {
         if (currentSeries.getSeries() == SeriesList.LAST_LIFE) return ((LastLife) currentSeries).boogeymanManager;
-        //if (currentSeries.getSeries() == SeriesList.LIMITED_LIFE) return ((LimitedLife) currentSeries).boogeymanManager;
+        if (currentSeries.getSeries() == SeriesList.LIMITED_LIFE) return ((LimitedLife) currentSeries).boogeymanManager;
         return null;
     }
     public static int cureBoogey(ServerCommandSource source, ServerPlayerEntity target) {
