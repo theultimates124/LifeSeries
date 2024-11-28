@@ -6,6 +6,7 @@ import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.Session;
+import net.mat0u5.lifeseries.series.unassigned.UnassignedSeries;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.mat0u5.lifeseries.series.lastlife.LastLife;
 import net.mat0u5.lifeseries.series.limitedlife.LimitedLife;
@@ -20,7 +21,7 @@ import java.util.List;
 
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "1.1.3";
+	public static final String MOD_VERSION = "1.1.4";
 	public static final String MOD_ID = "lifeseries";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ConfigManager config;
@@ -36,16 +37,15 @@ public class Main implements ModInitializer {
 		config = new ConfigManager("./config/"+MOD_ID+".properties", null);
 
 		String series = config.getProperty("currentSeries");
-		if (series == null) seriesUnassigned("");
-		parseSeries(series);
+		if (series == null) parseSeries("");
+		else parseSeries(series);
 
 		ModRegistries.registerModStuff();
 		LOGGER.info("Initializing Life Series...");
 	}
 	public void parseSeries(String series) {
 		if (!ALLOWED_SERIES_NAMES.contains(series)) {
-			seriesUnassigned(series);
-			return;
+			currentSeries = new UnassignedSeries();
 		}
 		if (series.equalsIgnoreCase("thirdlife")) {
 			currentSeries = new ThirdLife();
@@ -61,11 +61,5 @@ public class Main implements ModInitializer {
 		}
 		currentSession = currentSeries;
 		blacklist = currentSeries.createBlacklist();
-	}
-	public void seriesUnassigned(String series) {
-		LOGGER.error("Life Series is not chosen, shutting down server!");
-		LOGGER.error("You must replace '"+series+"' in the 'currentSeries' field with the desired series name in the config file, located at " + config.filePath);
-		LOGGER.error("Valid values for 'currentSeries' are "+String.join(", ",ALLOWED_SERIES_NAMES));
-		throw new RuntimeException("Server initialization aborted by Life Series.");
 	}
 }

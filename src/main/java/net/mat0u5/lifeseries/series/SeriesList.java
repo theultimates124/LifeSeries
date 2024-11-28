@@ -1,6 +1,8 @@
 package net.mat0u5.lifeseries.series;
 
 public enum SeriesList {
+    UNASSIGNED,
+
     THIRD_LIFE,
     LAST_LIFE,
     DOUBLE_LIFE,
@@ -15,6 +17,6 @@ public enum SeriesList {
         if (series == LIMITED_LIFE) return "limitedlife";
         if (series == SECRET_LIFE) return "secretlife";
         if (series == WILD_LIFE) return "wildlife";
-        return "";
+        return "unassigned";
     }
 }

@@ -13,6 +13,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
@@ -97,7 +99,10 @@ public class LimitedLife extends Series {
     public Boolean isOnSpecificLives(ServerPlayerEntity player, int check) {
         if (!isAlive(player)) return null;
         Integer lives = currentSeries.getPlayerLives(player);
-        return lives == check;
+        if (check == 1) return lives < 28800;
+        if (check == 2) return lives < 57600;
+        if (check == 3) return lives >= 57600;
+        return null;
     }
     @Override
     public void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
@@ -131,8 +136,8 @@ public class LimitedLife extends Series {
     public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
         if (isOnLastLife(attacker, false)) return true;
         if (attacker.getPrimeAdversary() == victim && isOnLastLife(victim, true)) return true;
-        if (isOnSpecificLives(attacker, 2) && isOnSpecificLives(victim, 3)) return true;
-        if (attacker.getPrimeAdversary() == victim && (isOnSpecificLives(victim, 2) && isOnSpecificLives(attacker, 3))) return true;
+        if (isOnSpecificLives(attacker, 2, false) && isOnSpecificLives(victim, 3, false)) return true;
+        if (attacker.getPrimeAdversary() == victim && (isOnSpecificLives(victim, 2, false) && isOnSpecificLives(attacker, 3, false))) return true;
         Boogeyman boogeymanAttacker = boogeymanManager.getBoogeyman(attacker);
         Boogeyman boogeymanVictim = boogeymanManager.getBoogeyman(victim);
         if (boogeymanAttacker != null && !boogeymanAttacker.cured) return true;
@@ -166,7 +171,7 @@ public class LimitedLife extends Series {
     public void playerLostAllLives(ServerPlayerEntity player) {
         super.playerLostAllLives(player);
         boogeymanManager.playerLostAllLives(player);
-        List<ServerPlayerEntity> players = PlayerUtils.getAllPlayers();
+        List<ServerPlayerEntity> players = new ArrayList<>(PlayerUtils.getAllPlayers());
         players.remove(player);
         PlayerUtils.sendTitle(player, Text.literal("You have run out of time!").formatted(Formatting.RED), 20, 160, 20);
         PlayerUtils.sendTitleWithSubtitleToPlayers(players, player.getStyledDisplayName(), Text.literal("ran out of time!"), 20, 80, 20);

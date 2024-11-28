@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.SessionStatus;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.command.CommandRegistryAccess;
@@ -15,6 +16,7 @@ import java.util.regex.Pattern;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
+import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.currentSession;
 import static net.mat0u5.lifeseries.utils.PermissionManager.isAdmin;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -22,11 +24,11 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class SessionCommand {
 
-    private static final Pattern TIME_PATTERN = Pattern.compile("(?:(\\d+)h)?(?:(\\d+)m)?(?:(\\d+)s)?");
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
+        if (currentSeries.getSeries() == SeriesList.UNASSIGNED) return;
         dispatcher.register(
             literal("session")
                 .then(literal("start")
@@ -162,7 +164,7 @@ public class SessionCommand {
     }
     public static int skipTime(ServerCommandSource source, String timeArgument) {
 
-        int totalTicks = parseTime(timeArgument);
+        int totalTicks = OtherUtils.parseTimeFromArgument(timeArgument);
         if (totalTicks == -1) {
             source.sendError(Text.literal("Invalid time format. Use h, m, s for hours, minutes, and seconds."));
             return -1;
@@ -173,7 +175,7 @@ public class SessionCommand {
     }
     public static int setTime(ServerCommandSource source, String timeArgument) {
 
-        int totalTicks = parseTime(timeArgument);
+        int totalTicks = OtherUtils.parseTimeFromArgument(timeArgument);
         if (totalTicks == -1) {
             source.sendError(Text.literal("Invalid time format. Use h, m, s for hours, minutes, and seconds."));
             return -1;
@@ -185,7 +187,7 @@ public class SessionCommand {
     }
     public static int addTime(ServerCommandSource source, String timeArgument) {
 
-        int totalTicks = parseTime(timeArgument);
+        int totalTicks = OtherUtils.parseTimeFromArgument(timeArgument);
         if (totalTicks == -1) {
             source.sendError(Text.literal("Invalid time format. Use h, m, s for hours, minutes, and seconds."));
             return -1;
@@ -197,7 +199,7 @@ public class SessionCommand {
     }
     public static int removeTime(ServerCommandSource source, String timeArgument) {
 
-        int totalTicks = parseTime(timeArgument);
+        int totalTicks = OtherUtils.parseTimeFromArgument(timeArgument);
         if (totalTicks == -1) {
             source.sendError(Text.literal("Invalid time format. Use h, m, s for hours, minutes, and seconds."));
             return -1;
@@ -206,22 +208,6 @@ public class SessionCommand {
         source.sendMessage(Text.of("Removed "+OtherUtils.formatTime(totalTicks) + " from the session length."));
 
         return 1;
-    }
-    private static int parseTime(String time) {
-        Matcher matcher = TIME_PATTERN.matcher(time);
-        if (!matcher.matches()) {
-            return -1; // Invalid time format
-        }
-
-        int hours = parseInt(matcher.group(1));
-        int minutes = parseInt(matcher.group(2));
-        int seconds = parseInt(matcher.group(3));
-
-        return (hours * 3600 + minutes * 60 + seconds) * 20;
-    }
-
-    private static int parseInt(String value) {
-        return value == null ? 0 : Integer.parseInt(value);
     }
 }
 

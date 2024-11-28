@@ -5,6 +5,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class OtherUtils {
     public static void broadcastMessage(MinecraftServer server, Text message) {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
@@ -41,5 +44,35 @@ public class OtherUtils {
     }
     public static int secondsToTicks(int secs) {
         return secs*20;
+    }
+
+    private static final Pattern TIME_PATTERN = Pattern.compile("(?:(\\d+)h)?(?:(\\d+)m)?(?:(\\d+)s)?");
+    public static int parseTimeFromArgument(String time) {
+        Matcher matcher = TIME_PATTERN.matcher(time);
+        if (!matcher.matches()) {
+            return -1; // Invalid time format
+        }
+
+        int hours = parseInt(matcher.group(1));
+        int minutes = parseInt(matcher.group(2));
+        int seconds = parseInt(matcher.group(3));
+
+        return (hours * 3600 + minutes * 60 + seconds) * 20;
+    }
+    public static int parseTimeSecondsFromArgument(String time) {
+        Matcher matcher = TIME_PATTERN.matcher(time);
+        if (!matcher.matches()) {
+            return -1; // Invalid time format
+        }
+
+        int hours = parseInt(matcher.group(1));
+        int minutes = parseInt(matcher.group(2));
+        int seconds = parseInt(matcher.group(3));
+
+        return (hours * 3600 + minutes * 60 + seconds);
+    }
+
+    private static int parseInt(String value) {
+        return value == null ? 0 : Integer.parseInt(value);
     }
 }

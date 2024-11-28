@@ -21,7 +21,8 @@ public class LivesCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
-        //if (currentSeries.getSeries() == SeriesList.LIMITED_LIFE) return;
+        if (currentSeries.getSeries() == SeriesList.UNASSIGNED) return;
+        if (currentSeries.getSeries() == SeriesList.LIMITED_LIFE) return;
 
         dispatcher.register(
             literal("lives")
@@ -77,12 +78,18 @@ public class LivesCommand {
                 )
             )
             .then(literal("reset")
-                .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                .then(argument("player", EntityArgumentType.player())
-                    .executes(context -> resetLives(
-                        context.getSource(), EntityArgumentType.getPlayer(context, "player"))
+                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                    .then(argument("player", EntityArgumentType.player())
+                            .executes(context -> resetLives(
+                                    context.getSource(), EntityArgumentType.getPlayer(context, "player"))
+                            )
                     )
-                )
+            )
+            .then(literal("resetAll")
+                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                    .executes(context -> resetAllLives(
+                            context.getSource())
+                    )
             )
         );
     }
@@ -150,6 +157,14 @@ public class LivesCommand {
         currentSeries.resetPlayerLife(target);
 
         source.sendMessage(Text.literal("Reset ").append(target.getStyledDisplayName()).append(Text.of("'s lives.")));
+        return 1;
+    }
+    public static int resetAllLives(ServerCommandSource source) {
+        MinecraftServer server = source.getServer();
+
+        currentSeries.resetAllPlayerLives();
+
+        source.sendMessage(Text.literal("Reset everyone's lives."));
         return 1;
     }
 }

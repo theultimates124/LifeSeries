@@ -21,6 +21,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
+import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,9 @@ public abstract class Series extends Session {
         if (lives == 3) return Formatting.GREEN;
         if (lives >= 4) return Formatting.DARK_GREEN;
         return Formatting.DARK_GRAY;
+    }
+    public Text getFormattedLives(ServerPlayerEntity player) {
+        return getFormattedLives(getPlayerLives(player));
     }
     public Text getFormattedLives(Integer lives) {
         if (lives == null) return Text.empty();
@@ -101,6 +105,10 @@ public abstract class Series extends Session {
         ScoreboardUtils.resetScore(ScoreHolder.fromName(player.getNameForScoreboard()), "Lives");
         reloadPlayerTeam(player);
     }
+    public void resetAllPlayerLives() {
+        ScoreboardUtils.removeObjective("Lives");
+        createScoreboards();
+    }
     public void addPlayerLife(ServerPlayerEntity player) {
         addToPlayerLives(player,1);
     }
@@ -135,6 +143,11 @@ public abstract class Series extends Session {
         if (!isAlive(player)) return null;
         Integer lives = currentSeries.getPlayerLives(player);
         return lives == check;
+    }
+    public Boolean isOnSpecificLives(ServerPlayerEntity player, int check, boolean fallback) {
+        Boolean isOnLife = isOnSpecificLives(player, check);
+        if (isOnLife == null) return fallback;
+        return isOnLife;
     }
     public void playerLostAllLives(ServerPlayerEntity player) {
         player.changeGameMode(GameMode.SPECTATOR);
