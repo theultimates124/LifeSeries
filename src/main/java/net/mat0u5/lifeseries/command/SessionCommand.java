@@ -123,7 +123,7 @@ public class SessionCommand {
         MinecraftServer server = source.getServer();
 
         if (!currentSession.validTime()) {
-            source.sendError(Text.of("The session time is not set!"));
+            source.sendError(Text.of("The session time is not set! Use '/session timer set <time>' to set the session time."));
             return -1;
         }
         if (currentSession.status == SessionStatus.STARTED) {

@@ -10,13 +10,16 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.config.DatabaseManager;
+import net.mat0u5.lifeseries.config.DatapackManager;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
+import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -47,17 +50,20 @@ public class Events {
 
     private static void onPlayerJoin(MinecraftServer server, ServerPlayerEntity player) {
         currentSeries.onPlayerJoin(player);
+        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+        PlayerUtils.applyResorucepack(serverPlayer);
     }
     private static void onServerStopping(MinecraftServer server) {
     }
     private static void onServerStart(MinecraftServer server) {
+        ServerWorld w = server.getOverworld();
         Main.server = server;
-        System.out.println("MinecraftServer instance captured.");
         currentSeries.initialize();
         DatabaseManager.initialize();
         if (currentSeries.getSeries() == SeriesList.DOUBLE_LIFE) {
             ((DoubleLife) currentSeries).loadSoulmates();
         }
+        new DatapackManager().onServerStarted(server);
     }
     private static void onServerTickEnd(MinecraftServer server) {
         try {

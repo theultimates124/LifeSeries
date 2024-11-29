@@ -1,12 +1,17 @@
 package net.mat0u5.lifeseries.utils;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
 import net.mat0u5.lifeseries.Main;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static net.mat0u5.lifeseries.Main.server;
 
 public class OtherUtils {
     public static void broadcastMessage(MinecraftServer server, Text message) {
@@ -74,5 +79,10 @@ public class OtherUtils {
 
     private static int parseInt(String value) {
         return value == null ? 0 : Integer.parseInt(value);
+    }
+    public static void executeCommand(String command) {
+        CommandManager manager = server.getCommandManager();
+        ServerCommandSource commandSource = server.getCommandSource().withSilent();
+        manager.executeWithPrefix(commandSource, command);
     }
 }

@@ -20,7 +20,6 @@ public class LimitedLifeBlacklist extends Blacklist {
     public static final List<Item> BLACKLISTED_ITEMS = List.of(
             Items.LECTERN,
             Items.BOOKSHELF,
-            //Items.ENCHANTING_TABLE,
             Items.MACE,
             Items.END_CRYSTAL,
             Items.LEATHER_HELMET,

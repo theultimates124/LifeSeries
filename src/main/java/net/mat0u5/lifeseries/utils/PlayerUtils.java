@@ -1,5 +1,7 @@
 package net.mat0u5.lifeseries.utils;
 
+import net.mat0u5.lifeseries.Main;
+import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
@@ -8,8 +10,11 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static net.mat0u5.lifeseries.Main.server;
 
@@ -48,5 +53,16 @@ public class PlayerUtils {
     }
     public static List<ServerPlayerEntity> getAllPlayers() {
         return server.getPlayerManager().getPlayerList();
+    }
+    public static void applyResorucepack(ServerPlayerEntity player) {
+        UUID id = UUID.nameUUIDFromBytes(Main.RESOURCEPACK_LINK.getBytes(StandardCharsets.UTF_8));
+        ResourcePackSendS2CPacket resourcepackPacket = new ResourcePackSendS2CPacket(
+                id,
+                Main.RESOURCEPACK_LINK,
+                Main.RESOURCEPACK_SHA1,
+                true,
+                Optional.of(Text.translatable("Life Series resourcepack."))
+        );
+        player.networkHandler.sendPacket(resourcepackPacket);
     }
 }
