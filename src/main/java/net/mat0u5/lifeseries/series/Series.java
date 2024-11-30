@@ -155,25 +155,24 @@ public abstract class Series extends Session {
     }
     public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
         if (isOnLastLife(attacker, false)) return true;
-        if (attacker.getPrimeAdversary() == victim && (isOnLastLife(victim, true))) return true;
+        if (attacker.getPrimeAdversary() == victim && (isOnLastLife(victim, false))) return true;
         return false;
     }
     /*
         Events
      */
     public void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
-        removePlayerLife(player);
         if (source != null) {
             if (source.getAttacker() instanceof ServerPlayerEntity) {
                 onPlayerKilledByPlayer(player, (ServerPlayerEntity) source.getAttacker());
-                return;
             }
         }
-        if (player.getPrimeAdversary() != null) {
+        else if (player.getPrimeAdversary() != null) {
             if (player.getPrimeAdversary() instanceof ServerPlayerEntity) {
                 onPlayerKilledByPlayer(player, (ServerPlayerEntity) player.getPrimeAdversary());
             }
         }
+        removePlayerLife(player);
     }
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
 

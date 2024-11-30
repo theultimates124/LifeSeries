@@ -31,6 +31,8 @@ public abstract class PlayerEntityMixin {
 
     @Inject(method = "applyDamage", at = @At("HEAD"))
     private void onApplyDamage(DamageSource source, float amount, CallbackInfo info) {
+        /*
+        Disabled for now, Reflection is not the way......
         try {
             Method applyArmorToDamage = LivingEntity.class.getDeclaredMethod("applyArmorToDamage", DamageSource.class, float.class);
             Method modifyAppliedDamage = LivingEntity.class.getDeclaredMethod("modifyAppliedDamage", DamageSource.class, float.class);
@@ -48,6 +50,7 @@ public abstract class PlayerEntityMixin {
         } catch (ReflectiveOperationException e) {
             e.printStackTrace(); // Log any reflection issues
         }
+        */
     }
 
     @Inject(method = "canFoodHeal", at = @At("HEAD"), cancellable = true)

@@ -58,7 +58,7 @@ public class LastLife extends Series {
     @Override
     public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
         if (isOnLastLife(attacker, false)) return true;
-        if (attacker.getPrimeAdversary() == victim && isOnLastLife(victim, true)) return true;
+        if (attacker.getPrimeAdversary() == victim && isOnLastLife(victim, false)) return true;
         Boogeyman boogeymanAttacker = boogeymanManager.getBoogeyman(attacker);
         Boogeyman boogeymanVictim = boogeymanManager.getBoogeyman(victim);
         if (boogeymanAttacker != null && !boogeymanAttacker.cured) return true;

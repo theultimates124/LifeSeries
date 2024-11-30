@@ -21,14 +21,14 @@ public class BoogeymanManager {
         @Override
         public void trigger() {
             if (boogeymanChosen) return;
-            OtherUtils.broadcastMessage(Text.literal("The boogeyman is being chosen in 5 minutes.").formatted(Formatting.RED));
+            OtherUtils.broadcastMessage(Text.literal("The Boogeyman is being chosen in 5 minutes.").formatted(Formatting.RED));
         }
     };
     public SessionAction actionBoogeymanWarn2 = new SessionAction(OtherUtils.minutesToTicks(9)) {
         @Override
         public void trigger() {
             if (boogeymanChosen) return;
-            OtherUtils.broadcastMessage(Text.literal("The boogeyman is being chosen in 1 minute.").formatted(Formatting.RED));
+            OtherUtils.broadcastMessage(Text.literal("The Boogeyman is being chosen in 1 minute.").formatted(Formatting.RED));
         }
     };
     public SessionAction actionBoogeymanChoose = new SessionAction(OtherUtils.minutesToTicks(10)) {
@@ -69,20 +69,20 @@ public class BoogeymanManager {
     }
     public void addBoogeymanManually(ServerPlayerEntity player) {
         addBoogeyman(player);
-        player.sendMessage(Text.of("§c [NOTICE] You are now a boogeyman!"));
+        player.sendMessage(Text.of("§c [NOTICE] You are now a Boogeyman!"));
     }
     public void removeBoogeymanManually(ServerPlayerEntity player) {
         Boogeyman boogeyman = getBoogeyman(player);
         if (boogeyman == null) return;
         boogeymen.remove(boogeyman);
         if (boogeymen.isEmpty()) boogeymanChosen = false;
-        player.sendMessage(Text.of("§c [NOTICE] You are no longer a boogeyman!"));
+        player.sendMessage(Text.of("§c [NOTICE] You are no longer a Boogeyman!"));
     }
     public void resetBoogeymen() {
         for (Boogeyman boogeyman : boogeymen) {
             ServerPlayerEntity player = server.getPlayerManager().getPlayer(boogeyman.uuid);
             if (player == null) continue;
-            player.sendMessage(Text.of("§c [NOTICE] You are no longer a boogeyman!"));
+            player.sendMessage(Text.of("§c [NOTICE] You are no longer a Boogeyman!"));
         }
         boogeymen = new ArrayList<>();
         boogeymanChosen = false;
@@ -95,7 +95,7 @@ public class BoogeymanManager {
         PlayerUtils.sendTitle(player,Text.of("§aYou are cured!"), 20, 30, 20);
     }
     public void prepareToChooseBoogeymen() {
-        OtherUtils.broadcastMessage(Text.literal("The boogeyman is about to be chosen.").formatted(Formatting.RED));
+        OtherUtils.broadcastMessage(Text.literal("The Boogeyman is about to be chosen.").formatted(Formatting.RED));
         TaskScheduler.scheduleTask(100, () -> {
             resetBoogeymen();
             chooseBoogeymen(PlayerUtils.getAllPlayers(), 100);
@@ -155,25 +155,25 @@ public class BoogeymanManager {
         PlayerUtils.sendTitleToPlayers(boogeyPlayers, Text.literal("The Boogeyman.").formatted(Formatting.RED),10,50,20);
         for (ServerPlayerEntity boogey : boogeyPlayers) {
             addBoogeyman(boogey);
-            boogey.sendMessage(Text.of("§7You are the boogeyman. You must by any means necessary kill a §2dark green§7, §agreen§7 or §eyellow§7 name by direct action to be cured of the curse. " +
-                    "If you fail, next session you will become a §cred name§7. All loyalties and friendships are removed while you are the boogeyman."));
+            boogey.sendMessage(Text.of("§7You are the Boogeyman. You must by any means necessary kill a §2dark green§7, §agreen§7 or §eyellow§7 name by direct action to be cured of the curse. " +
+                    "If you fail, next session you will become a §cred name§7. All loyalties and friendships are removed while you are the Boogeyman."));
         }
     }
     public void sessionEnd() {
         for (Boogeyman boogeyman : boogeymen) {
-            if (boogeyman.died) return;
+            if (boogeyman.died) continue;
 
             if (!boogeyman.cured) {
                 ServerPlayerEntity player = server.getPlayerManager().getPlayer(boogeyman.uuid);
                 if (player == null) {
-                    OtherUtils.broadcastMessageToAdmins(Text.of("§c[BoogeymanManager] The boogeyman ("+boogeyman.name+") has failed to kill a person, and is offline at session end. " +
+                    OtherUtils.broadcastMessageToAdmins(Text.of("§c[BoogeymanManager] The Boogeyman ("+boogeyman.name+") has failed to kill a person, and is offline at session end. " +
                             "That means their lives have not been set to 1. You must do this manually once they are online again."));
-                    return;
+                    continue;
                 }
-                currentSeries.setPlayerLives(player, 1);
-                player.sendMessage(Text.of("§7You failed to kill a green or yellow name last session as the boogeyman. As punishment, you have dropped to your §cLast Life§7. " +
+                player.sendMessage(Text.of("§7You failed to kill a green or yellow name last session as the Boogeyman. As punishment, you have dropped to your §cLast Life§7. " +
                         "All alliances are severed and you are now hostile to all players. You may team with others on their Last Life if you wish."));
                 OtherUtils.broadcastMessage(player.getStyledDisplayName().copy().append(Text.of("§7 failed to kill a player while being the §cBoogeyman§7. They have been been dropped to their §cLast Life§7")));
+                currentSeries.setPlayerLives(player, 1);
             }
         }
     }

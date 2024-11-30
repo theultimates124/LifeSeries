@@ -135,7 +135,7 @@ public class LimitedLife extends Series {
     @Override
     public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
         if (isOnLastLife(attacker, false)) return true;
-        if (attacker.getPrimeAdversary() == victim && isOnLastLife(victim, true)) return true;
+        if (attacker.getPrimeAdversary() == victim && isOnLastLife(victim, false)) return true;
         if (isOnSpecificLives(attacker, 2, false) && isOnSpecificLives(victim, 3, false)) return true;
         if (attacker.getPrimeAdversary() == victim && (isOnSpecificLives(victim, 2, false) && isOnSpecificLives(attacker, 3, false))) return true;
         Boogeyman boogeymanAttacker = boogeymanManager.getBoogeyman(attacker);
