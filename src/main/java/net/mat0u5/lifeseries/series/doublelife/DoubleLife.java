@@ -208,9 +208,10 @@ public class DoubleLife extends Series {
         DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE));
         soulmate.damage(damageSource, 0.0000001F);
 
-        float newHealth =player.getHealth() - amount;
-        if (newHealth < 0.0F) newHealth = 0.01F;
+        float newHealth =player.getHealth();
+        if (newHealth <= 0.0F) newHealth = 0.01F;
         soulmate.setHealth(newHealth);
+
         TaskScheduler.scheduleTask(1,()-> syncPlayers(player, soulmate));
     }
     @Override
