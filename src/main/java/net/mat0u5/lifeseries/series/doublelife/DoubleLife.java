@@ -73,6 +73,12 @@ public class DoubleLife extends Series {
         super.sessionStart();
         activeActions = List.of(actionChooseSoulmates);
     }
+    @Override
+    public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
+        if (isAllowedToAttack(killer, victim)) return;
+        OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + " was killed by "
+                +killer.getNameForScoreboard() + ", who is not §cred name§f."));
+    }
 
 
     public void loadSoulmates() {
@@ -88,8 +94,9 @@ public class DoubleLife extends Series {
         }
     }
     public void saveSoulmates() {
+        updateOrderedSoulmates();
         DatabaseManager.deleteDoubleLifeSoulmates();
-        DatabaseManager.setAllSoulmates(soulmates);
+        DatabaseManager.setAllSoulmates(soulmatesOrdered);
     }
     public boolean isMainSoulmate(ServerPlayerEntity player) {
         return soulmatesOrdered.containsKey(player.getUuid());
@@ -114,6 +121,7 @@ public class DoubleLife extends Series {
         soulmates.put(player1.getUuid(), player2.getUuid());
         soulmates.put(player2.getUuid(), player1.getUuid());
         syncPlayers(player1, player2);
+        updateOrderedSoulmates();
     }
     public void resetSoulmate(ServerPlayerEntity player) {
         UUID playerUUID = player.getUuid();
@@ -129,6 +137,7 @@ public class DoubleLife extends Series {
     public void resetAllSoulmates() {
         soulmates = new HashMap<>();
         soulmatesOrdered = new HashMap<>();
+        DatabaseManager.deleteDoubleLifeSoulmates();
     }
 
     public void rollSoulmates() {

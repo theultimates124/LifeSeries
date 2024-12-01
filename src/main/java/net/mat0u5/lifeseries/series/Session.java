@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class Session {
     public List<SessionAction> activeActions = new ArrayList<>();
-    List<UUID> displayTimer = new ArrayList<>();
+    public List<UUID> displayTimer = new ArrayList<>();
     public int DISPLAY_TIMER_INTERVAL = 20;
     public int currentTimer = 20;
 

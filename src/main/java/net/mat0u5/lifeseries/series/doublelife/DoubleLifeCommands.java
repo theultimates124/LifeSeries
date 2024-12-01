@@ -26,39 +26,37 @@ public class DoubleLifeCommands {
         if (currentSeries.getSeries() != SeriesList.DOUBLE_LIFE) return;
 
         dispatcher.register(
-            literal("doublelife")
+            literal("soulmate")
                 .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                .then(literal("soulmate")
-                    .then(literal("get")
-                        .then(argument("player", EntityArgumentType.player())
-                            .executes(context -> getSoulmate(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+                .then(literal("get")
+                    .then(argument("player", EntityArgumentType.player())
+                        .executes(context -> getSoulmate(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+                    )
+                )
+                .then(literal("set")
+                    .then(argument("player", EntityArgumentType.player())
+                        .then(argument("soulmate", EntityArgumentType.player())
+                            .executes(context -> setSoulmate(
+                                context.getSource(),
+                                EntityArgumentType.getPlayer(context, "player"),
+                                EntityArgumentType.getPlayer(context, "soulmate")
+                            ))
                         )
                     )
-                    .then(literal("set")
-                        .then(argument("player", EntityArgumentType.player())
-                            .then(argument("soulmate", EntityArgumentType.player())
-                                .executes(context -> setSoulmate(
-                                    context.getSource(),
-                                    EntityArgumentType.getPlayer(context, "player"),
-                                    EntityArgumentType.getPlayer(context, "soulmate")
-                                ))
-                            )
-                        )
+                )
+                .then(literal("list")
+                    .executes(context -> listSoulmates(context.getSource()))
+                )
+                .then(literal("reset")
+                    .then(argument("player", EntityArgumentType.player())
+                        .executes(context -> resetSoulmate(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
                     )
-                    .then(literal("list")
-                        .executes(context -> listSoulmates(context.getSource()))
-                    )
-                    .then(literal("reset")
-                        .then(argument("player", EntityArgumentType.player())
-                            .executes(context -> resetSoulmate(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
-                        )
-                    )
-                    .then(literal("resetAll")
-                        .executes(context -> resetAllSoulmates(context.getSource()))
-                    )
-                    .then(literal("rollRandom")
-                        .executes(context -> rollSoulmates(context.getSource()))
-                    )
+                )
+                .then(literal("resetAll")
+                    .executes(context -> resetAllSoulmates(context.getSource()))
+                )
+                .then(literal("rollRandom")
+                    .executes(context -> rollSoulmates(context.getSource()))
                 )
         );
     }
@@ -143,7 +141,7 @@ public class DoubleLifeCommands {
 
         PlayerManager playerManager = source.getServer().getPlayerManager();
 
-        for (Map.Entry<UUID, UUID> entry : series.soulmates.entrySet()) {
+        for (Map.Entry<UUID, UUID> entry : series.soulmatesOrdered.entrySet()) {
             ServerPlayerEntity player = playerManager.getPlayer(entry.getKey());
             ServerPlayerEntity soulmate = playerManager.getPlayer(entry.getValue());
             MutableText pt1 = Text.literal(entry.getKey().toString());

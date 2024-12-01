@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
@@ -12,6 +13,8 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
+import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.*;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -37,6 +40,7 @@ public class LifeSeriesCommand {
                 )
                 .then(literal("setSeries")
                     .then(argument("series", StringArgumentType.string())
+                        .suggests((context, builder) -> CommandSource.suggestMatching(ALLOWED_SERIES_NAMES, builder))
                         .executes(context -> setSeries(
                             context.getSource(), StringArgumentType.getString(context, "series"), false)
                         )

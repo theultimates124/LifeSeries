@@ -144,7 +144,7 @@ public abstract class Series extends Session {
         Integer lives = currentSeries.getPlayerLives(player);
         return lives == check;
     }
-    public Boolean isOnSpecificLives(ServerPlayerEntity player, int check, boolean fallback) {
+    public boolean isOnSpecificLives(ServerPlayerEntity player, int check, boolean fallback) {
         Boolean isOnLife = isOnSpecificLives(player, check);
         if (isOnLife == null) return fallback;
         return isOnLife;

@@ -9,20 +9,22 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
+import org.spongepowered.asm.mixin.Mutable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
 public class LimitedLife extends Series {
 
     public BoogeymanManager boogeymanManager = new BoogeymanManager();
-    public static int delayUntilRemove = 20;
+    public static int ticksUntilSecond = 20;
 
     @Override
     public SeriesList getSeries() {
@@ -33,22 +35,38 @@ public class LimitedLife extends Series {
     public Blacklist createBlacklist() {
         return new LimitedLifeBlacklist();
     }
-
     @Override
-    public void tickSessionOn() {
-        super.tickSessionOn();
-        delayUntilRemove--;
-        if (delayUntilRemove <= 0) {
-            delayUntilRemove = 20;
-            secondPassed();
+    public void displayTimers(MinecraftServer server) {
+        //This function is called once every second, so we can
+        String message = "";
+        if (status == SessionStatus.NOT_STARTED) {
+            message = "Session has not started";
         }
-    }
-    public void secondPassed() {
+        else if (status == SessionStatus.STARTED) {
+            message = getRemainingLength();
+        }
+        else if (status == SessionStatus.PAUSED) {
+            message = "Session has been paused";
+        }
+        else if (status == SessionStatus.FINISHED) {
+            message = "Session has ended";
+        }
+
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
-            if (!hasAssignedLives(player)) continue;
-            if (!isAlive(player)) continue;
-            removePlayerLife(player);
-            player.sendMessage(getFormattedLives(getPlayerLives(player)), true);
+            if (status == SessionStatus.STARTED && isAlive(player)) {
+                // One second has passed - remove a players life
+                removePlayerLife(player);
+            }
+
+            MutableText fullMessage = Text.literal("");
+            if (displayTimer.contains(player.getUuid())) {
+                fullMessage.append(Text.literal(message).formatted(Formatting.GRAY));
+            }
+            if (hasAssignedLives(player)) {
+                if (!fullMessage.getString().isEmpty()) fullMessage.append(Text.of("  |  "));
+                fullMessage.append(getFormattedLives(getPlayerLives(player)));
+            }
+            player.sendMessage(fullMessage, true);
         }
     }
     @Override
@@ -99,29 +117,40 @@ public class LimitedLife extends Series {
     public Boolean isOnSpecificLives(ServerPlayerEntity player, int check) {
         if (!isAlive(player)) return null;
         Integer lives = currentSeries.getPlayerLives(player);
-        if (check == 1) return lives < 28800;
-        if (check == 2) return lives < 57600;
+        if (check == 1) return 0 < lives && lives < 28800;
+        if (check == 2) return 28800 <= lives && lives < 57600;
         if (check == 3) return lives >= 57600;
         return null;
     }
     @Override
     public void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
-        super.onPlayerDeath(player, source);
+        if (source != null) {
+            if (source.getAttacker() instanceof ServerPlayerEntity) {
+                onPlayerKilledByPlayer(player, (ServerPlayerEntity) source.getAttacker());
+                return;
+            }
+        }
+        else if (player.getPrimeAdversary() != null) {
+            if (player.getPrimeAdversary() instanceof ServerPlayerEntity) {
+                onPlayerKilledByPlayer(player, (ServerPlayerEntity) player.getPrimeAdversary());
+                return;
+            }
+        }
+        addToPlayerLives(player, -3600);
+        PlayerUtils.sendTitle(player, Text.literal("-1 hour").formatted(Formatting.RED), 20, 80, 20);
     }
     @Override
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
         Boogeyman boogeyman  = boogeymanManager.getBoogeyman(killer);
         if (boogeyman == null || boogeyman.cured) {
-            if (isAllowedToAttack(killer, victim)) {
-                addToPlayerLives(victim, -3600);
-                PlayerUtils.sendTitle(victim, Text.literal("-1 hour").formatted(Formatting.RED), 20, 80, 20);
-                addToPlayerLives(killer, 1800);
-                PlayerUtils.sendTitle(killer, Text.literal("+30 minutes").formatted(Formatting.GREEN), 20, 80, 20);
-                return;
-            }
-            OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + " was killed by "+killer.getNameForScoreboard() +
-                    ", who is not §cred name§f, and is not a §cboogeyman§f!"));
-            OtherUtils.broadcastMessageToAdmins(Text.of("No time has been removed from either of the players."));
+            addToPlayerLives(victim, -3600);
+            PlayerUtils.sendTitle(victim, Text.literal("-1 hour").formatted(Formatting.RED), 20, 80, 20);
+            addToPlayerLives(killer, 1800);
+            PlayerUtils.sendTitle(killer, Text.literal("+30 minutes").formatted(Formatting.GREEN), 20, 80, 20);
+            if (isAllowedToAttack(killer, victim)) return;
+            OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + "§7 was killed by §d"+killer.getNameForScoreboard() +
+                    "§7, who is not §cred name§7, and is not a §cboogeyman§f!"));
+            OtherUtils.broadcastMessageToAdmins(Text.of("§7Remember to remove or add time to them (using §f/lives add/remove <player> <time>§7) if this was indeed an unjustified kill."));
             return;
         }
         boogeymanManager.cure(killer);

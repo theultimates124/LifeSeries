@@ -1,8 +1,6 @@
 package net.mat0u5.lifeseries.utils;
 
 import net.minecraft.scoreboard.*;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import static net.mat0u5.lifeseries.Main.server;
