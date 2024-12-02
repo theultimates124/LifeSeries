@@ -8,8 +8,8 @@
 This server-side mod aims to recreate [Grian](https://www.youtube.com/c/Grian)'s Life Series in minecraft fabric, with as many QOL features as possible. 
 This includes automated lives tracking, automated team colors, automated session timer, automatic Boogeyman selection and kill tracking, and much more.<br>
 Join the [Discord](https://discord.gg/QWJxfb4zQZ) or make an issue if you want to submit any bugs / give suggestions.
------
 ## Features
+
 Currently, the first four seasons of the Life Series are implemented, the last two are much more complicated, but they are planned to be released.
 
 | Third Life | Last Life | Double Life | Limited Life | | Secret Life        | Wild Life   |
@@ -20,17 +20,18 @@ Currently, the first four seasons of the Life Series are implemented, the last t
 ### Selecting a series
 After first starting a server with this mod installed, you will need to choose the series you want. You can do this with the `/lifeseries setSeries <series>` command. Don't worry, you don't have to remember all of this, you will be given instructions in chat ;) <br>
 After you select your series, you must restart the server.
+
 ### Starting a session
 To start a session, you must first set its length using `/session timer set <time>`. The `<time>` field is a string, which includes the hours, minutes and seconds you want the session to last - example valid values: `30m`,`1h`, `1h45m`, `2h35m20s` <br>
 After you set your session time, you can simply run `/session start` to start the session.<br>
------
+
 ## The Blacklists
 Every session has certain blacklisted items to prevent players from getting to overpowered, just like Grian's series, where some for example banned enchantment tables and similar OP items.<br>
 Since I am creating this mod mainly for the group of players I am playing with, the Blacklists are catered to how we feel a balanced series should look like.<br>
 For Example most of the series have maces, end crystals, strength pots,... banned.<br>
 A similar feature to the item blacklist is enchantment clamping, which limits specific (mainly combat) enchantments to level 1.<br>
 **I understand that some people might want these banned features in the game, and I am planning to make the blacklists configurable, but this has not yet been implemented.**
------
+
 ## Commands & Subcommands
 Unless specified otherwise (using "*No permissions required.*"), all commands can only be used by opped players (permissionLevel >= 2)
 
