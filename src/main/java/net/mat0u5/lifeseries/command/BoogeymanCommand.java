@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
+import static net.mat0u5.lifeseries.utils.PermissionManager.isAdmin;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -29,35 +30,36 @@ public class BoogeymanCommand {
             currentSeries.getSeries() != SeriesList.LIMITED_LIFE) return;
         dispatcher.register(
             literal("boogeyman")
+                .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                 .then(literal("clear")
-                        .executes(context -> boogeyClear(
-                                context.getSource()
-                        ))
+                    .executes(context -> boogeyClear(
+                        context.getSource()
+                    ))
                 )
                 .then(literal("list")
-                        .executes(context -> boogeyList(
-                                context.getSource()
-                        ))
+                    .executes(context -> boogeyList(
+                        context.getSource()
+                    ))
                 )
                 .then(literal("add")
-                        .then(argument("player", EntityArgumentType.player())
-                                .executes(context -> addBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
-                        )
+                    .then(argument("player", EntityArgumentType.player())
+                        .executes(context -> addBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+                    )
                 )
                 .then(literal("remove")
-                        .then(argument("player", EntityArgumentType.player())
-                                .executes(context -> removeBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
-                        )
+                    .then(argument("player", EntityArgumentType.player())
+                        .executes(context -> removeBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+                    )
                 )
                 .then(literal("cure")
-                        .then(argument("player", EntityArgumentType.player())
-                                .executes(context -> cureBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
-                        )
+                    .then(argument("player", EntityArgumentType.player())
+                        .executes(context -> cureBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+                    )
                 )
                 .then(literal("chooseRandom")
-                        .executes(context -> boogeyChooseRandom(
-                                context.getSource()
-                        ))
+                    .executes(context -> boogeyChooseRandom(
+                        context.getSource()
+                    ))
                 )
 
         );

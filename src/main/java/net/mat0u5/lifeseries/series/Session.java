@@ -7,14 +7,14 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class Session {
+    public Map<UUID, Integer> playerNaturalDeathLog = new HashMap<>();
     public List<SessionAction> activeActions = new ArrayList<>();
     public List<UUID> displayTimer = new ArrayList<>();
-    public int DISPLAY_TIMER_INTERVAL = 20;
+    public static final int NATURAL_DEATH_LOG_MAX = 2400;
+    public static final int DISPLAY_TIMER_INTERVAL = 20;
     public int currentTimer = 20;
 
     public Integer sessionLength = null;
@@ -92,6 +92,22 @@ public class Session {
             displayTimers(server);
         }
 
+        if (playerNaturalDeathLog != null && !playerNaturalDeathLog.isEmpty()) {
+            int currentTime = server.getTicks();
+            List<UUID> removeQueue = new ArrayList<>();
+            for (Map.Entry<UUID, Integer> entry : playerNaturalDeathLog.entrySet()) {
+                int tickDiff = currentTime - entry.getValue();
+                if (tickDiff >= NATURAL_DEATH_LOG_MAX) {
+                    removeQueue.add(entry.getKey());
+                }
+            }
+            if (!removeQueue.isEmpty()) {
+                for (UUID uuid : removeQueue) {
+                    playerNaturalDeathLog.remove(uuid);
+                }
+            }
+        }
+
         if (!validTime()) return;
         if (status != SessionStatus.STARTED) return;
         tickSessionOn();
@@ -100,7 +116,6 @@ public class Session {
         passedTime++;
         if (passedTime >= sessionLength) {
             status = SessionStatus.FINISHED;
-            sessionEnd();
             OtherUtils.broadcastMessage(Text.literal("The session has ended!").formatted(Formatting.GOLD));
         }
 

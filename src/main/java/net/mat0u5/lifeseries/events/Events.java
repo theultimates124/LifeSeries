@@ -56,7 +56,6 @@ public class Events {
     private static void onServerStopping(MinecraftServer server) {
     }
     private static void onServerStart(MinecraftServer server) {
-        ServerWorld w = server.getOverworld();
         Main.server = server;
         currentSeries.initialize();
         DatabaseManager.initialize();

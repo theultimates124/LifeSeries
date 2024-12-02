@@ -11,15 +11,17 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static net.mat0u5.lifeseries.Main.server;
 
 public class PlayerUtils {
     public static void sendTitleWithSubtitle(ServerPlayerEntity player, Text title, Text subtitle, int fadeIn, int stay, int fadeOut) {
+        if (player == null) return;
+        if (player.isDead()) {
+            TaskScheduler.scheduleTask(5, () -> sendTitleWithSubtitle(server.getPlayerManager().getPlayer(player.getUuid()), title, subtitle, fadeIn, stay, fadeOut));
+            return;
+        }
         TitleFadeS2CPacket fadePacket = new TitleFadeS2CPacket(fadeIn, stay, fadeOut);
         player.networkHandler.sendPacket(fadePacket);
         TitleS2CPacket titlePacket = new TitleS2CPacket(title);
@@ -28,6 +30,11 @@ public class PlayerUtils {
         player.networkHandler.sendPacket(subtitlePacket);
     }
     public static void sendTitle(ServerPlayerEntity player, Text title, int fadeIn, int stay, int fadeOut) {
+        if (player == null) return;
+        if (player.isDead()) {
+            TaskScheduler.scheduleTask(5, () -> sendTitle(server.getPlayerManager().getPlayer(player.getUuid()), title, fadeIn, stay, fadeOut));
+            return;
+        }
         TitleFadeS2CPacket fadePacket = new TitleFadeS2CPacket(fadeIn, stay, fadeOut);
         player.networkHandler.sendPacket(fadePacket);
         TitleS2CPacket titlePacket = new TitleS2CPacket(title);

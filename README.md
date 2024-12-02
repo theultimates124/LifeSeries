@@ -12,9 +12,9 @@ Join the [Discord](https://discord.gg/QWJxfb4zQZ) or make an issue if you want t
 ## Features
 Currently, the first four seasons of the Life Series are implemented, the last two are much more complicated, but they are planned to be released.
 
-| Third Life | Last Life | Double Life | Limited Life  | | Secret Life | Wild Life   |
-|------------|-----------|-------------|---------------|-|-------------|-------------|
-| Completed  | Completed | Completed   | Like 95% done | | Not Started | Not Started |
+| Third Life | Last Life | Double Life | Limited Life | | Secret Life        | Wild Life   |
+|------------|-----------|-------------|--------------|-|--------------------|-------------|
+| Completed  | Completed | Completed   | Completed    | | Starting work soon | Not Started |
 -----
 ## Usage
 ### Selecting a series
@@ -77,6 +77,15 @@ This command **always** available
 </details>
 
 <details open>
+<summary>/claimkill</summary>
+
+*This command is only available when you have selected a Series.*
+- `/claimkill <player>` - Used when for example you kill a player as the Boogeyman with a trap, so you don't get automatically cured. An admin must confirm this claim for you to be cured. *No permissions required.*
+- `/claimkill validate <killer> <victim>` - This is the command the admin uses to validate a claimed kill.
+</details>
+
+
+<details open>
 <summary>/boogeyman</summary>
 
 *This command is only available when playing Last Life or Limited Life.*
@@ -95,7 +104,7 @@ This command **always** available
 - `/lives rollLives [<player>]` - Rolls 2-6 lives for everyone or for the `[<player>]`, if specified. *This command is only available when playing Last Life.*
 
 
-- `/soulmate` - *These commands is only available when playing Double Life.*
+- `/soulmate` - *These commands are only available when playing Double Life.*
   - `/soulmate get <player>` - Shows you who `<player>`'s soulmate is.
   - `/soulmate set <player1> <player2>` - Makes `<player1>` be `<player2>`'s soulmate.
   - `/soulmate list` - Shows you all the soulmate pairs.

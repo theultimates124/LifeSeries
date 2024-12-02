@@ -17,6 +17,7 @@ import net.minecraft.util.Formatting;
 import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.*;
+import static net.mat0u5.lifeseries.utils.PermissionManager.isAdmin;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -39,6 +40,7 @@ public class LifeSeriesCommand {
                     .executes(context -> getCredits(context.getSource()))
                 )
                 .then(literal("setSeries")
+                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                     .then(argument("series", StringArgumentType.string())
                         .suggests((context, builder) -> CommandSource.suggestMatching(ALLOWED_SERIES_NAMES, builder))
                         .executes(context -> setSeries(

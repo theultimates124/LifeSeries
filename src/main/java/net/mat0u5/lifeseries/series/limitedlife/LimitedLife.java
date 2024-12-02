@@ -23,7 +23,7 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 
 public class LimitedLife extends Series {
 
-    public BoogeymanManager boogeymanManager = new BoogeymanManager();
+    public LimitedLifeBoogeymanManager boogeymanManager = new LimitedLifeBoogeymanManager();
     public static int ticksUntilSecond = 20;
 
     @Override
@@ -130,36 +130,87 @@ public class LimitedLife extends Series {
                 return;
             }
         }
-        else if (player.getPrimeAdversary() != null) {
+        if (player.getPrimeAdversary() != null) {
             if (player.getPrimeAdversary() instanceof ServerPlayerEntity) {
                 onPlayerKilledByPlayer(player, (ServerPlayerEntity) player.getPrimeAdversary());
                 return;
             }
         }
+        onPlayerDiedNaturally(player);
         addToPlayerLives(player, -3600);
-        PlayerUtils.sendTitle(player, Text.literal("-1 hour").formatted(Formatting.RED), 20, 80, 20);
+        if (isAlive(player)) {
+            PlayerUtils.sendTitle(player, Text.literal("-1 hour").formatted(Formatting.RED), 20, 80, 20);
+        }
+    }
+    @Override
+    public void onClaimKill(ServerPlayerEntity killer, ServerPlayerEntity victim) {
+        Boogeyman boogeyman  = boogeymanManager.getBoogeyman(killer);
+        if (boogeyman == null || boogeyman.cured) {
+            addToPlayerLives(killer, 1800);
+            PlayerUtils.sendTitle(killer, Text.literal("+30 minutes").formatted(Formatting.GREEN), 20, 80, 20);
+            return;
+        }
+        boogeymanManager.cure(killer);
+
+        //Victim was killed by boogeyman - remove 2 hours from victim and add 1 hour to boogey
+        boolean wasAlive = false;
+        if (isAlive(victim)) {
+            addToPlayerLives(victim, -3600);
+            wasAlive = true;
+        }
+        addToPlayerLives(killer, 3600);
+        if (isAlive(victim)) {
+            PlayerUtils.sendTitle(killer, Text.literal("+1 hour").formatted(Formatting.GREEN), 20, 80, 20);
+            PlayerUtils.sendTitle(victim, Text.literal("-1 extra hour").formatted(Formatting.RED), 20, 80, 20);
+        }
+        else if (wasAlive) {
+            PlayerUtils.sendTitleWithSubtitle(killer,
+                    Text.literal("+1 hour").formatted(Formatting.GREEN),
+                    Text.literal("").append(victim.getStyledDisplayName()).append(Text.literal(" ran out of time!")),
+                    20, 80, 20);
+        }
+        else {
+            PlayerUtils.sendTitle(killer, Text.literal("+1 hour").formatted(Formatting.GREEN), 20, 80, 20);
+        }
     }
     @Override
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
         Boogeyman boogeyman  = boogeymanManager.getBoogeyman(killer);
         if (boogeyman == null || boogeyman.cured) {
+            boolean wasAllowedToAttack = isAllowedToAttack(killer, victim);
             addToPlayerLives(victim, -3600);
-            PlayerUtils.sendTitle(victim, Text.literal("-1 hour").formatted(Formatting.RED), 20, 80, 20);
             addToPlayerLives(killer, 1800);
-            PlayerUtils.sendTitle(killer, Text.literal("+30 minutes").formatted(Formatting.GREEN), 20, 80, 20);
-            if (isAllowedToAttack(killer, victim)) return;
-            OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + "§7 was killed by §d"+killer.getNameForScoreboard() +
+            if (isAlive(victim)) {
+                PlayerUtils.sendTitle(victim, Text.literal("-1 hour").formatted(Formatting.RED), 20, 80, 20);
+                PlayerUtils.sendTitle(killer, Text.literal("+30 minutes").formatted(Formatting.GREEN), 20, 80, 20);
+            }
+            else {
+                PlayerUtils.sendTitleWithSubtitle(killer,
+                        Text.literal("+30 minutes").formatted(Formatting.GREEN),
+                        Text.literal("").append(victim.getStyledDisplayName()).append(Text.literal(" ran out of time!")),
+                        20, 80, 20);
+            }
+            if (wasAllowedToAttack) return;
+            OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + "§7 was killed by §f"+killer.getNameForScoreboard() +
                     "§7, who is not §cred name§7, and is not a §cboogeyman§f!"));
             OtherUtils.broadcastMessageToAdmins(Text.of("§7Remember to remove or add time to them (using §f/lives add/remove <player> <time>§7) if this was indeed an unjustified kill."));
             return;
         }
         boogeymanManager.cure(killer);
 
-        //Victim was killed by boogeyman - remove 2 hours from victim and add extra 1 hour to boogey
+        //Victim was killed by boogeyman - remove 2 hours from victim and add 1 hour to boogey
         addToPlayerLives(victim, -7200);
-        PlayerUtils.sendTitle(victim, Text.literal("-2 hours").formatted(Formatting.RED), 20, 80, 20);
         addToPlayerLives(killer, 3600);
-        PlayerUtils.sendTitle(killer, Text.literal("+1 hour").formatted(Formatting.GREEN), 20, 80, 20);
+
+        if (isAlive(victim)) {
+            PlayerUtils.sendTitle(victim, Text.literal("-2 hours").formatted(Formatting.RED), 20, 80, 20);
+            PlayerUtils.sendTitleWithSubtitle(killer,Text.of("§aYou are cured!"), Text.literal("+1 hour").formatted(Formatting.GREEN), 20, 80, 20);
+        }
+        else {
+            PlayerUtils.sendTitleWithSubtitle(killer,Text.of("§aYou are cured, +1 hour"),
+                    Text.literal("").append(victim.getStyledDisplayName()).append(Text.literal(" ran out of time!"))
+                    , 20, 80, 20);
+        }
     }
     @Override
     public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {

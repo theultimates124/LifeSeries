@@ -4,10 +4,8 @@ import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.ScoreboardUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.mat0u5.lifeseries.utils.TeamUtils;
-import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -21,15 +19,14 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
-import org.apache.logging.log4j.core.jmx.Server;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
 
 public abstract class Series extends Session {
+
     public abstract SeriesList getSeries();
     public abstract Blacklist createBlacklist();
     public void initialize() {
@@ -162,17 +159,31 @@ public abstract class Series extends Session {
         Events
      */
     public void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
+        boolean killedByPlayer = false;
         if (source != null) {
             if (source.getAttacker() instanceof ServerPlayerEntity) {
                 onPlayerKilledByPlayer(player, (ServerPlayerEntity) source.getAttacker());
+                killedByPlayer = true;
             }
         }
-        else if (player.getPrimeAdversary() != null) {
+        if (player.getPrimeAdversary() != null && !killedByPlayer) {
             if (player.getPrimeAdversary() instanceof ServerPlayerEntity) {
                 onPlayerKilledByPlayer(player, (ServerPlayerEntity) player.getPrimeAdversary());
+                killedByPlayer = true;
             }
         }
+        if (!killedByPlayer) {
+            onPlayerDiedNaturally(player);
+        }
         removePlayerLife(player);
+    }
+    public void onPlayerDiedNaturally(ServerPlayerEntity player) {
+        if (playerNaturalDeathLog.containsKey(player.getUuid())) {
+            playerNaturalDeathLog.remove(player.getUuid());
+        }
+        playerNaturalDeathLog.put(player.getUuid(), server.getTicks());
+    }
+    public void onClaimKill(ServerPlayerEntity killer, ServerPlayerEntity victim) {
     }
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
 

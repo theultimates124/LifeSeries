@@ -23,7 +23,7 @@ import java.util.List;
 public class Main implements ModInitializer {
 	public static final String RESOURCEPACK_LINK = "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-78f06453bd0b83e1115b66cf8add50ab5c5fa1a5/RP.zip";
 	public static final String RESOURCEPACK_SHA1 = "345cf3d9bf7fa5a85323b94dafd85105ee0b05ee";
-	public static final String MOD_VERSION = "1.1.8";
+	public static final String MOD_VERSION = "1.1.9";
 	public static final String MOD_ID = "lifeseries";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ConfigManager config;
