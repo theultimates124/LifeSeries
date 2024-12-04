@@ -25,14 +25,17 @@ public enum SeriesList {
         return List.of(THIRD_LIFE,LAST_LIFE,DOUBLE_LIFE,LIMITED_LIFE,SECRET_LIFE,WILD_LIFE);
     }
     public static List<SeriesList> getAllImplemented() {
-        return List.of(THIRD_LIFE,LAST_LIFE,DOUBLE_LIFE,LIMITED_LIFE);
+        return List.of(THIRD_LIFE,LAST_LIFE,DOUBLE_LIFE,LIMITED_LIFE,SECRET_LIFE);
+    }
+    public static List<String> getImplementedSeriesNames() {
+        return List.of("thirdlife", "lastlife", "doublelife", "limitedlife", "secretlife");
     }
     public static String getDatapackName(SeriesList series) {
         if (series == THIRD_LIFE) return "Third Life Recipe Datapack.zip";
         if (series == LAST_LIFE) return "Last Life Recipe Datapack.zip";
         if (series == DOUBLE_LIFE) return "Double Life Recipe Datapack.zip";
         if (series == LIMITED_LIFE) return "Limited Life Recipe Datapack.zip";
-        if (series == SECRET_LIFE) return "";
+        if (series == SECRET_LIFE) return "Secret Life Recipe Datapack.zip";
         if (series == WILD_LIFE) return "";
         return "";
     }

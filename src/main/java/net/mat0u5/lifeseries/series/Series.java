@@ -29,6 +29,12 @@ public abstract class Series extends Session {
 
     public abstract SeriesList getSeries();
     public abstract Blacklist createBlacklist();
+    public String getResourcepackURL() {
+        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-main-5e2204b54e2f5e556012a4b6e5f7bd74a3d1e659/RP.zip";
+    }
+    public String getResourcepackSHA1() {
+        return "f44a80b445062e80d14676faf8020e846ca04ac2";
+    }
     public void initialize() {
         createTeams();
         createScoreboards();

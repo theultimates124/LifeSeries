@@ -13,6 +13,7 @@ import net.minecraft.text.Text;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
 
 public class PlayerUtils {
@@ -62,11 +63,13 @@ public class PlayerUtils {
         return server.getPlayerManager().getPlayerList();
     }
     public static void applyResorucepack(ServerPlayerEntity player) {
-        UUID id = UUID.nameUUIDFromBytes(Main.RESOURCEPACK_LINK.getBytes(StandardCharsets.UTF_8));
+        String RESOURCEPACK_LINK = currentSeries.getResourcepackURL();
+        String RESOURCEPACK_SHA1 = currentSeries.getResourcepackSHA1();
+        UUID id = UUID.nameUUIDFromBytes(RESOURCEPACK_LINK.getBytes(StandardCharsets.UTF_8));
         ResourcePackSendS2CPacket resourcepackPacket = new ResourcePackSendS2CPacket(
                 id,
-                Main.RESOURCEPACK_LINK,
-                Main.RESOURCEPACK_SHA1,
+                RESOURCEPACK_LINK,
+                RESOURCEPACK_SHA1,
                 true,
                 Optional.of(Text.translatable("Life Series resourcepack."))
         );
