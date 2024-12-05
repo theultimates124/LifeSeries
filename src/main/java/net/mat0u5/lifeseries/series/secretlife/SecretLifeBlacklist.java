@@ -1,4 +1,4 @@
-package net.mat0u5.lifeseries.series.doublelife;
+package net.mat0u5.lifeseries.series.secretlife;
 
 import net.mat0u5.lifeseries.series.Blacklist;
 import net.minecraft.block.Block;
@@ -16,11 +16,10 @@ import net.minecraft.registry.RegistryKey;
 
 import java.util.List;
 
-public class DoubleLifeBlacklist extends Blacklist {
+public class SecretLifeBlacklist extends Blacklist {
     public static final List<Item> BLACKLISTED_ITEMS = List.of(
             Items.LECTERN,
             Items.BOOKSHELF,
-            Items.ENCHANTING_TABLE,
             Items.MACE,
             Items.END_CRYSTAL,
             Items.LEATHER_HELMET,
@@ -48,12 +47,14 @@ public class DoubleLifeBlacklist extends Blacklist {
             Enchantments.POWER,
             Enchantments.PUNCH,
 
-            //Maybe we should enable protection enchantments?
+            /* maaaaybeee???
             Enchantments.PROTECTION,
             Enchantments.PROJECTILE_PROTECTION,
             Enchantments.BLAST_PROTECTION,
             Enchantments.FIRE_PROTECTION,
             Enchantments.FEATHER_FALLING,
+            */
+
             Enchantments.THORNS,
 
             Enchantments.BREACH,

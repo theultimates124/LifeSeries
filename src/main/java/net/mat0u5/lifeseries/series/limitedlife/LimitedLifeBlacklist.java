@@ -21,7 +21,7 @@ public class LimitedLifeBlacklist extends Blacklist {
             Items.LECTERN,
             Items.BOOKSHELF,
             Items.MACE,
-            Items.END_CRYSTAL,
+            //Items.END_CRYSTAL, Let The Chaos Ensue
             Items.LEATHER_HELMET,
             Items.CHAINMAIL_HELMET,
             Items.GOLDEN_HELMET,
@@ -87,6 +87,8 @@ public class LimitedLifeBlacklist extends Blacklist {
         if (potions == null) return false;
         for (StatusEffectInstance effect : potions.getEffects()) {
             if (effect.equals(StatusEffects.STRENGTH)) return true;
+            if (effect.equals(StatusEffects.INSTANT_HEALTH)) return true;
+            if (effect.equals(StatusEffects.INSTANT_DAMAGE)) return true;
         }
         return false;
     }

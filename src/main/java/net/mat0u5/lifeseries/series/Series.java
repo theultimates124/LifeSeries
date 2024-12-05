@@ -1,11 +1,9 @@
 package net.mat0u5.lifeseries.series;
 
-import net.mat0u5.lifeseries.utils.PlayerUtils;
-import net.mat0u5.lifeseries.utils.ScoreboardUtils;
-import net.mat0u5.lifeseries.utils.TaskScheduler;
-import net.mat0u5.lifeseries.utils.TeamUtils;
+import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -30,14 +28,24 @@ public abstract class Series extends Session {
     public abstract SeriesList getSeries();
     public abstract Blacklist createBlacklist();
     public String getResourcepackURL() {
-        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-main-5e2204b54e2f5e556012a4b6e5f7bd74a3d1e659/RP.zip";
+        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-main-0c89c6fd068f52aeb882e1c0bda935eb46f24331/RP.zip";
     }
     public String getResourcepackSHA1() {
-        return "f44a80b445062e80d14676faf8020e846ca04ac2";
+        return "7f4eba01453f6cf58bf08131fc5576f5ed873679";
     }
     public void initialize() {
         createTeams();
         createScoreboards();
+        updateStuff();
+    }
+    public void updateStuff() {
+        OtherUtils.executeCommand("/gamerule keepInventory true");
+        if (getSeries() == SeriesList.SECRET_LIFE) {
+            OtherUtils.executeCommand("/gamerule naturalRegeneration false");
+        }
+        else {
+            OtherUtils.executeCommand("/gamerule naturalRegeneration true");
+        }
     }
     public void createTeams() {
         TeamUtils.createTeam("Dead", Formatting.DARK_GRAY);
@@ -225,6 +233,9 @@ public abstract class Series extends Session {
 
     }
     public void onPlayerJoin(ServerPlayerEntity player) {
+        if (getSeries() != SeriesList.SECRET_LIFE) {
+            Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(20);
+        }
         reloadPlayerTeam(player);
     }
     public List<ServerPlayerEntity> getNonRedPlayers() {

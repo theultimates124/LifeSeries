@@ -1,8 +1,6 @@
 package net.mat0u5.lifeseries.series.lastlife;
 
-import com.google.common.collect.Lists;
 import net.mat0u5.lifeseries.series.Blacklist;
-import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
@@ -92,6 +90,8 @@ public class LastLifeBlacklist extends Blacklist {
         if (potions == null) return false;
         for (StatusEffectInstance effect : potions.getEffects()) {
             if (effect.equals(StatusEffects.STRENGTH)) return true;
+            if (effect.equals(StatusEffects.INSTANT_HEALTH)) return true;
+            if (effect.equals(StatusEffects.INSTANT_DAMAGE)) return true;
         }
         return false;
     }

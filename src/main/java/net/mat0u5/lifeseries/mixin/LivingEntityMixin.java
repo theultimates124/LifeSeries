@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.mixin;
 
+import net.mat0u5.lifeseries.series.SeriesList;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -12,6 +13,14 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
+    @Inject(method = "heal", at = @At("HEAD"), cancellable = true)
+    private void onHealHead(float amount, CallbackInfo info) {
+        if (currentSeries.getSeries() != SeriesList.SECRET_LIFE) return;
+        LivingEntity entity = (LivingEntity) (Object) this;
+        if (entity instanceof PlayerEntity player) {
+            info.cancel();
+        }
+    }
     @Inject(method = "heal", at = @At("TAIL"))
     private void onHeal(float amount, CallbackInfo info) {
         LivingEntity entity = (LivingEntity) (Object) this;

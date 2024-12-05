@@ -14,6 +14,7 @@ import static net.mat0u5.lifeseries.Main.blacklist;
 public abstract class PlayerInventoryMixin {
     @Inject(method = "markDirty", at = @At("HEAD"))
     private void onInventoryUpdated(CallbackInfo ci) {
+        if (blacklist == null) return;
         PlayerInventory inventory = (PlayerInventory) (Object) this;
         PlayerEntity player = inventory.player;
         blacklist.onInventoryUpdated((ServerPlayerEntity) player,inventory,ci);

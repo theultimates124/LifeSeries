@@ -88,9 +88,11 @@ public class Events {
     }
 
     public static ActionResult onBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
+        if (blacklist == null) return ActionResult.PASS;
         return blacklist.onBlockUse(player,world,hand,hitResult);
     }
     public static ActionResult onBlockAttack(ServerPlayerEntity player, World world, BlockPos pos) {
+        if (blacklist == null) return ActionResult.PASS;
         if (world.isClient()) return ActionResult.PASS;
         return blacklist.onBlockAttack(player,world,pos);
     }

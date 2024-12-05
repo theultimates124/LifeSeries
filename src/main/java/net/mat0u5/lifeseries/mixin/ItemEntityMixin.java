@@ -2,9 +2,7 @@ package net.mat0u5.lifeseries.mixin;
 
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,6 +15,7 @@ public abstract class ItemEntityMixin {
 
     @Inject(method = "onPlayerCollision", at = @At("HEAD"), cancellable = true)
     private void onPlayerPickup(PlayerEntity player, CallbackInfo ci) {
+        if (blacklist == null) return;
         ItemEntity itemEntity = (ItemEntity) (Object) this;
         if (itemEntity.cannotPickup()) return;
         if (itemEntity.getWorld().isClient) return;

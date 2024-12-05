@@ -2,7 +2,10 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![Discord](https://badgen.net/discord/online-members/QWJxfb4zQZ?icon=discord&label=Discord&list=what)](https://discord.gg/QWJxfb4zQZ)
 
+[<img alt="modrinth" height="40" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/modrinth_vector.svg">](https://modrinth.com/mod/life-series)
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/mat0u5)
+
 
 # Life Series
 This server-side mod aims to recreate [Grian](https://www.youtube.com/c/Grian)'s Life Series in minecraft fabric, with as many QOL features as possible. 
@@ -12,9 +15,9 @@ Join the [Discord](https://discord.gg/QWJxfb4zQZ) or make an issue if you want t
 
 Currently, the first four seasons of the Life Series are implemented, the last two are much more complicated, but they are planned to be released.
 
-| Third Life | Last Life | Double Life | Limited Life | | Secret Life        | Wild Life   |
-|------------|-----------|-------------|--------------|-|--------------------|-------------|
-| Completed  | Completed | Completed   | Completed    | | Starting work soon | Not Started |
+| Third Life | Last Life | Double Life | Limited Life | | Secret Life | Wild Life   |
+|------------|-----------|-------------|--------------|-|-------------|-------------|
+| Completed  | Completed | Completed   | Completed    | | In Progress | Not Started |
 -----
 ## Usage
 ### Selecting a series
