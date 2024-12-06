@@ -84,7 +84,7 @@ This command **always** available
 <summary>/claimkill</summary>
 
 *This command is only available when you have selected a Series.*
-- `/claimkill <player>` - Used when for example you kill a player as the Boogeyman with a trap, so you don't get automatically cured. An admin must confirm this claim for you to be cured. *No permissions required.*
+- `/claimkill <player>` - Used when you'd want to claim credit for a kill. For example you kill a player as the Boogeyman with a trap, so you don't get automatically cured. Or when you gain something for killing players in a series (like Limited Life). An admin must confirm this claim for you to be given the kill rewards. *No permissions required.*
 - `/claimkill validate <killer> <victim>` - This is the command the admin uses to validate a claimed kill.
 </details>
 

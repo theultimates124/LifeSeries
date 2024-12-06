@@ -36,7 +36,7 @@ public class LimitedLifeBlacklist extends Blacklist {
             Blocks.LECTERN,
             Blocks.BOOKSHELF
     );
-    public static final List<RegistryKey<Enchantment>> LIMITED_ENCHANTMENTS = List.of(
+    public static final List<RegistryKey<Enchantment>> CLAMPED_ENCHANTMENTS = List.of(
             Enchantments.SHARPNESS,
             Enchantments.SMITE,
             Enchantments.BANE_OF_ARTHROPODS,
@@ -74,7 +74,7 @@ public class LimitedLifeBlacklist extends Blacklist {
 
     @Override
     public List<RegistryKey<Enchantment>> getClampedEnchants() {
-        return LIMITED_ENCHANTMENTS;
+        return CLAMPED_ENCHANTMENTS;
     }
 
     @Override

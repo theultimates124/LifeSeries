@@ -39,12 +39,13 @@ public abstract class Series extends Session {
         updateStuff();
     }
     public void updateStuff() {
-        OtherUtils.executeCommand("/gamerule keepInventory true");
+        OtherUtils.executeCommand("worldborder set 500");
+        OtherUtils.executeCommand("gamerule keepInventory true");
         if (getSeries() == SeriesList.SECRET_LIFE) {
-            OtherUtils.executeCommand("/gamerule naturalRegeneration false");
+            OtherUtils.executeCommand("gamerule naturalRegeneration false");
         }
         else {
-            OtherUtils.executeCommand("/gamerule naturalRegeneration true");
+            OtherUtils.executeCommand("gamerule naturalRegeneration true");
         }
     }
     public void createTeams() {

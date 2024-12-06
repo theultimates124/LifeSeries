@@ -1,11 +1,17 @@
 package net.mat0u5.lifeseries.series;
 
 import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.utils.PlayerUtils;
+import net.mat0u5.lifeseries.utils.WorldUitls;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.TeleportCommand;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.border.WorldBorder;
 
 import java.util.*;
 
@@ -107,6 +113,10 @@ public class Session {
                 }
             }
         }
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            if (player.isSpectator()) continue;
+            checkPlayerPosition(player);
+        }
 
         if (!validTime()) return;
         if (status != SessionStatus.STARTED) return;
@@ -130,6 +140,27 @@ public class Session {
             }
         }
         activeActions = remaining;
+    }
+    public void checkPlayerPosition(ServerPlayerEntity player) {
+        WorldBorder border = player.getWorld().getWorldBorder();
+        double playerSize = player.getBoundingBox().getLengthX()/2;
+        double minX = border.getBoundWest() + playerSize;
+        double maxX = border.getBoundEast() - playerSize;
+        double minZ = border.getBoundNorth() + playerSize;
+        double maxZ = border.getBoundSouth() - playerSize;
+
+        double playerX = player.getX();
+        double playerZ = player.getZ();
+
+        if (playerX < minX || playerX > maxX || playerZ < minZ || playerZ > maxZ) {
+            // Clamp player position inside the border
+            double clampedX = Math.max(minX, Math.min(maxX, playerX));
+            double clampedZ = Math.max(minZ, Math.min(maxZ, playerZ));
+            double safeY = WorldUitls.findSafeY(player.getWorld(), new Vec3d(clampedX, player.getY(), clampedZ));
+
+            // Teleport player inside the world border
+            player.teleport(player.getServerWorld(),clampedX, safeY, clampedZ, player.getYaw(), player.getPitch());
+        }
     }
     public void displayTimers(MinecraftServer server) {
         String message = "";
