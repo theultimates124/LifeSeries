@@ -19,7 +19,6 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -47,7 +46,6 @@ public class Events {
 
         ServerLivingEntityEvents.AFTER_DEATH.register(Events::onEntityDeath);
     }
-
     private static void onPlayerJoin(MinecraftServer server, ServerPlayerEntity player) {
         currentSeries.onPlayerJoin(player);
         ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;

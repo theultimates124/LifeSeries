@@ -24,6 +24,8 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
 
 public abstract class Series extends Session {
+    public boolean CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = false;
+    public boolean NO_HEALING = false;
 
     public abstract SeriesList getSeries();
     public abstract Blacklist createBlacklist();

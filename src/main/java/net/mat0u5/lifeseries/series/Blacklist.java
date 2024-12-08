@@ -6,6 +6,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
@@ -21,6 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +30,6 @@ public abstract class Blacklist {
     public abstract List<Item> getItemBlacklist();
     public abstract List<Block> getBlockBlacklist();
     public abstract List<RegistryKey<Enchantment>> getClampedEnchants();
-
-
 
     public ActionResult onBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
         processItemStack(player, player.getStackInHand(hand));
@@ -93,5 +93,18 @@ public abstract class Blacklist {
                 enchant.setValue(1);
             }
         }
+    }
+    public List<EnchantmentLevelEntry> clampEnchantmentList(List<EnchantmentLevelEntry> list) {
+        List<RegistryKey<Enchantment>> clamp = getClampedEnchants();
+        List<EnchantmentLevelEntry> result = new ArrayList<>();
+        for (EnchantmentLevelEntry enchantment : list) {
+            RegistryEntry<Enchantment> enchRegistryEntry = enchantment.enchantment;
+            Optional<RegistryKey<Enchantment>> enchantRegistryKey = enchRegistryEntry.getKey();
+            if (enchantRegistryKey.isEmpty()) continue;
+            if (clamp.contains(enchantRegistryKey.get())) {
+                result.add(new EnchantmentLevelEntry(enchRegistryEntry, 1));
+            }
+        }
+        return result;
     }
 }

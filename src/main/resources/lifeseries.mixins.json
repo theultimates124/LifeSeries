@@ -9,7 +9,8 @@
 		"MobEntityMixin",
 		"SpawnEggItemMixin",
 		"LivingEntityMixin",
-		"PlayerEntityMixin"
+		"PlayerEntityMixin",
+		"EnchantmentHelperMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -10,6 +10,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import java.util.Objects;
 
 public class SecretLife extends Series {
+
     public static final double MAX_HEALTH = 60.0d;
     @Override
     public SeriesList getSeries() {
@@ -18,6 +19,12 @@ public class SecretLife extends Series {
     @Override
     public Blacklist createBlacklist() {
         return new SecretLifeBlacklist();
+    }
+    @Override
+    public void initialize() {
+        super.initialize();
+        CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = true;
+        NO_HEALING = true;
     }
     @Override
     public String getResourcepackURL() {

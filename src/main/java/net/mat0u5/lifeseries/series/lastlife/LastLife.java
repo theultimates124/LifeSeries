@@ -24,6 +24,11 @@ public class LastLife extends Series {
         return new LastLifeBlacklist();
     }
     @Override
+    public void initialize() {
+        super.initialize();
+        CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = true;
+    }
+    @Override
     public void sessionStart() {
         super.sessionStart();
         boogeymanManager.resetBoogeymen();

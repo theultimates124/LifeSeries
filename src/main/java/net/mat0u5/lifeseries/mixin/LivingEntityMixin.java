@@ -15,7 +15,8 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 public abstract class LivingEntityMixin {
     @Inject(method = "heal", at = @At("HEAD"), cancellable = true)
     private void onHealHead(float amount, CallbackInfo info) {
-        if (currentSeries.getSeries() != SeriesList.SECRET_LIFE) return;
+        if (!currentSeries.NO_HEALING) return;
+
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity instanceof PlayerEntity player) {
             info.cancel();

@@ -9,23 +9,16 @@ import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
-import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.damage.DamageType;
-import net.minecraft.entity.damage.DamageTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.command.DamageCommand;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 import java.util.*;
 
@@ -52,6 +45,11 @@ public class DoubleLife extends Series {
     @Override
     public Blacklist createBlacklist() {
         return new DoubleLifeBlacklist();
+    }
+    @Override
+    public void initialize() {
+        super.initialize();
+        CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = true;
     }
     @Override
     public void onPlayerJoin(ServerPlayerEntity player) {

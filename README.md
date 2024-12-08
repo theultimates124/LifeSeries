@@ -33,7 +33,8 @@ Every session has certain blacklisted items to prevent players from getting to o
 Since I am creating this mod mainly for the group of players I am playing with, the Blacklists are catered to how we feel a balanced series should look like.<br>
 For Example most of the series have maces, end crystals, strength pots,... banned.<br>
 A similar feature to the item blacklist is enchantment clamping, which limits specific (mainly combat) enchantments to level 1.<br>
-**I understand that some people might want these banned features in the game, and I am planning to make the blacklists configurable, but this has not yet been implemented.**
+**I understand that some people might want these banned features in the game, and I am planning to make the blacklists configurable, but this has not yet been implemented.**<br>
+On series where bookshelves are banned, the enchantment table has been modified a little bit to give all enchantments (because in vanilla its impossible to get some without bookshelves), and its also possible to get higher levels on some enchants directly from the table (like efficiency, unbreaking, fortune,...)
 
 ## Commands & Subcommands
 Unless specified otherwise (using "*No permissions required.*"), all commands can only be used by opped players (permissionLevel >= 2)

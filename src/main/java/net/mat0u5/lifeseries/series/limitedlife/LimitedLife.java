@@ -36,6 +36,11 @@ public class LimitedLife extends Series {
         return new LimitedLifeBlacklist();
     }
     @Override
+    public void initialize() {
+        super.initialize();
+        CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = true;
+    }
+    @Override
     public void displayTimers(MinecraftServer server) {
         //This function is called once every second, so we can
         String message = "";
