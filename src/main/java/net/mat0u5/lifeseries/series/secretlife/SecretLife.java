@@ -1,16 +1,23 @@
 package net.mat0u5.lifeseries.series.secretlife;
 
+import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
+import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageType;
+import net.minecraft.entity.damage.DamageTypes;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 
 import java.util.Objects;
 
 public class SecretLife extends Series {
-
+    public static final RegistryKey<DamageType> TASK_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(Main.MOD_ID, "task"));
     public static final double MAX_HEALTH = 60.0d;
     @Override
     public SeriesList getSeries() {
@@ -52,10 +59,40 @@ public class SecretLife extends Series {
             player.setHealth((float) MAX_HEALTH);
         }
     }
-    public void setPlayerHealth(ServerPlayerEntity player, double newHealth) {
-        Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(newHealth);
+    public void removePlayerHealth(ServerPlayerEntity player, double health) {
+        addPlayerHealth(player,-health);
+    }
+    public void addPlayerHealth(ServerPlayerEntity player, double health) {
+        double currentHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
+        setPlayerHealth(player, currentHealth + health);
+    }
+    public void setPlayerHealth(ServerPlayerEntity player, double health) {
+        if (health > MAX_HEALTH) health = MAX_HEALTH;
+        Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(health);
+        if (player.getMaxHealth() > player.getHealth() && !player.isDead()) {
+            player.setHealth(player.getMaxHealth());
+        }
+    }
+    public double getPlayerHealth(ServerPlayerEntity player) {
+        return player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
+    }
+    public double getRoundedHealth(ServerPlayerEntity player) {
+        return Math.floor(player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH)*10)/10.0;
     }
     public void syncPlayerHealth(ServerPlayerEntity player) {
         setPlayerHealth(player, player.getHealth());
+    }
+    public void syncAllPlayerHealth() {
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            setPlayerHealth(player, player.getHealth());
+        }
+    }
+    public void resetPlayerHealth(ServerPlayerEntity player) {
+        setPlayerHealth(player, MAX_HEALTH);
+    }
+    public void resetAllPlayerHealth() {
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            resetPlayerHealth(player);
+        }
     }
 }

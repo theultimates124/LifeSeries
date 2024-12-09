@@ -7,6 +7,7 @@ import net.mat0u5.lifeseries.events.Events;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLifeCommands;
 import net.mat0u5.lifeseries.series.lastlife.LastLifeCommands;
 import net.mat0u5.lifeseries.series.limitedlife.LimitedLifeCommands;
+import net.mat0u5.lifeseries.series.secretlife.SecretLifeCommands;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
@@ -26,6 +27,7 @@ public class ModRegistries {
         CommandRegistrationCallback.EVENT.register(DoubleLifeCommands::register);
         CommandRegistrationCallback.EVENT.register(LastLifeCommands::register);
         CommandRegistrationCallback.EVENT.register(LimitedLifeCommands::register);
+        CommandRegistrationCallback.EVENT.register(SecretLifeCommands::register);
 
         CommandRegistrationCallback.EVENT.register(LivesCommand::register);
         CommandRegistrationCallback.EVENT.register(SessionCommand::register);

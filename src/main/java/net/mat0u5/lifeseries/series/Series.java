@@ -24,6 +24,7 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
 
 public abstract class Series extends Session {
+    public boolean DROP_SPAWN_EGGS = true;
     public boolean CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = false;
     public boolean NO_HEALING = false;
 
@@ -166,6 +167,7 @@ public abstract class Series extends Session {
     public void playerLostAllLives(ServerPlayerEntity player) {
         player.changeGameMode(GameMode.SPECTATOR);
         PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER);
+        WorldUitls.summonHarmlessLightning(player.getServerWorld(), player);
     }
     public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
         if (isOnLastLife(attacker, false)) return true;
@@ -209,9 +211,11 @@ public abstract class Series extends Session {
 
     }
     public void onMobDeath(LivingEntity entity, DamageSource damageSource) {
+        if (!DROP_SPAWN_EGGS) return;
         if (entity.getEntityWorld().isClient() || !(damageSource.getAttacker() instanceof ServerPlayerEntity)) {
             return;
         }
+
         if (entity instanceof EnderDragonEntity) return;
         if (entity instanceof WitherEntity) return;
         if (entity instanceof WardenEntity) return;
@@ -227,8 +231,8 @@ public abstract class Series extends Session {
         if (spawnEggItem == null) return;
         if (spawnEggItem.isEmpty()) return;
 
-        // Drop the spawn egg with a 3% chance
-        if (Math.random() <= 0.0333d) {
+        // Drop the spawn egg with a 5% chance
+        if (Math.random() <= 0.05d) {
             entity.dropStack(spawnEggItem);
         }
     }

@@ -117,3 +117,17 @@ This command **always** available
   - `/soulmate resetAll` - Resets all soulmates.
   - `/soulmate rollRandom` - Rolls random soulmates from the list of online players.
 </details>
+
+<details open>
+<summary>/lives</summary>
+
+*This command is only available when playing Secret Life.*
+- `/health` - Shows you the amount of health you have (pr useless huh xD). *No permissions required.*
+- `/health sync` - Synchronizes the health and max health of all players. This should never be necessary to run.
+- `/health add <player> [amount]` - Adds `[amount]` health to `<player>`. If `[amount]` is not specified, it defaults to 1.
+- `/health remove <player> [amount]` - Removes `[amount]` health from `<player>`. If `[amount]` is not specified, it defaults to 1.
+- `/health set <player> <amount>` - Sets `<player>`'s health to `<amount>`.
+- `/health get <player>` - Shows you how much health `<player>` has.
+- `/health reset <player>` - Resets `<player>`'s health to 60 (default on Secret Life).
+- `/health resetAll` - Resets the health of all online players to 60 (default on Secret Life).
+</details>

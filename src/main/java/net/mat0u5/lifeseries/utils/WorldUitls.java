@@ -1,5 +1,9 @@
 package net.mat0u5.lifeseries.utils;
 
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LightningEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -31,5 +35,18 @@ public class WorldUitls {
                 && world.getBlockState(pos.up()).getCollisionShape(world, pos.up()).isEmpty();
 
         return isSolidBlockBelow && isNonCollisionAbove;
+    }
+    public static void summonHarmlessLightning(ServerWorld world, ServerPlayerEntity player) {
+        Vec3d playerPos = player.getPos();
+
+        // Create a new lightning entity
+        LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
+        lightning.setPos(playerPos.x, playerPos.y, playerPos.z);
+
+        // Prevent the lightning from dealing damage or causing fire
+        lightning.setCosmetic(true);
+
+        // Spawn the lightning entity in the world
+        world.spawnEntity(lightning);
     }
 }
