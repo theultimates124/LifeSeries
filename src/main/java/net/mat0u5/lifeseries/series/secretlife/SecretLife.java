@@ -8,7 +8,6 @@ import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
-import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -35,11 +34,11 @@ public class SecretLife extends Series {
     }
     @Override
     public String getResourcepackURL() {
-        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-secretlife-9cee1e5a515c44bb9d97b8344f4955db8640bf88/RP.zip";
+        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-secretlife-7e2a0c58de185efa815d5ef0d279e4e6687047cd/RP.zip";
     }
     @Override
     public String getResourcepackSHA1() {
-        return "1ad0f33082f86b0fd0c98acd49b4d5d2fdb9855d";
+        return "e4c5498814648eaa322fb5b7fb2479276e48dea7";
     }
     @Override
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {

@@ -17,6 +17,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.border.WorldBorder;
 
 import java.util.*;
 
@@ -42,9 +43,11 @@ public abstract class Series extends Session {
         updateStuff();
     }
     public void updateStuff() {
-        OtherUtils.executeCommand("worldborder set 500");
+        if (server.getOverworld().getWorldBorder().getSize() > 1000000) {
+            OtherUtils.executeCommand("worldborder set 500");
+        }
         OtherUtils.executeCommand("gamerule keepInventory true");
-        if (getSeries() == SeriesList.SECRET_LIFE) {
+        if (NO_HEALING) {
             OtherUtils.executeCommand("gamerule naturalRegeneration false");
         }
         else {

@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.series.limitedlife;
 
 import net.mat0u5.lifeseries.series.BoogeymanManager;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
@@ -46,6 +47,29 @@ public class LimitedLifeBoogeymanManager extends BoogeymanManager {
             addBoogeyman(boogey);
             boogey.sendMessage(Text.of("§7You are the Boogeyman. You must by any means necessary kill a §2dark green§7, §agreen§7 or §eyellow§7 name by direct action to be cured of the curse. " +
                     "If you fail, next session you will become a §cred name§7. All loyalties and friendships are removed while you are the Boogeyman."));
+        }
+    }
+    @Override
+    public void playerFailBoogeyman(ServerPlayerEntity player) {
+        if (!currentSeries.isAlive(player)) return;
+        if (currentSeries.isOnLastLife(player)) return;
+        String setTo = "";
+        if (currentSeries.isOnSpecificLives(player, 3)) {
+            setTo = "16";
+            currentSeries.setPlayerLives(player, 57600);
+        }
+        else if (currentSeries.isOnSpecificLives(player, 2)) {
+            setTo = "8";
+            currentSeries.setPlayerLives(player, 28800);
+        }
+
+        if (!currentSeries.isOnLastLife(player)) {
+            player.sendMessage(Text.of("§7You failed to kill a green or yellow name last session as the Boogeyman. As punishment, you have dropped to "+setTo + " hours left."));
+            OtherUtils.broadcastMessage(player.getStyledDisplayName().copy().append(Text.of("§7 failed to kill a player while being the §cBoogeyman§7. Their time has been dropped to "+setTo + " hours left.")));
+
+        }
+        else {
+            OtherUtils.broadcastMessage(player.getStyledDisplayName().copy().append(Text.of("§7 failed to kill a player while being the §cBoogeyman§7. But since they are already a Red life, nothing has changed :)")));
         }
     }
 }
