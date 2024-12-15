@@ -1,6 +1,6 @@
 package net.mat0u5.lifeseries.utils;
 
-import net.mat0u5.lifeseries.Main;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
@@ -9,7 +9,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -66,13 +69,35 @@ public class PlayerUtils {
         String RESOURCEPACK_LINK = currentSeries.getResourcepackURL();
         String RESOURCEPACK_SHA1 = currentSeries.getResourcepackSHA1();
         UUID id = UUID.nameUUIDFromBytes(RESOURCEPACK_LINK.getBytes(StandardCharsets.UTF_8));
-        ResourcePackSendS2CPacket resourcepackPacket = new ResourcePackSendS2CPacket(
-                id,
-                RESOURCEPACK_LINK,
-                RESOURCEPACK_SHA1,
-                true,
-                Optional.of(Text.translatable("Life Series resourcepack."))
-        );
-        player.networkHandler.sendPacket(resourcepackPacket);
+
+        if (player.getServer().isDedicated()) {
+            // Multiplayer environment
+            ResourcePackSendS2CPacket resourcepackPacket = new ResourcePackSendS2CPacket(
+                    id,
+                    RESOURCEPACK_LINK,
+                    RESOURCEPACK_SHA1,
+                    true,
+                    Optional.of(Text.translatable("Life Series resourcepack."))
+            );
+            player.networkHandler.sendPacket(resourcepackPacket);
+        } else {
+            // Singleplayer environment
+            // Doesnt work for some reason xD
+            MinecraftClient client = MinecraftClient.getInstance();
+            client.execute(() -> {
+                try {
+                    URL url = new URL(RESOURCEPACK_LINK);
+                    client.getServerResourcePackProvider().addResourcePack(
+                            id,
+                            url,
+                            RESOURCEPACK_SHA1
+                    );
+                } catch (MalformedURLException e) {
+                    // Handle invalid URL format
+                    client.player.sendMessage(Text.literal("Invalid resource pack URL!").formatted(Formatting.RED), false);
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 }

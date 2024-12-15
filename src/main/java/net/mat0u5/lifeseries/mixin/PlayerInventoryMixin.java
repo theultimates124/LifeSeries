@@ -17,6 +17,6 @@ public abstract class PlayerInventoryMixin {
         if (blacklist == null) return;
         PlayerInventory inventory = (PlayerInventory) (Object) this;
         PlayerEntity player = inventory.player;
-        blacklist.onInventoryUpdated((ServerPlayerEntity) player,inventory,ci);
+        blacklist.onInventoryUpdated(player,inventory,ci);
     }
 }

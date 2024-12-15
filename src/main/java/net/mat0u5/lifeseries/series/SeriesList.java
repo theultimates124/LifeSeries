@@ -28,7 +28,7 @@ public enum SeriesList {
         return List.of(THIRD_LIFE,LAST_LIFE,DOUBLE_LIFE,LIMITED_LIFE,SECRET_LIFE);
     }
     public static List<String> getImplementedSeriesNames() {
-        return List.of("thirdlife", "lastlife", "doublelife", "limitedlife", "secretlife");
+        return List.of("thirdlife", "lastlife", "doublelife", "limitedlife");
     }
     public static String getDatapackName(SeriesList series) {
         if (series == THIRD_LIFE) return "Third Life Recipe Datapack.zip";
