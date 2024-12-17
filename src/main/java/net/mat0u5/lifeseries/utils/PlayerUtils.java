@@ -71,33 +71,14 @@ public class PlayerUtils {
         UUID id = UUID.nameUUIDFromBytes(RESOURCEPACK_LINK.getBytes(StandardCharsets.UTF_8));
 
         if (player.getServer().isDedicated()) {
-            // Multiplayer environment
             ResourcePackSendS2CPacket resourcepackPacket = new ResourcePackSendS2CPacket(
                     id,
                     RESOURCEPACK_LINK,
                     RESOURCEPACK_SHA1,
-                    true,
+                    false,
                     Optional.of(Text.translatable("Life Series resourcepack."))
             );
             player.networkHandler.sendPacket(resourcepackPacket);
-        } else {
-            // Singleplayer environment
-            // Doesnt work for some reason xD
-            MinecraftClient client = MinecraftClient.getInstance();
-            client.execute(() -> {
-                try {
-                    URL url = new URL(RESOURCEPACK_LINK);
-                    client.getServerResourcePackProvider().addResourcePack(
-                            id,
-                            url,
-                            RESOURCEPACK_SHA1
-                    );
-                } catch (MalformedURLException e) {
-                    // Handle invalid URL format
-                    client.player.sendMessage(Text.literal("Invalid resource pack URL!").formatted(Formatting.RED), false);
-                    e.printStackTrace();
-                }
-            });
         }
     }
 }
