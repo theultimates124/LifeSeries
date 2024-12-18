@@ -70,6 +70,10 @@ public class ClaimKillCommand {
             source.sendError(Text.of(victim.getNameForScoreboard() + " did not die in the last 2 minutes. Or they might have been killed by a player directly."));
             return -1;
         }
+        if (player == victim) {
+            source.sendError(Text.of("You cannot claim credit for your own death :P"));
+            return -1;
+        }
         Text textAll = Text.literal("").append(player.getStyledDisplayName()).append("§7 claims credit for ")
                 .append(victim.getStyledDisplayName())
                 .append(Text.of("§7's death. Only an admin can validate this claim."));

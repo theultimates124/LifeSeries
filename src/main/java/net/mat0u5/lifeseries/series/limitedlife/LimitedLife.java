@@ -131,14 +131,18 @@ public class LimitedLife extends Series {
     public void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
         if (source != null) {
             if (source.getAttacker() instanceof ServerPlayerEntity) {
-                onPlayerKilledByPlayer(player, (ServerPlayerEntity) source.getAttacker());
-                return;
+                if (player != source.getAttacker()) {
+                    onPlayerKilledByPlayer(player, (ServerPlayerEntity) source.getAttacker());
+                    return;
+                }
             }
         }
         if (player.getPrimeAdversary() != null) {
             if (player.getPrimeAdversary() instanceof ServerPlayerEntity) {
-                onPlayerKilledByPlayer(player, (ServerPlayerEntity) player.getPrimeAdversary());
-                return;
+                if (player != player.getPrimeAdversary()) {
+                    onPlayerKilledByPlayer(player, (ServerPlayerEntity) player.getPrimeAdversary());
+                    return;
+                }
             }
         }
         onPlayerDiedNaturally(player);

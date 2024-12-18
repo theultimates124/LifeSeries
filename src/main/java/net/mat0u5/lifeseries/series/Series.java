@@ -184,14 +184,18 @@ public abstract class Series extends Session {
         boolean killedByPlayer = false;
         if (source != null) {
             if (source.getAttacker() instanceof ServerPlayerEntity) {
-                onPlayerKilledByPlayer(player, (ServerPlayerEntity) source.getAttacker());
-                killedByPlayer = true;
+                if (player != source.getAttacker()) {
+                    onPlayerKilledByPlayer(player, (ServerPlayerEntity) source.getAttacker());
+                    killedByPlayer = true;
+                }
             }
         }
         if (player.getPrimeAdversary() != null && !killedByPlayer) {
             if (player.getPrimeAdversary() instanceof ServerPlayerEntity) {
-                onPlayerKilledByPlayer(player, (ServerPlayerEntity) player.getPrimeAdversary());
-                killedByPlayer = true;
+                if (player != player.getPrimeAdversary()) {
+                    onPlayerKilledByPlayer(player, (ServerPlayerEntity) player.getPrimeAdversary());
+                    killedByPlayer = true;
+                }
             }
         }
         if (!killedByPlayer) {
