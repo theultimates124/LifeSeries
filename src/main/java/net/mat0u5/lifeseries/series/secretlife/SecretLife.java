@@ -1,22 +1,22 @@
 package net.mat0u5.lifeseries.series.secretlife;
 
-import net.mat0u5.lifeseries.Main;
+import net.mat0u5.lifeseries.config.StringListManager;
 import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageType;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 
+import java.util.List;
 import java.util.Objects;
 
 public class SecretLife extends Series {
-    public static final RegistryKey<DamageType> TASK_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(Main.MOD_ID, "task"));
+
+    public static StringListManager configEasyTasks;
+    public static StringListManager configHardTasks;
+    public static StringListManager configRedTasks;
     public static final double MAX_HEALTH = 60.0d;
     @Override
     public SeriesList getSeries() {
@@ -31,6 +31,15 @@ public class SecretLife extends Series {
         super.initialize();
         CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = true;
         NO_HEALING = true;
+        configEasyTasks = new StringListManager("./config/lifeseries/secretlife","easy-tasks.json");
+        configHardTasks = new StringListManager("./config/lifeseries/secretlife","hard-tasks.json");
+        configRedTasks = new StringListManager("./config/lifeseries/secretlife","red-tasks.json");
+        List<String> easy = configEasyTasks.loadStrings();
+        List<String> hard = configHardTasks.loadStrings();
+        List<String> red = configRedTasks.loadStrings();
+        System.out.println("configEasyTasks:"+easy);
+        System.out.println("configHardTasks:"+hard);
+        System.out.println("configRedTasks:"+red);
     }
     @Override
     public String getResourcepackURL() {

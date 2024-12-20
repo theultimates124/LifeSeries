@@ -1,7 +1,6 @@
 package net.mat0u5.lifeseries.series.doublelife;
 
 import net.mat0u5.lifeseries.Main;
-import net.mat0u5.lifeseries.config.DatabaseManager;
 import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
@@ -80,7 +79,7 @@ public class DoubleLife extends Series {
 
 
     public void loadSoulmates() {
-        soulmates = DatabaseManager.getAllSoulmates();
+        soulmates = DoubleLifeDatabase.getAllSoulmates();
         updateOrderedSoulmates();
     }
     public void updateOrderedSoulmates() {
@@ -93,8 +92,8 @@ public class DoubleLife extends Series {
     }
     public void saveSoulmates() {
         updateOrderedSoulmates();
-        DatabaseManager.deleteDoubleLifeSoulmates();
-        DatabaseManager.setAllSoulmates(soulmatesOrdered);
+        DoubleLifeDatabase.deleteDoubleLifeSoulmates();
+        DoubleLifeDatabase.setAllSoulmates(soulmatesOrdered);
     }
     public boolean isMainSoulmate(ServerPlayerEntity player) {
         return soulmatesOrdered.containsKey(player.getUuid());
@@ -135,7 +134,7 @@ public class DoubleLife extends Series {
     public void resetAllSoulmates() {
         soulmates = new HashMap<>();
         soulmatesOrdered = new HashMap<>();
-        DatabaseManager.deleteDoubleLifeSoulmates();
+        DoubleLifeDatabase.deleteDoubleLifeSoulmates();
     }
 
     public void rollSoulmates() {

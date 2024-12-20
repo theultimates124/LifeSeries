@@ -19,7 +19,6 @@ import java.util.List;
 public class SecretLifeBlacklist extends Blacklist {
     public static final List<Item> BLACKLISTED_ITEMS = List.of(
             Items.LECTERN,
-            Items.BOOKSHELF,
             Items.MACE,
             Items.END_CRYSTAL,
             Items.LEATHER_HELMET,
@@ -33,8 +32,7 @@ public class SecretLifeBlacklist extends Blacklist {
     );
 
     public static final List<Block> BLACKLISTED_BLOCKS = List.of(
-            Blocks.LECTERN,
-            Blocks.BOOKSHELF
+            Blocks.LECTERN
     );
     public static final List<RegistryKey<Enchantment>> CLAMPED_ENCHANTMENTS = List.of(
             Enchantments.SHARPNESS,
@@ -46,14 +44,6 @@ public class SecretLifeBlacklist extends Blacklist {
 
             Enchantments.POWER,
             Enchantments.PUNCH,
-
-            /* maaaaybeee???
-            Enchantments.PROTECTION,
-            Enchantments.PROJECTILE_PROTECTION,
-            Enchantments.BLAST_PROTECTION,
-            Enchantments.FIRE_PROTECTION,
-            Enchantments.FEATHER_FALLING,
-            */
 
             Enchantments.THORNS,
 
