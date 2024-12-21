@@ -92,6 +92,22 @@ public class SecretLifeCommands {
                     )
                 )
         );
+        dispatcher.register(
+            literal("task")
+                .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                .then(literal("test")
+                    .executes(context -> test(
+                        context.getSource())
+                    )
+                )
+        );
+    }
+    public static int test(ServerCommandSource source) {
+        MinecraftServer server = source.getServer();
+        final ServerPlayerEntity self = source.getPlayer();
+        if (self == null) return -1;
+        TaskManager.assignRandomTask(self);
+        return 1;
     }
     public static int showHealth(ServerCommandSource source) {
 
