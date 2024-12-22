@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.series.SeriesList;
+import net.mat0u5.lifeseries.series.secretlife.TaskManager;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -38,6 +39,10 @@ public class LifeSeriesCommand {
                 )
                 .then(literal("credits")
                     .executes(context -> getCredits(context.getSource()))
+                )
+                .then(literal("reload")
+                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                    .executes(context -> reload(context.getSource()))
                 )
                 .then(literal("setSeries")
                     .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
@@ -93,6 +98,13 @@ public class LifeSeriesCommand {
     }
     public static int getVersion(ServerCommandSource source) {
         source.sendMessage(Text.of("Mod version: "+ Main.MOD_VERSION));
+        return 1;
+    }
+    public static int reload(ServerCommandSource source) {
+        if (currentSeries.getSeries() == SeriesList.SECRET_LIFE) {
+            TaskManager.initialize();
+        }
+        source.sendMessage(Text.of("Reloaded."));
         return 1;
     }
     public static int getCredits(ServerCommandSource source) {

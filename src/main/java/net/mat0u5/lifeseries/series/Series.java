@@ -265,4 +265,27 @@ public abstract class Series extends Session {
         }
         return nonRedPlayers;
     }
+    public List<ServerPlayerEntity> getAlivePlayers() {
+        List<ServerPlayerEntity> players = PlayerUtils.getAllPlayers();
+        if (players == null) return new ArrayList<>();
+        if (players.isEmpty()) return new ArrayList<>();
+        List<ServerPlayerEntity> alivePlayers = new ArrayList<>();
+        for (ServerPlayerEntity player : players) {
+            if (!isAlive(player)) continue;
+            alivePlayers.add(player);
+        }
+        return alivePlayers;
+    }
+    public boolean anyGreenPlayers() {
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            if (isOnSpecificLives(player, 3, false)) return true;
+        }
+        return false;
+    }
+    public boolean anyYellowPlayers() {
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            if (isOnSpecificLives(player, 2, false)) return true;
+        }
+        return false;
+    }
 }

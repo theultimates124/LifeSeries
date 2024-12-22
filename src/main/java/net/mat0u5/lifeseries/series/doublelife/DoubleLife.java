@@ -8,6 +8,7 @@ import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
+import net.mat0u5.lifeseries.utils.WorldUitls;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.registry.RegistryKey;
@@ -18,6 +19,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.*;
 
@@ -31,6 +34,12 @@ public class DoubleLife extends Series {
         @Override
         public void trigger() {
             rollSoulmates();
+        }
+    };
+    public SessionAction actionRandomTP = new SessionAction(5) {
+        @Override
+        public void trigger() {
+            distributePlayers();
         }
     };
 
@@ -68,7 +77,7 @@ public class DoubleLife extends Series {
     @Override
     public void sessionStart() {
         super.sessionStart();
-        activeActions = List.of(actionChooseSoulmates);
+        activeActions = List.of(actionChooseSoulmates, actionRandomTP);
     }
     @Override
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
@@ -162,10 +171,25 @@ public class DoubleLife extends Series {
     public List<ServerPlayerEntity> getNonAssignedPlayers() {
         List<ServerPlayerEntity> playersToRoll = new ArrayList<>();
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            if (!isAlive(player)) continue;
             if (hasSoulmate(player)) continue;
             playersToRoll.add(player);
         }
         return playersToRoll;
+    }
+    public void distributePlayers() {
+        List<ServerPlayerEntity> players = getNonAssignedPlayers();
+        PlayerUtils.playSoundToPlayers(players, SoundEvents.ENTITY_ENDERMAN_TELEPORT);
+
+        for (ServerPlayerEntity player : players) {
+            BlockPos pos;
+            do {
+                pos = WorldUitls.getRandomCoords(player.getServerWorld());
+            }
+            while(player.getServerWorld().getBlockState(pos).isLiquid());
+            Vec3d tpPos = pos.toBottomCenterPos();
+            player.teleport(player.getServerWorld(), tpPos.getX(), tpPos.getY(), tpPos.getZ(), player.getYaw(), player.getPitch());
+        }
     }
 
     public void chooseRandomSoulmates() {

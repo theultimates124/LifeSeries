@@ -22,6 +22,7 @@ public class BoogeymanManager {
         public void trigger() {
             if (boogeymanChosen) return;
             OtherUtils.broadcastMessage(Text.literal("The Boogeyman is being chosen in 5 minutes.").formatted(Formatting.RED));
+            PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER);
         }
     };
     public SessionAction actionBoogeymanWarn2 = new SessionAction(OtherUtils.minutesToTicks(9)) {
@@ -29,6 +30,7 @@ public class BoogeymanManager {
         public void trigger() {
             if (boogeymanChosen) return;
             OtherUtils.broadcastMessage(Text.literal("The Boogeyman is being chosen in 1 minute.").formatted(Formatting.RED));
+            PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER);
         }
     };
     public SessionAction actionBoogeymanChoose = new SessionAction(OtherUtils.minutesToTicks(10)) {
@@ -96,9 +98,10 @@ public class BoogeymanManager {
     }
     public void prepareToChooseBoogeymen() {
         OtherUtils.broadcastMessage(Text.literal("The Boogeyman is about to be chosen.").formatted(Formatting.RED));
+        PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER);
         TaskScheduler.scheduleTask(100, () -> {
             resetBoogeymen();
-            chooseBoogeymen(PlayerUtils.getAllPlayers(), 100);
+            chooseBoogeymen(currentSeries.getAlivePlayers(), 100);
         });
     }
     public void chooseBoogeymen(List<ServerPlayerEntity> allowedPlayers, double currentChance) {
@@ -191,6 +194,7 @@ public class BoogeymanManager {
     public void onPlayerJoin(ServerPlayerEntity player) {
         if (!boogeymanChosen) return;
         if (rolledPlayers.contains(player.getUuid())) return;
+        if (!currentSeries.isAlive(player)) return;
         TaskScheduler.scheduleTask(200, () -> {
             player.sendMessage(Text.of("§cSince you were not present when the Boogeyman was being chosen, your chance to become the Boogeyman is now. Good luck!"));
             double chanceForBoogey = 100.0 /PlayerUtils.getAllPlayers().size();

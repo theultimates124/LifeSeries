@@ -106,7 +106,8 @@ public class SecretLifeCommands {
         MinecraftServer server = source.getServer();
         final ServerPlayerEntity self = source.getPlayer();
         if (self == null) return -1;
-        TaskManager.assignRandomTask(self);
+        //TaskManager.assignRandomTaskToPlayer(self);
+        TaskManager.assignRandomTasks();
         return 1;
     }
     public static int showHealth(ServerCommandSource source) {

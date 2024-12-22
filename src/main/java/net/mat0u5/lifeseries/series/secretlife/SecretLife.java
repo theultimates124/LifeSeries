@@ -8,6 +8,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import java.util.List;
 import java.util.Objects;
 
 public class SecretLife extends Series {
@@ -52,6 +53,11 @@ public class SecretLife extends Series {
             setPlayerHealth(player, MAX_HEALTH);
             player.setHealth((float) MAX_HEALTH);
         }
+    }
+    @Override
+    public void sessionStart() {
+        super.sessionStart();
+        activeActions = List.of(TaskManager.actionChooseTasks);
     }
     public void removePlayerHealth(ServerPlayerEntity player, double health) {
         addPlayerHealth(player,-health);
