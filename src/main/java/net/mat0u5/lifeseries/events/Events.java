@@ -3,6 +3,7 @@ package net.mat0u5.lifeseries.events;
 
 
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
@@ -14,11 +15,13 @@ import net.mat0u5.lifeseries.config.DatapackManager;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
+import net.mat0u5.lifeseries.utils.WorldUitls;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -31,6 +34,7 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 public class Events {
 
     public static void register() {
+        ServerLifecycleEvents.SERVER_STARTING.register(Events::onServerStarting);
         ServerLifecycleEvents.SERVER_STARTED.register(Events::onServerStart);
         ServerLifecycleEvents.SERVER_STOPPING.register(Events::onServerStopping);
         AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
@@ -52,6 +56,9 @@ public class Events {
         PlayerUtils.applyResorucepack(serverPlayer);
     }
     private static void onServerStopping(MinecraftServer server) {
+    }
+    private static void onServerStarting(MinecraftServer server) {
+        Main.server = server;
     }
     private static void onServerStart(MinecraftServer server) {
         Main.server = server;

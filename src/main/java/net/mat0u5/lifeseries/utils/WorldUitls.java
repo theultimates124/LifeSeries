@@ -6,6 +6,7 @@ import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
@@ -15,6 +16,20 @@ import java.util.Random;
 
 public class WorldUitls {
     static Random rnd = new Random();
+    public static boolean shouldChunkLoad(ServerWorld world, ChunkPos chunkPos) {
+        var border = world.getWorldBorder();
+        double minX = border.getBoundWest() - 32; // 2 chunks = 32 blocks
+        double maxX = border.getBoundEast() + 32;
+        double minZ = border.getBoundNorth() - 32;
+        double maxZ = border.getBoundSouth() + 32;
+
+        double chunkMinX = chunkPos.getStartX();
+        double chunkMaxX = chunkPos.getEndX();
+        double chunkMinZ = chunkPos.getStartZ();
+        double chunkMaxZ = chunkPos.getEndZ();
+
+        return !(chunkMaxX < minX || chunkMinX > maxX || chunkMaxZ < minZ || chunkMinZ > maxZ);
+    }
     public static BlockPos getRandomCoords(World world) {
         WorldBorder border = world.getWorldBorder();
         double minX = border.getBoundWest();

@@ -3,14 +3,21 @@ package net.mat0u5.lifeseries.series.secretlife;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import net.mat0u5.lifeseries.series.SeriesList;
+import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.utils.PermissionManager.isAdmin;
@@ -101,6 +108,14 @@ public class SecretLifeCommands {
                     )
                 )
         );
+        dispatcher.register(
+            literal("gift")
+                .then(argument("player", EntityArgumentType.player())
+                    .executes(context -> gift(
+                        context.getSource(), EntityArgumentType.getPlayer(context, "player"))
+                    )
+                )
+        );
     }
     public static int test(ServerCommandSource source) {
         MinecraftServer server = source.getServer();
@@ -108,6 +123,39 @@ public class SecretLifeCommands {
         if (self == null) return -1;
         //TaskManager.assignRandomTaskToPlayer(self);
         TaskManager.assignRandomTasks();
+        return 1;
+    }
+    static List<UUID> playersGiven = new ArrayList<>();
+    public static int gift(ServerCommandSource source, ServerPlayerEntity target) {
+        MinecraftServer server = source.getServer();
+        final ServerPlayerEntity self = source.getPlayer();
+        if (self == null) return -1;
+        if (target == null) return -1;
+        SecretLife secretLife = (SecretLife) currentSeries;
+
+        if (target == self) {
+            source.sendError(Text.of("Nice Try."));
+            return -1;
+        }
+        if (playersGiven.contains(self.getUuid())) {
+            source.sendError(Text.of("You have already gifted a heart this session."));
+            return -1;
+        }
+        if (!secretLife.isAlive(target)) {
+            source.sendError(Text.of("That player is not alive."));
+            return -1;
+        }
+        playersGiven.add(self.getUuid());
+        secretLife.addPlayerHealth(target, 2);
+        Text senderMessage = Text.literal("You have gifted a heart to ").append(target.getStyledDisplayName()).append(Text.of("."));
+        Text recipientMessage = Text.literal("").append(self.getStyledDisplayName()).append(Text.of("§a gave you a heart."));
+
+        self.sendMessage(senderMessage);
+        PlayerUtils.sendTitle(target, recipientMessage, 20, 20, 20);
+        target.sendMessage(recipientMessage);
+
+        PlayerUtils.playSoundToPlayers(List.of(self,target), SoundEvent.of(Identifier.of("minecraft","secretlife_life")));
+
         return 1;
     }
     public static int showHealth(ServerCommandSource source) {

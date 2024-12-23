@@ -104,11 +104,12 @@ public class TaskManager {
             PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("3").formatted(Formatting.RED),0,35,0);
         });
         TaskScheduler.scheduleTask(70, () -> {
-            PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvents.UI_BUTTON_CLICK.value());
+            //PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvents.UI_BUTTON_CLICK.value());
             PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("2").formatted(Formatting.RED),0,35,0);
+            PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvent.of(Identifier.of("minecraft","secretlife_task")));
         });
-        TaskScheduler.scheduleTask(100, () -> {
-            PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvents.UI_BUTTON_CLICK.value());
+        TaskScheduler.scheduleTask(105, () -> {
+            //PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvents.UI_BUTTON_CLICK.value());
             PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("1").formatted(Formatting.RED),0,35,0);
         });
         TaskScheduler.scheduleTask(130, () -> {
@@ -116,7 +117,7 @@ public class TaskManager {
                 AnimationUtils.playTotemAnimation(player);
             }
         });
-        TaskScheduler.scheduleTask(170, TaskManager::assignRandomTasks);
+        TaskScheduler.scheduleTask(165, TaskManager::assignRandomTasks);
     }
     public static void temp(ServerPlayerEntity player) {
         int i = 0;

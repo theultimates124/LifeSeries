@@ -62,16 +62,26 @@ public class SecretLife extends Series {
     public void removePlayerHealth(ServerPlayerEntity player, double health) {
         addPlayerHealth(player,-health);
     }
+    public void removePlayerHealthClamped(ServerPlayerEntity player, double health) {
+        addPlayerHealthClamped(player,-health);
+    }
     public void addPlayerHealth(ServerPlayerEntity player, double health) {
         double currentHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
         setPlayerHealth(player, currentHealth + health);
     }
+    public void addPlayerHealthClamped(ServerPlayerEntity player, double health) {
+        double currentHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
+        setPlayerHealthClamped(player, currentHealth + health);
+    }
     public void setPlayerHealth(ServerPlayerEntity player, double health) {
-        if (health > MAX_HEALTH) health = MAX_HEALTH;
         Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(health);
         if (player.getMaxHealth() > player.getHealth() && !player.isDead()) {
             player.setHealth(player.getMaxHealth());
         }
+    }
+    public void setPlayerHealthClamped(ServerPlayerEntity player, double health) {
+        if (health > MAX_HEALTH) health = MAX_HEALTH;
+        setPlayerHealth(player, health);
     }
     public double getPlayerHealth(ServerPlayerEntity player) {
         return player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
