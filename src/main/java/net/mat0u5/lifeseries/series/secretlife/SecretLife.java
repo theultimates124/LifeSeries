@@ -30,11 +30,11 @@ public class SecretLife extends Series {
     }
     @Override
     public String getResourcepackURL() {
-        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-secretlife-7e2a0c58de185efa815d5ef0d279e4e6687047cd/RP.zip";
+        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-secretlife-88c7bc3cf13c71a3325103851754755e11ef3280/RP.zip";
     }
     @Override
     public String getResourcepackSHA1() {
-        return "e4c5498814648eaa322fb5b7fb2479276e48dea7";
+        return "10cafd881ae1c8cdbc76b2627e175657cf3c7b52";
     }
     @Override
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
