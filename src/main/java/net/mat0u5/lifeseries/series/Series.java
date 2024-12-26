@@ -16,8 +16,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.border.WorldBorder;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
 
@@ -167,10 +170,24 @@ public abstract class Series extends Session {
         if (isOnLife == null) return fallback;
         return isOnLife;
     }
+    private HashMap<UUID, HashMap<Vec3d,List<Float>>> respawnPositions = new HashMap<>();
     public void playerLostAllLives(ServerPlayerEntity player) {
         player.changeGameMode(GameMode.SPECTATOR);
         PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER);
         WorldUitls.summonHarmlessLightning(player.getServerWorld(), player);
+        Vec3d pos = player.getPos();
+        HashMap<Vec3d, List<Float>> info = new HashMap<>();
+        info.put(pos, List.of(player.getYaw(),player.getPitch()));
+        respawnPositions.put(player.getUuid(), info);
+    }
+    public void getRespawnTarget(ServerPlayerEntity player, TeleportTarget.PostDimensionTransition postDimensionTransition, CallbackInfoReturnable<TeleportTarget> cir) {
+        if (!respawnPositions.containsKey(player.getUuid())) return;
+        HashMap<Vec3d, List<Float>> info = respawnPositions.get(player.getUuid());
+        respawnPositions.remove(player.getUuid());
+        for (Map.Entry<Vec3d, List<Float>> entry : info.entrySet()) {
+            cir.setReturnValue(new TeleportTarget(player.getServerWorld(), entry.getKey(), Vec3d.ZERO, entry.getValue().get(0), entry.getValue().get(1), postDimensionTransition));
+            break;
+        }
     }
     public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
         if (isOnLastLife(attacker, false)) return true;

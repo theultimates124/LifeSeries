@@ -10,7 +10,8 @@
 		"SpawnEggItemMixin",
 		"LivingEntityMixin",
 		"PlayerEntityMixin",
-		"EnchantmentHelperMixin"
+		"EnchantmentHelperMixin",
+		"ServerPlayerEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
