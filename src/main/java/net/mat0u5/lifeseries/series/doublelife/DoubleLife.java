@@ -77,7 +77,9 @@ public class DoubleLife extends Series {
     @Override
     public void sessionStart() {
         super.sessionStart();
-        activeActions = List.of(actionChooseSoulmates, actionRandomTP);
+        activeActions.addAll(
+                List.of(actionChooseSoulmates, actionRandomTP)
+        );
     }
     @Override
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {

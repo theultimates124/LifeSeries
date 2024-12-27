@@ -26,6 +26,14 @@ public class Session {
     public Integer sessionLength = null;
     public int passedTime;
     public SessionStatus status = SessionStatus.NOT_STARTED;
+
+    SessionAction defaultWarningAction = new SessionAction(OtherUtils.minutesToTicks(-5)) {
+        @Override
+        public void trigger() {
+            OtherUtils.broadcastMessage(Text.literal("Session ends in 5 minutes!").formatted(Formatting.GOLD));
+        }
+    };
+
     public void sessionStart() {
         if (!canStartSession()) return;
         status = SessionStatus.STARTED;
@@ -37,10 +45,12 @@ public class Session {
         OtherUtils.broadcastMessage(firstLine);
         OtherUtils.broadcastMessage(infoText1);
         OtherUtils.broadcastMessage(infoText2);
+        activeActions.clear();
+        activeActions.add(defaultWarningAction);
     }
     public void sessionEnd() {
         status = SessionStatus.FINISHED;
-        OtherUtils.broadcastMessage(Text.literal("Session stopped!").formatted(Formatting.GOLD));
+        OtherUtils.broadcastMessage(Text.literal("The session has ended!").formatted(Formatting.GOLD));
     }
     public void sessionPause() {
         if (status == SessionStatus.PAUSED) {
@@ -125,8 +135,7 @@ public class Session {
     public void tickSessionOn() {
         passedTime++;
         if (passedTime >= sessionLength) {
-            status = SessionStatus.FINISHED;
-            OtherUtils.broadcastMessage(Text.literal("The session has ended!").formatted(Formatting.GOLD));
+            sessionEnd();
         }
 
         //Actions
@@ -134,7 +143,7 @@ public class Session {
         if (activeActions.isEmpty()) return;
         List<SessionAction> remaining = new ArrayList<>();
         for (SessionAction action : activeActions) {
-            boolean triggered = action.tick(passedTime);
+            boolean triggered = action.tick(passedTime, sessionLength);
             if (!triggered) {
                 remaining.add(action);
             }

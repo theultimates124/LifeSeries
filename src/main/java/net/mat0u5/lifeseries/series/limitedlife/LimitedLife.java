@@ -245,11 +245,11 @@ public class LimitedLife extends Series {
     public void sessionStart() {
         super.sessionStart();
         boogeymanManager.resetBoogeymen();
-        activeActions = List.of(
+        activeActions.addAll(List.of(
                 boogeymanManager.actionBoogeymanWarn1,
                 boogeymanManager.actionBoogeymanWarn2,
                 boogeymanManager.actionBoogeymanChoose
-        );
+        ));
     }
     @Override
     public void sessionEnd() {

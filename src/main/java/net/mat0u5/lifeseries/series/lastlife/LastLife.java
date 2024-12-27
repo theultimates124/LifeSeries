@@ -32,12 +32,12 @@ public class LastLife extends Series {
     public void sessionStart() {
         super.sessionStart();
         boogeymanManager.resetBoogeymen();
-        activeActions = List.of(
-            livesManager.actionChooseLives,
-            boogeymanManager.actionBoogeymanWarn1,
-            boogeymanManager.actionBoogeymanWarn2,
-            boogeymanManager.actionBoogeymanChoose
-        );
+        activeActions.addAll(List.of(
+                livesManager.actionChooseLives,
+                boogeymanManager.actionBoogeymanWarn1,
+                boogeymanManager.actionBoogeymanWarn2,
+                boogeymanManager.actionBoogeymanChoose
+        ));
     }
     @Override
     public void sessionEnd() {

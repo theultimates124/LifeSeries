@@ -6,17 +6,32 @@ public abstract class SessionAction {
     public SessionAction(int triggerAtTicks) {
         this.triggerAtTicks = triggerAtTicks;
     }
-    public boolean tick(int currentTick) {
-        if (hasTriggered && triggerAtTicks > currentTick) {
-            hasTriggered = false;
+    public boolean tick(int currentTick, int sessionLength) {
+        if (triggerAtTicks < 0) {
+            int remaining = sessionLength-currentTick;
+            if (hasTriggered && remaining > -triggerAtTicks) {
+                hasTriggered = false;
+            }
+            if (hasTriggered) return true;
+            if (remaining <= -triggerAtTicks) {
+                hasTriggered = true;
+                trigger();
+                return true;
+            }
+            return false;
         }
-        if (hasTriggered) return true;
-        if (triggerAtTicks <= currentTick) {
-            hasTriggered = true;
-            trigger();
-            return true;
+        else {
+            if (hasTriggered && triggerAtTicks > currentTick) {
+                hasTriggered = false;
+            }
+            if (hasTriggered) return true;
+            if (triggerAtTicks <= currentTick) {
+                hasTriggered = true;
+                trigger();
+                return true;
+            }
+            return false;
         }
-        return false;
     }
     public abstract void trigger();
 }
