@@ -32,6 +32,7 @@ public class TaskManager {
     public static List<String> hardTasks;
     public static List<String> redTasks;
     public static Random rnd = new Random();
+
     public static void initialize() {
         StringListManager configEasyTasks = new StringListManager("./config/lifeseries/secretlife","easy-tasks.json");
         StringListManager configHardTasks = new StringListManager("./config/lifeseries/secretlife","hard-tasks.json");
@@ -40,6 +41,7 @@ public class TaskManager {
         hardTasks = configHardTasks.loadStrings();
         redTasks = configRedTasks.loadStrings();
     }
+
     public static Task getRandomTask(TaskType type) {
         //TODO don't give out tasks that have already been selected.
         String selectedTask = "";
@@ -54,6 +56,7 @@ public class TaskManager {
         }
         return new Task(selectedTask, type);
     }
+
     public static List<Task> getAllTasks(TaskType type) {
         List<Task> result = new ArrayList<>();
         List<String> tasks = easyTasks;
@@ -65,6 +68,7 @@ public class TaskManager {
         }
         return result;
     }
+
     public static ItemStack getTaskBook(ServerPlayerEntity player, Task task) {
         ItemStack book = new ItemStack(Items.WRITTEN_BOOK);
         WrittenBookContentComponent bookContent = new WrittenBookContentComponent(
@@ -78,25 +82,29 @@ public class TaskManager {
 
         ItemStackUtils.setCustomComponentBoolean(book, "SecretTask", true);
         ItemStackUtils.setCustomComponentInt(book, "TaskDifficulty", task.getDifficulty());
+        ItemStackUtils.setCustomComponentBoolean(book, "KillPermitted", task.killPermitted());
         return book;
     }
-    public static void assignRandomTaskToPlayer(ServerPlayerEntity player) {
+
+    public static void assignRandomTaskToPlayer(ServerPlayerEntity player, TaskType type) {
         if (!currentSeries.isAlive(player)) return;
-        TaskType type = TaskType.EASY;
-        if (currentSeries.isOnLastLife(player)) type = TaskType.RED;
         Task task = getRandomTask(type);
         ItemStack book = getTaskBook(player, task);
         //TODO if player doesnt have space
         player.giveItemStack(book);
     }
+
     public static void assignRandomTasks() {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             if (!currentSeries.isAlive(player)) continue;
-            assignRandomTaskToPlayer(player);
+            TaskType type = TaskType.EASY;
+            if (currentSeries.isOnLastLife(player)) type = TaskType.RED;
+            removePlayersTaskBook(player);
+            assignRandomTaskToPlayer(player, type);
         }
     }
+
     public static void chooseTasks(List<ServerPlayerEntity> allowedPlayers) {
-        //TODO add the whispering sound
         PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("Your secret is...").formatted(Formatting.RED),20,35,0);
 
         TaskScheduler.scheduleTask(40, () -> {
@@ -119,13 +127,120 @@ public class TaskManager {
         });
         TaskScheduler.scheduleTask(165, TaskManager::assignRandomTasks);
     }
-    public static void temp(ServerPlayerEntity player) {
-        int i = 0;
-        Task.checkPlayerColors();
-        for (Task task : getAllTasks(TaskType.RED)) {
-            if (!task.isValid()) continue;
-            ItemStack book = getTaskBook(player, task);
-            player.giveItemStack(book);
+
+    public static ItemStack getPlayersTaskBook(ServerPlayerEntity player) {
+        for (ItemStack item : PlayerUtils.getPlayerInventory(player)) {
+            if (ItemStackUtils.hasCustomComponentEntry(item,"SecretTask")) return item;
         }
+        return null;
+    }
+
+    public static void removePlayersTaskBook(ServerPlayerEntity player) {
+        for (ItemStack item : PlayerUtils.getPlayerInventory(player)) {
+            if (ItemStackUtils.hasCustomComponentEntry(item,"SecretTask")) {
+                PlayerUtils.clearItemStack(player, item);
+            }
+        }
+    }
+
+    public static boolean getPlayerKillPermitted(ServerPlayerEntity player) {
+        ItemStack item = getPlayersTaskBook(player);
+        if (item == null) return false;
+        if (!ItemStackUtils.hasCustomComponentEntry(item,"SecretTask")) return false;
+        if (!ItemStackUtils.hasCustomComponentEntry(item,"TaskDifficulty")) return false;
+        if (!ItemStackUtils.hasCustomComponentEntry(item,"KillPermitted")) return false;
+        return ItemStackUtils.getCustomComponentBoolean(item, "KillPermitted");
+    }
+
+    public static TaskType getPlayersTaskType(ServerPlayerEntity player) {
+        ItemStack item = getPlayersTaskBook(player);
+        if (item == null) return null;
+        if (!ItemStackUtils.hasCustomComponentEntry(item,"SecretTask")) return null;
+        if (!ItemStackUtils.hasCustomComponentEntry(item,"TaskDifficulty")) return null;
+        int difficulty = ItemStackUtils.getCustomComponentInt(item, "TaskDifficulty");
+        if (difficulty == 1) return TaskType.EASY;
+        if (difficulty == 2) return TaskType.HARD;
+        if (difficulty == 3) return TaskType.RED;
+        return null;
+    }
+
+    public static void addHealthThenItems(ServerPlayerEntity player, int addHealth) {
+        SecretLife series = (SecretLife) currentSeries;
+        double currentHealth = series.getPlayerHealth(player);
+        if (currentHealth > SecretLife.MAX_HEALTH) currentHealth = SecretLife.MAX_HEALTH;
+        int rounded = (int) Math.floor(currentHealth);
+        int remainderToMax = (int) SecretLife.MAX_HEALTH - rounded;
+
+        if (addHealth <= remainderToMax && remainderToMax != 0) {
+            series.addPlayerHealth(player, addHealth);
+        }
+        else if (remainderToMax != 0) {
+            series.setPlayerHealth(player, SecretLife.MAX_HEALTH);
+            int itemsNum = (addHealth - remainderToMax)/2;
+            if (itemsNum == 0) return;
+            System.out.println("Spawning " + itemsNum + " items.");
+        }
+    }
+
+    public static void succeedTask(ServerPlayerEntity player) {
+        //TODO animations
+        SecretLife series = (SecretLife) currentSeries;
+        TaskType type = getPlayersTaskType(player);
+        if (type == null) return;
+        removePlayersTaskBook(player);
+
+        if (type == TaskType.EASY) {
+            addHealthThenItems(player, 20);
+            return;
+        }
+        if (type == TaskType.HARD) {
+            addHealthThenItems(player, 40);
+            return;
+        }
+        if (type == TaskType.RED) {
+            addHealthThenItems(player, 10);
+            return;
+        }
+
+        if (series.isOnLastLife(player)) {
+            //TODO
+            assignRandomTaskToPlayer(player, TaskType.RED);
+        }
+    }
+
+    public static void rerollTask(ServerPlayerEntity player) {
+        //TODO animations
+        SecretLife series = (SecretLife) currentSeries;
+        TaskType type = getPlayersTaskType(player);
+        if (type == null) return;
+        if (type == TaskType.EASY) {
+            removePlayersTaskBook(player);
+            TaskType newType = TaskType.HARD;
+            if (series.isOnLastLife(player)) newType = TaskType.RED;
+            assignRandomTaskToPlayer(player, newType);
+        }
+    }
+
+    public static void failTask(ServerPlayerEntity player) {
+        //TODO animations
+        SecretLife series = (SecretLife) currentSeries;
+        TaskType type = getPlayersTaskType(player);
+        if (type == null) return;
+        removePlayersTaskBook(player);
+
+        if (type == TaskType.HARD) {
+            series.removePlayerHealth(player, 20);
+            return;
+        }
+        if (type == TaskType.RED) {
+            series.removePlayerHealth(player, 5);
+            return;
+        }
+
+        if (series.isOnLastLife(player)) {
+            //TODO
+            assignRandomTaskToPlayer(player, TaskType.RED);
+        }
+
     }
 }

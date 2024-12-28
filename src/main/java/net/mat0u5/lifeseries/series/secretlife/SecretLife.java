@@ -5,6 +5,7 @@ import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -17,7 +18,7 @@ public class SecretLife extends Series {
     SessionAction taskWarningAction = new SessionAction(OtherUtils.minutesToTicks(-5)) {
         @Override
         public void trigger() {
-            OtherUtils.broadcastMessage(Text.literal("Session ends in 5 minutes, you better finish secret tasks if you haven't!").formatted(Formatting.GOLD));
+            OtherUtils.broadcastMessage(Text.literal("Session ends in 5 minutes, you better finish your secret tasks if you haven't!").formatted(Formatting.GOLD));
         }
     };
 
@@ -82,6 +83,24 @@ public class SecretLife extends Series {
     @Override
     public void sessionEnd() {
         super.sessionEnd();
+    }
+
+    @Override
+    public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
+        if (isAllowedToAttack(killer, victim)) {
+            addPlayerHealth(killer, 20);
+            PlayerUtils.sendTitle(killer, Text.literal("+10 Hearts").formatted(Formatting.RED), 0, 40, 20);
+            return;
+        }
+        OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + " was killed by "
+                +killer.getNameForScoreboard() + ". The kill was not permitted with a task."));
+    }
+
+    @Override
+    public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
+        if (TaskManager.getPlayerKillPermitted(attacker)) return true;
+        if (attacker.getPrimeAdversary() == victim && (TaskManager.getPlayerKillPermitted(victim))) return true;
+        return false;
     }
 
     public void removePlayerHealth(ServerPlayerEntity player, double health) {

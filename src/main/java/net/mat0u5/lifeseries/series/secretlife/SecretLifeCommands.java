@@ -102,11 +102,27 @@ public class SecretLifeCommands {
         dispatcher.register(
             literal("task")
                 .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                .then(literal("test")
-                    .executes(context -> test(
-                        context.getSource())
+                    .then(literal("succeed")
+                            .then(argument("player", EntityArgumentType.player())
+                                    .executes(context -> succeedTask(
+                                            context.getSource(), EntityArgumentType.getPlayer(context, "player"))
+                                    )
+                            )
                     )
-                )
+                    .then(literal("fail")
+                            .then(argument("player", EntityArgumentType.player())
+                                    .executes(context -> failTask(
+                                            context.getSource(), EntityArgumentType.getPlayer(context, "player"))
+                                    )
+                            )
+                    )
+                    .then(literal("reroll")
+                            .then(argument("player", EntityArgumentType.player())
+                                    .executes(context -> rerollTask(
+                                            context.getSource(), EntityArgumentType.getPlayer(context, "player"))
+                                    )
+                            )
+                    )
         );
         dispatcher.register(
             literal("gift")
@@ -117,12 +133,22 @@ public class SecretLifeCommands {
                 )
         );
     }
-    public static int test(ServerCommandSource source) {
+    public static int succeedTask(ServerCommandSource source, ServerPlayerEntity target) {
         MinecraftServer server = source.getServer();
-        final ServerPlayerEntity self = source.getPlayer();
-        if (self == null) return -1;
-        //TaskManager.assignRandomTaskToPlayer(self);
-        TaskManager.assignRandomTasks();
+        if (target == null) return -1;
+        TaskManager.succeedTask(target);
+        return 1;
+    }
+    public static int failTask(ServerCommandSource source, ServerPlayerEntity target) {
+        MinecraftServer server = source.getServer();
+        if (target == null) return -1;
+        TaskManager.failTask(target);
+        return 1;
+    }
+    public static int rerollTask(ServerCommandSource source, ServerPlayerEntity target) {
+        MinecraftServer server = source.getServer();
+        if (target == null) return -1;
+        TaskManager.rerollTask(target);
         return 1;
     }
     static List<UUID> playersGiven = new ArrayList<>();

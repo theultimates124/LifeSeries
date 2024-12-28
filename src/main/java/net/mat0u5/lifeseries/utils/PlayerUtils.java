@@ -1,6 +1,8 @@
 package net.mat0u5.lifeseries.utils;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
@@ -9,10 +11,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -33,6 +32,7 @@ public class PlayerUtils {
         SubtitleS2CPacket subtitlePacket = new SubtitleS2CPacket(subtitle);
         player.networkHandler.sendPacket(subtitlePacket);
     }
+
     public static void sendTitle(ServerPlayerEntity player, Text title, int fadeIn, int stay, int fadeOut) {
         if (player == null) return;
         if (player.isDead()) {
@@ -44,27 +44,33 @@ public class PlayerUtils {
         TitleS2CPacket titlePacket = new TitleS2CPacket(title);
         player.networkHandler.sendPacket(titlePacket);
     }
+
     public static void sendTitleToPlayers(Collection<ServerPlayerEntity> players, Text title, int fadeIn, int stay, int fadeOut) {
         for (ServerPlayerEntity player : players) {
             sendTitle(player, title, fadeIn, stay, fadeOut);
         }
     }
+
     public static void sendTitleWithSubtitleToPlayers(Collection<ServerPlayerEntity> players, Text title, Text subtitle, int fadeIn, int stay, int fadeOut) {
         for (ServerPlayerEntity player : players) {
             sendTitleWithSubtitle(player, title, subtitle, fadeIn, stay, fadeOut);
         }
     }
+
     public static void playSoundToPlayers(Collection<ServerPlayerEntity> players, SoundEvent sound) {
         playSoundToPlayers(players,sound,SoundCategory.MASTER,1,1);
     }
+
     public static void playSoundToPlayers(Collection<ServerPlayerEntity> players, SoundEvent sound, SoundCategory soundCategory, int volume, int pitch) {
         for (ServerPlayerEntity player : players) {
             player.playSoundToPlayer(sound, soundCategory, volume, pitch);
         }
     }
+
     public static List<ServerPlayerEntity> getAllPlayers() {
         return server.getPlayerManager().getPlayerList();
     }
+
     public static void applyResorucepack(ServerPlayerEntity player) {
         String RESOURCEPACK_LINK = currentSeries.getResourcepackURL();
         String RESOURCEPACK_SHA1 = currentSeries.getResourcepackSHA1();
@@ -79,6 +85,29 @@ public class PlayerUtils {
                     Optional.of(Text.translatable("Life Series resourcepack."))
             );
             player.networkHandler.sendPacket(resourcepackPacket);
+        }
+    }
+
+    public static List<ItemStack> getPlayerInventory(ServerPlayerEntity player) {
+        List<ItemStack> list = new ArrayList<>();
+        Inventory inventory = player.getInventory();
+        for (int i = 0; i < inventory.size(); i++) {
+            ItemStack itemStack = inventory.getStack(i);
+            if (!itemStack.isEmpty()) {
+                list.add(itemStack);
+            }
+        }
+        return list;
+    }
+
+    public static void clearItemStack(ServerPlayerEntity player, ItemStack itemStack) {
+        if (itemStack == null || itemStack.isEmpty()) return;
+        Inventory inventory = player.getInventory();
+        for (int i = 0; i < inventory.size(); i++) {
+            ItemStack stack = inventory.getStack(i);
+            if (stack.equals(itemStack)) {
+                inventory.removeStack(i);
+            }
         }
     }
 }

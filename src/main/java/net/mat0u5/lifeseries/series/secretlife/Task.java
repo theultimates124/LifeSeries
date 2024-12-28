@@ -39,6 +39,7 @@ public class Task {
     ${green/yellow} - Replaced with "green" if there are any alive, or "yellow", if greens are dead. If both are dead, tasks are unavailable.
     ${green} - Replaced with "green". Tasks are only available when a green player is alive.
     ${yellow} - Replaced with "yellow". Tasks are only available when a yellow player is alive.
+    ${kill_not_permitted} - For red tasks. If its present, and the task owner kills a person, they will NOT get the 10 hearts for killing someone.
      */
     public List<RawFilteredPair<Text>> getBookLines() {
         List<RawFilteredPair<Text>> lines = new ArrayList<>();
@@ -68,6 +69,9 @@ public class Task {
         if (page.contains("${yellow}")) {
             if (anyYellowPlayers) page = page.replaceAll("\\$\\{yellow}","yellow");
         }
+        if (page.contains("${kill_not_permitted}")) {
+            if (anyYellowPlayers) page = page.replaceAll("\\$\\{kill_not_permitted}","");
+        }
         return page;
     }
     public int getDifficulty() {
@@ -75,5 +79,10 @@ public class Task {
         if (type == TaskType.HARD) return 2;
         if (type == TaskType.RED) return 3;
         return 0;
+    }
+    public boolean killPermitted() {
+        if (type != TaskType.RED) return false;
+        if (rawTask.contains("${kill_not_permitted}")) return false;
+        return true;
     }
 }
