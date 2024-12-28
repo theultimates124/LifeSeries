@@ -10,9 +10,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
@@ -96,6 +93,7 @@ public class SessionCommand {
 
         );
     }
+
     public static int getTime(ServerCommandSource source) {
         MinecraftServer server = source.getServer();
         final ServerPlayerEntity self = source.getPlayer();
@@ -108,6 +106,7 @@ public class SessionCommand {
         source.sendMessage(Text.of("The session ends in " + currentSession.getRemainingLength()));
         return 1;
     }
+
     public static int displayTimer(ServerCommandSource source) {
         MinecraftServer server = source.getServer();
         final ServerPlayerEntity self = source.getPlayer();
@@ -119,6 +118,7 @@ public class SessionCommand {
         else currentSession.addToDisplayTimer(self);
         return 1;
     }
+
     public static int startSession(ServerCommandSource source) {
         MinecraftServer server = source.getServer();
 
@@ -138,6 +138,7 @@ public class SessionCommand {
 
         return 1;
     }
+
     public static int stopSession(ServerCommandSource source) {
         MinecraftServer server = source.getServer();
 
@@ -150,6 +151,7 @@ public class SessionCommand {
 
         return 1;
     }
+
     public static int pauseSession(ServerCommandSource source) {
         MinecraftServer server = source.getServer();
 
@@ -162,6 +164,7 @@ public class SessionCommand {
 
         return 1;
     }
+
     public static int skipTime(ServerCommandSource source, String timeArgument) {
 
         int totalTicks = OtherUtils.parseTimeFromArgument(timeArgument);
@@ -173,6 +176,7 @@ public class SessionCommand {
 
         return 1;
     }
+
     public static int setTime(ServerCommandSource source, String timeArgument) {
 
         int totalTicks = OtherUtils.parseTimeFromArgument(timeArgument);
@@ -185,6 +189,7 @@ public class SessionCommand {
 
         return 1;
     }
+
     public static int addTime(ServerCommandSource source, String timeArgument) {
 
         int totalTicks = OtherUtils.parseTimeFromArgument(timeArgument);
@@ -197,6 +202,7 @@ public class SessionCommand {
 
         return 1;
     }
+
     public static int removeTime(ServerCommandSource source, String timeArgument) {
 
         int totalTicks = OtherUtils.parseTimeFromArgument(timeArgument);

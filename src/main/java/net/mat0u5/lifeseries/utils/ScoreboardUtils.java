@@ -10,6 +10,7 @@ public class ScoreboardUtils {
     public static ScoreboardObjective createObjective(String name) {
         return createObjective(name, name, ScoreboardCriterion.DUMMY);
     }
+
     public static ScoreboardObjective createObjective(String name, String displayName, ScoreboardCriterion criterion) {
         Scoreboard scoreboard = server.getScoreboard();
         if (scoreboard.getNullableObjective(name) != null) return null;

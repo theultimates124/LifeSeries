@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 public class TextUtils {
     private static HashMap<List<String>, List<String>> emotes = new HashMap<List<String>, List<String>>();
+
     public static void setEmotes() {
         emotes.put(List.of("skull"),List.of("☠"));
         emotes.put(List.of("smile"),List.of("☺"));
@@ -16,6 +17,7 @@ public class TextUtils {
         emotes.put(List.of("copyright"),List.of("©"));
         emotes.put(List.of("trademark","tm"),List.of("™"));
     }
+
     public static String replaceEmotes(String input) {
         for (Map.Entry<List<String>, List<String>> entry : emotes.entrySet()) {
             if (entry.getValue().size()==0) continue;
@@ -28,6 +30,7 @@ public class TextUtils {
         }
         return input;
     }
+
     public static String replaceCaseInsensitive(String input, String replaceWhat, String replaceWith) {
         Pattern pattern = Pattern.compile(replaceWhat, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(input);

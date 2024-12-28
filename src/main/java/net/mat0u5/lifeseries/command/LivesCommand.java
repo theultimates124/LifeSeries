@@ -93,6 +93,7 @@ public class LivesCommand {
             )
         );
     }
+
     public static int showLives(ServerCommandSource source) {
 
         MinecraftServer server = source.getServer();
@@ -112,6 +113,7 @@ public class LivesCommand {
 
         return 1;
     }
+
     public static int getLivesFor(ServerCommandSource source, ServerPlayerEntity target) {
         if (target == null) return -1;
 
@@ -127,11 +129,13 @@ public class LivesCommand {
         source.sendMessage(pt1.append(pt2).append(pt3));
         return 1;
     }
+
     public static int reloadLives(ServerCommandSource source) {
         MinecraftServer server = source.getServer();
         currentSeries.reloadAllPlayerTeams();
         return 1;
     }
+
     public static int lifeManager(ServerCommandSource source, ServerPlayerEntity target, int amount, boolean setNotGive) {
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
@@ -150,6 +154,7 @@ public class LivesCommand {
         }
         return 1;
     }
+
     public static int resetLives(ServerCommandSource source, ServerPlayerEntity target) {
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
@@ -159,6 +164,7 @@ public class LivesCommand {
         source.sendMessage(Text.literal("Reset ").append(target.getStyledDisplayName()).append(Text.of("'s lives.")));
         return 1;
     }
+
     public static int resetAllLives(ServerCommandSource source) {
         MinecraftServer server = source.getServer();
 

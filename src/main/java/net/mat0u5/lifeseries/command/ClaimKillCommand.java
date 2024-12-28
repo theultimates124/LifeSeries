@@ -49,6 +49,7 @@ public class ClaimKillCommand {
                 )
         );
     }
+
     public static List<String> getSuggestions() {
         List<String> suggestions = new ArrayList<>();
         Set<UUID> recentDeaths = currentSession.playerNaturalDeathLog.keySet();
@@ -59,6 +60,7 @@ public class ClaimKillCommand {
         }
         return suggestions;
     }
+
     public static int claimCredit(ServerCommandSource source, ServerPlayerEntity victim) {
         if (victim == null) return -1;
         PlayerEntity player = source.getPlayer();
@@ -89,6 +91,7 @@ public class ClaimKillCommand {
 
         return 1;
     }
+
     public static int claimCreditAccept(ServerCommandSource source, ServerPlayerEntity killer, ServerPlayerEntity victim) {
         if (killer == null) return -1;
         if (victim == null) return -1;

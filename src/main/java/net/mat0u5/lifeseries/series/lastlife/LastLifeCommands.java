@@ -1,7 +1,6 @@
 package net.mat0u5.lifeseries.series.lastlife;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.mat0u5.lifeseries.series.Boogeyman;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.AnimationUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
@@ -14,9 +13,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.utils.PermissionManager.isAdmin;
@@ -50,6 +47,7 @@ public class LastLifeCommands {
                 )
         );
     }
+
     public static int assignRandomLives(ServerCommandSource source, Collection<ServerPlayerEntity> players) {
         if (!isValidCommand(source)) return -1;
 
@@ -57,6 +55,7 @@ public class LastLifeCommands {
         ((LastLife) currentSeries).livesManager.assignRandomLives(players);
         return 1;
     }
+
     public static int giftLife(ServerCommandSource source, ServerPlayerEntity target) {
         if (!isValidCommand(source)) return -1;
 

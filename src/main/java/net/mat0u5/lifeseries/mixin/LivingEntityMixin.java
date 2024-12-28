@@ -22,6 +22,7 @@ public abstract class LivingEntityMixin {
             info.cancel();
         }
     }
+
     @Inject(method = "heal", at = @At("TAIL"))
     private void onHeal(float amount, CallbackInfo info) {
         LivingEntity entity = (LivingEntity) (Object) this;

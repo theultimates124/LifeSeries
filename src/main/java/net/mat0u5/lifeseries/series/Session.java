@@ -48,10 +48,12 @@ public class Session {
         activeActions.clear();
         activeActions.add(defaultWarningAction);
     }
+
     public void sessionEnd() {
         status = SessionStatus.FINISHED;
         OtherUtils.broadcastMessage(Text.literal("The session has ended!").formatted(Formatting.GOLD));
     }
+
     public void sessionPause() {
         if (status == SessionStatus.PAUSED) {
             OtherUtils.broadcastMessage(Text.literal("Session unpaused!").formatted(Formatting.GOLD));
@@ -62,40 +64,50 @@ public class Session {
             status = SessionStatus.PAUSED;
         }
     }
+
     public boolean canStartSession() {
         if (!validTime()) return false;
         if (status == SessionStatus.STARTED) return false;
         if (status == SessionStatus.PAUSED) return false;
         return true;
     }
+
     public void setSessionLength(int lengthTicks) {
         sessionLength = lengthTicks;
     }
+
     public void addSessionLength(int lengthTicks) {
         if (sessionLength == null) sessionLength = 0;
         sessionLength += lengthTicks;
     }
+
     public void removeSessionLength(int lengthTicks) {
         if (sessionLength == null) sessionLength = 0;
         sessionLength -= lengthTicks;
     }
+
     public String getSessionLength() {
         if (sessionLength == null) return "";
         return OtherUtils.formatTime(sessionLength);
     }
+
     public String getRemainingLength() {
         if (sessionLength == null) return "";
         return OtherUtils.formatTime(sessionLength-passedTime);
     }
+
     public boolean validTime() {
         return sessionLength != null;
     }
+
     public boolean isInDisplayTimer(ServerPlayerEntity player) {
         return displayTimer.contains(player.getUuid());
     }
+
     public void addToDisplayTimer(ServerPlayerEntity player) {
         displayTimer.add(player.getUuid());
     }
+
     public void removeFromDisplayTimer(ServerPlayerEntity player) {
         if (!displayTimer.contains(player.getUuid())) return;
         displayTimer.remove(player.getUuid());
@@ -132,6 +144,7 @@ public class Session {
         if (status != SessionStatus.STARTED) return;
         tickSessionOn();
     }
+
     public void tickSessionOn() {
         passedTime++;
         if (passedTime >= sessionLength) {
@@ -150,6 +163,7 @@ public class Session {
         }
         activeActions = remaining;
     }
+
     public void checkPlayerPosition(ServerPlayerEntity player) {
         WorldBorder border = player.getWorld().getWorldBorder();
         double playerSize = player.getBoundingBox().getLengthX()/2;
@@ -171,6 +185,7 @@ public class Session {
             player.teleport(player.getServerWorld(),clampedX, safeY, clampedZ, player.getYaw(), player.getPitch());
         }
     }
+
     public void displayTimers(MinecraftServer server) {
         String message = "";
         if (status == SessionStatus.NOT_STARTED) {

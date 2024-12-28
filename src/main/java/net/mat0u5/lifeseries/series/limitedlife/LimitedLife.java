@@ -13,11 +13,9 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
-import org.spongepowered.asm.mixin.Mutable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
@@ -35,11 +33,13 @@ public class LimitedLife extends Series {
     public Blacklist createBlacklist() {
         return new LimitedLifeBlacklist();
     }
+
     @Override
     public void initialize() {
         super.initialize();
         CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = true;
     }
+
     @Override
     public void displayTimers(MinecraftServer server) {
         //This function is called once every second, so we can
@@ -74,6 +74,7 @@ public class LimitedLife extends Series {
             player.sendMessage(fullMessage, true);
         }
     }
+
     @Override
     public Formatting getColorForLives(Integer lives) {
         if (lives == null) return Formatting.GRAY;
@@ -82,12 +83,14 @@ public class LimitedLife extends Series {
         if (lives >= 1) return Formatting.DARK_RED;
         return Formatting.DARK_GRAY;
     }
+
     @Override
     public Text getFormattedLives(Integer lives) {
         if (lives == null) return Text.empty();
         Formatting color = getColorForLives(lives);
         return Text.literal(OtherUtils.formatTime(lives*20)).formatted(color);
     }
+
     @Override
     public void reloadPlayerTeamActual(ServerPlayerEntity player) {
         Integer lives = getPlayerLives(player);
@@ -97,6 +100,7 @@ public class LimitedLife extends Series {
         else if (lives >= 28800) TeamUtils.addPlayerToTeam("Yellow",player);
         else if (lives >= 1) TeamUtils.addPlayerToTeam("Red",player);
     }
+
     @Override
     public void setPlayerLives(ServerPlayerEntity player, int lives) {
         Formatting colorBefore = player.getScoreboardTeam().getColor();
@@ -112,12 +116,14 @@ public class LimitedLife extends Series {
             reloadPlayerTeam(player);
         }
     }
+
     @Override
     public Boolean isOnLastLife(ServerPlayerEntity player) {
         if (!isAlive(player)) return null;
         Integer lives = currentSeries.getPlayerLives(player);
         return lives < 28800;
     }
+
     @Override
     public Boolean isOnSpecificLives(ServerPlayerEntity player, int check) {
         if (!isAlive(player)) return null;
@@ -127,6 +133,7 @@ public class LimitedLife extends Series {
         if (check == 3) return lives >= 57600;
         return null;
     }
+
     @Override
     public void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
         if (source != null) {
@@ -151,6 +158,7 @@ public class LimitedLife extends Series {
             PlayerUtils.sendTitle(player, Text.literal("-1 hour").formatted(Formatting.RED), 20, 80, 20);
         }
     }
+
     @Override
     public void onClaimKill(ServerPlayerEntity killer, ServerPlayerEntity victim) {
         Boogeyman boogeyman  = boogeymanManager.getBoogeyman(killer);
@@ -182,6 +190,7 @@ public class LimitedLife extends Series {
             PlayerUtils.sendTitle(killer, Text.literal("+1 hour").formatted(Formatting.GREEN), 20, 80, 20);
         }
     }
+
     @Override
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
         Boogeyman boogeyman  = boogeymanManager.getBoogeyman(killer);
@@ -221,6 +230,7 @@ public class LimitedLife extends Series {
                     , 20, 80, 20);
         }
     }
+
     @Override
     public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
         if (isOnLastLife(attacker, false)) return true;
@@ -233,6 +243,7 @@ public class LimitedLife extends Series {
         if (attacker.getPrimeAdversary() == victim && (boogeymanVictim != null && !boogeymanVictim.cured)) return true;
         return false;
     }
+
     @Override
     public void onPlayerJoin(ServerPlayerEntity player) {
         super.onPlayerJoin(player);
@@ -241,6 +252,7 @@ public class LimitedLife extends Series {
             setPlayerLives(player,86400);
         }
     }
+
     @Override
     public void sessionStart() {
         super.sessionStart();
@@ -251,11 +263,13 @@ public class LimitedLife extends Series {
                 boogeymanManager.actionBoogeymanChoose
         ));
     }
+
     @Override
     public void sessionEnd() {
         super.sessionEnd();
         boogeymanManager.sessionEnd();
     }
+
     @Override
     public void playerLostAllLives(ServerPlayerEntity player) {
         super.playerLostAllLives(player);
@@ -266,5 +280,4 @@ public class LimitedLife extends Series {
         PlayerUtils.sendTitleWithSubtitleToPlayers(players, player.getStyledDisplayName(), Text.literal("ran out of time!"), 20, 80, 20);
         OtherUtils.broadcastMessage(Text.literal("").append(player.getStyledDisplayName()).append(Text.of(" ran out of time")));
     }
-
 }

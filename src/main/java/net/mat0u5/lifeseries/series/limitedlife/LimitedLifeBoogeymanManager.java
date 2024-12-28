@@ -19,6 +19,7 @@ public class LimitedLifeBoogeymanManager extends BoogeymanManager {
     @Override
     public void onPlayerJoin(ServerPlayerEntity player) {
     }
+
     @Override
     public void boogeymenChooseRandom(List<ServerPlayerEntity> allowedPlayers, double currentChance) {
         List<ServerPlayerEntity> nonRedPlayers = currentSeries.getNonRedPlayers();
@@ -49,6 +50,7 @@ public class LimitedLifeBoogeymanManager extends BoogeymanManager {
                     "If you fail, next session you will become a §cred name§7. All loyalties and friendships are removed while you are the Boogeyman."));
         }
     }
+
     @Override
     public void playerFailBoogeyman(ServerPlayerEntity player) {
         if (!currentSeries.isAlive(player)) return;

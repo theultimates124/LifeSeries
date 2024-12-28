@@ -46,6 +46,7 @@ public class DatapackManager {
             Main.LOGGER.error("Error copying bundled datapacks.", e);
         }
     }
+
     private void handleNormal(Path targetFolder, URL resourceUrl) {
         try {
             // Running in development or where resources are on the file system
@@ -74,6 +75,7 @@ public class DatapackManager {
             Main.LOGGER.error("Error copying bundled datapacks.", e);
         }
     }
+
     private void handleJar(Path targetFolder, String resourcePath) {
         try {
             // Use the existing FileSystem for the JAR
@@ -115,24 +117,24 @@ public class DatapackManager {
         }
     }
 
-
-
-
     public void onServerStarted(MinecraftServer server) {
         disableAllDatapacks();
         TaskScheduler.scheduleTask(20, () -> copyBundledDatapacks(server));
         TaskScheduler.scheduleTask(50, this::reloadServer);
         TaskScheduler.scheduleTask(100, this::enableUsedDatapacks);
     }
+
     private void disableAllDatapacks() {
         for (SeriesList series : SeriesList.getAllImplemented()) {
             String datapackName = SeriesList.getDatapackName(series);
             OtherUtils.executeCommand("datapack disable \"file/"+datapackName+"\"");
         }
     }
+
     private void reloadServer() {
         OtherUtils.executeCommand("reload");
     }
+
     private void enableUsedDatapacks() {
         for (SeriesList series : SeriesList.getAllImplemented()) {
             String datapackName = SeriesList.getDatapackName(series);

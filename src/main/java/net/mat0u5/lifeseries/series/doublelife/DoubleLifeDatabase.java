@@ -15,6 +15,7 @@ public class DoubleLifeDatabase extends DatabaseManager {
             container.delete();
         }
     }
+
     public static void setAllSoulmates(Map<UUID, UUID> soulmates) {
         for (Map.Entry<UUID, UUID> entry : soulmates.entrySet()) {
             DataContainer container = doublelife.createContainer();
@@ -22,6 +23,7 @@ public class DoubleLifeDatabase extends DatabaseManager {
             container.put(JavaTypes.UUID, "player2", entry.getValue());
         }
     }
+
     public static Map<UUID, UUID> getAllSoulmates() {
         Map<UUID, UUID> soulmates = new HashMap<>();
         for (DataContainer container : doublelife.getContainers()) {

@@ -12,10 +12,12 @@ public class ThirdLife extends Series {
     public SeriesList getSeries() {
         return SeriesList.THIRD_LIFE;
     }
+
     @Override
     public Blacklist createBlacklist() {
         return new ThirdLifeBlacklist();
     }
+
     @Override
     public void onPlayerJoin(ServerPlayerEntity player) {
         super.onPlayerJoin(player);
@@ -24,6 +26,7 @@ public class ThirdLife extends Series {
             setPlayerLives(player,3);
         }
     }
+
     @Override
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
         if (isAllowedToAttack(killer, victim)) return;

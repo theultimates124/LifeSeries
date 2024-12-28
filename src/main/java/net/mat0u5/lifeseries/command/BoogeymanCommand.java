@@ -69,11 +69,13 @@ public class BoogeymanCommand {
 
         );
     }
+
     public static BoogeymanManager getBM() {
         if (currentSeries.getSeries() == SeriesList.LAST_LIFE) return ((LastLife) currentSeries).boogeymanManager;
         if (currentSeries.getSeries() == SeriesList.LIMITED_LIFE) return ((LimitedLife) currentSeries).boogeymanManager;
         return null;
     }
+
     public static int cureBoogey(ServerCommandSource source, ServerPlayerEntity target) {
 
         if (target == null) return -1;
@@ -91,6 +93,7 @@ public class BoogeymanCommand {
 
         return 1;
     }
+
     public static int addBoogey(ServerCommandSource source, ServerPlayerEntity target) {
 
         if (target == null) return -1;
@@ -108,6 +111,7 @@ public class BoogeymanCommand {
 
         return 1;
     }
+
     public static int removeBoogey(ServerCommandSource source, ServerPlayerEntity target) {
 
         if (target == null) return -1;
@@ -125,6 +129,7 @@ public class BoogeymanCommand {
 
         return 1;
     }
+
     public static int boogeyList(ServerCommandSource source) {
         BoogeymanManager bm = getBM();
         if (bm == null) return -1;
@@ -137,6 +142,7 @@ public class BoogeymanCommand {
 
         return 1;
     }
+
     public static int boogeyClear(ServerCommandSource source) {
         BoogeymanManager bm = getBM();
         if (bm == null) return -1;
@@ -146,6 +152,7 @@ public class BoogeymanCommand {
 
         return 1;
     }
+
     public static int boogeyChooseRandom(ServerCommandSource source) {
         BoogeymanManager bm = getBM();
         if (bm == null) return -1;

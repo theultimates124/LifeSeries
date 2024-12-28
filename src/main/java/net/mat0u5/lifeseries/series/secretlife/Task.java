@@ -20,10 +20,12 @@ public class Task {
         this.rawTask = task;
         this.type = type;
     }
+
     public static void checkPlayerColors() {
         anyGreenPlayers = currentSeries.anyGreenPlayers();
         anyYellowPlayers = currentSeries.anyYellowPlayers();
     }
+
     public boolean isValid() {
         if (rawTask == null) return false;
         if (rawTask.isEmpty()) return false;
@@ -49,6 +51,7 @@ public class Task {
         }
         return lines;
     }
+
     public String formatString(String page) {
         if (page.contains("${random_player}")) {
             List<ServerPlayerEntity> players = new ArrayList<>();
@@ -74,12 +77,14 @@ public class Task {
         }
         return page;
     }
+
     public int getDifficulty() {
         if (type == TaskType.EASY) return 1;
         if (type == TaskType.HARD) return 2;
         if (type == TaskType.RED) return 3;
         return 0;
     }
+
     public boolean killPermitted() {
         if (type != TaskType.RED) return false;
         if (rawTask.contains("${kill_not_permitted}")) return false;

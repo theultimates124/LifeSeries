@@ -32,6 +32,7 @@ public class LastLifeLivesManager {
         AnimationUtils.createSpiral(target);
         currentSeries.addPlayerLife(target);
     }
+
     public void assignRandomLivesToUnassignedPlayers() {
         List<ServerPlayerEntity> assignTo = new ArrayList<>();
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
@@ -41,6 +42,7 @@ public class LastLifeLivesManager {
         if (assignTo.isEmpty()) return;
         assignRandomLives(assignTo);
     }
+
     public void assignRandomLives(Collection<ServerPlayerEntity> players) {
         HashMap<ServerPlayerEntity, Integer> lives = new HashMap<>();
         for (ServerPlayerEntity player : players) {
@@ -53,6 +55,7 @@ public class LastLifeLivesManager {
             lifeRoll( 0, -1, lives);
         });
     }
+
     public void lifeRoll(int currentStep, int lastNum,  HashMap<ServerPlayerEntity, Integer> lives) {
         int delay = 1;
         if (currentStep >= 30) delay = 2;

@@ -1,11 +1,14 @@
 package net.mat0u5.lifeseries.series.secretlife;
 
 import net.mat0u5.lifeseries.series.*;
+import net.mat0u5.lifeseries.utils.ItemStackUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -13,8 +16,11 @@ import net.minecraft.util.Formatting;
 import java.util.List;
 import java.util.Objects;
 
+import static net.mat0u5.lifeseries.Main.currentSeries;
+
 public class SecretLife extends Series {
     public static final double MAX_HEALTH = 60.0d;
+    public ItemSpawner itemSpawner;
     SessionAction taskWarningAction = new SessionAction(OtherUtils.minutesToTicks(-5)) {
         @Override
         public void trigger() {
@@ -38,6 +44,47 @@ public class SecretLife extends Series {
         CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = true;
         NO_HEALING = true;
         TaskManager.initialize();
+        SecretLifeDatabase.loadLocations();
+        initializeItemSpawner();
+    }
+
+    public void initializeItemSpawner() {
+        itemSpawner = new ItemSpawner();
+        itemSpawner.addItem(new ItemStack(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE), 10);
+        itemSpawner.addItem(new ItemStack(Items.ANCIENT_DEBRIS), 10);
+        itemSpawner.addItem(new ItemStack(Items.EXPERIENCE_BOTTLE, 16), 10);
+        itemSpawner.addItem(new ItemStack(Items.PUFFERFISH_BUCKET), 10);
+        itemSpawner.addItem(new ItemStack(Items.DIAMOND, 2), 10);
+        itemSpawner.addItem(new ItemStack(Items.GOLD_BLOCK, 2), 10);
+        itemSpawner.addItem(new ItemStack(Items.IRON_BLOCK, 2), 10);
+        itemSpawner.addItem(new ItemStack(Items.COAL_BLOCK, 2), 10);
+        itemSpawner.addItem(new ItemStack(Items.GOLDEN_APPLE), 10);
+        itemSpawner.addItem(new ItemStack(Items.INFESTED_STONE, 16), 10);
+        itemSpawner.addItem(new ItemStack(Items.SCULK_SHRIEKER, 2), 10);
+        itemSpawner.addItem(new ItemStack(Items.SCULK_SENSOR, 8), 10);
+        itemSpawner.addItem(new ItemStack(Items.TNT, 8), 10);
+        itemSpawner.addItem(new ItemStack(Items.OBSIDIAN, 8), 10);
+        itemSpawner.addItem(new ItemStack(Items.ARROW, 32), 10);
+
+        //Potions
+        //Enchanted Books
+        //Spawn Eggs
+
+        ItemStack endCrystal = new ItemStack(Items.END_CRYSTAL);
+        ItemStackUtils.setCustomComponentBoolean(endCrystal, "IgnoreBlacklist", true);
+        itemSpawner.addItem(endCrystal, 10);
+
+        ItemStack mace = new ItemStack(Items.MACE);
+        ItemStackUtils.setCustomComponentBoolean(mace, "IgnoreBlacklist", true);
+        mace.setDamage(mace.getMaxDamage()-1);
+        itemSpawner.addItem(mace, 3);
+
+        ItemStack patat = new ItemStack(Items.POISONOUS_POTATO);
+        patat.set(DataComponentTypes.CUSTOM_NAME,Text.of("§6§l§nThe Sacred Patat"));
+        ItemStackUtils.addLoreToItemStack(patat,
+                List.of(Text.of("§5§oEating this might help you. Or maybe not..."))
+        );
+        itemSpawner.addItem(patat, 100);
     }
 
     @Override
@@ -69,15 +116,18 @@ public class SecretLife extends Series {
             setPlayerHealth(player, MAX_HEALTH);
             player.setHealth((float) MAX_HEALTH);
         }
+        TaskManager.checkSecretLifePositions();
     }
 
     @Override
     public void sessionStart() {
-        super.sessionStart();
-        activeActions.clear(); // To remove default 5 min warning
-        activeActions.addAll(
-                List.of(TaskManager.actionChooseTasks, taskWarningAction)
-        );
+        if (TaskManager.checkSecretLifePositions()) {
+            super.sessionStart();
+            activeActions.clear(); // To remove default 5 min warning
+            activeActions.addAll(
+                    List.of(TaskManager.actionChooseTasks, taskWarningAction)
+            );
+        }
     }
 
     @Override
@@ -88,8 +138,10 @@ public class SecretLife extends Series {
     @Override
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
         if (isAllowedToAttack(killer, victim)) {
-            addPlayerHealth(killer, 20);
-            PlayerUtils.sendTitle(killer, Text.literal("+10 Hearts").formatted(Formatting.RED), 0, 40, 20);
+            if (currentSeries.isOnLastLife(killer)) {
+                addPlayerHealth(killer, 20);
+                PlayerUtils.sendTitle(killer, Text.literal("+10 Hearts").formatted(Formatting.RED), 0, 40, 20);
+            }
             return;
         }
         OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + " was killed by "
@@ -98,8 +150,8 @@ public class SecretLife extends Series {
 
     @Override
     public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
-        if (TaskManager.getPlayerKillPermitted(attacker)) return true;
-        if (attacker.getPrimeAdversary() == victim && (TaskManager.getPlayerKillPermitted(victim))) return true;
+        if (currentSeries.isOnLastLife(attacker)) return true;
+        if (attacker.getPrimeAdversary() == victim && (currentSeries.isOnLastLife(victim))) return true;
         return false;
     }
 

@@ -19,7 +19,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.TeleportTarget;
-import net.minecraft.world.border.WorldBorder;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
@@ -34,17 +33,20 @@ public abstract class Series extends Session {
 
     public abstract SeriesList getSeries();
     public abstract Blacklist createBlacklist();
+
     public String getResourcepackURL() {
         return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-main-0c89c6fd068f52aeb882e1c0bda935eb46f24331/RP.zip";
     }
     public String getResourcepackSHA1() {
         return "7f4eba01453f6cf58bf08131fc5576f5ed873679";
     }
+
     public void initialize() {
         createTeams();
         createScoreboards();
         updateStuff();
     }
+
     public void updateStuff() {
         if (server.getOverworld().getWorldBorder().getSize() > 1000000) {
             OtherUtils.executeCommand("worldborder set 500");
@@ -57,6 +59,7 @@ public abstract class Series extends Session {
             OtherUtils.executeCommand("gamerule naturalRegeneration true");
         }
     }
+
     public void createTeams() {
         TeamUtils.createTeam("Dead", Formatting.DARK_GRAY);
         TeamUtils.createTeam("Unassigned", Formatting.GRAY);
@@ -66,6 +69,7 @@ public abstract class Series extends Session {
         TeamUtils.createTeam("Green", Formatting.GREEN);
         TeamUtils.createTeam("DarkGreen", Formatting.DARK_GREEN);
     }
+
     public Formatting getColorForLives(Integer lives) {
         if (lives == null) return Formatting.GRAY;
         if (lives == 1) return Formatting.DARK_RED;
@@ -74,22 +78,27 @@ public abstract class Series extends Session {
         if (lives >= 4) return Formatting.DARK_GREEN;
         return Formatting.DARK_GRAY;
     }
+
     public Text getFormattedLives(ServerPlayerEntity player) {
         return getFormattedLives(getPlayerLives(player));
     }
+
     public Text getFormattedLives(Integer lives) {
         if (lives == null) return Text.empty();
         Formatting color = getColorForLives(lives);
         return Text.literal(String.valueOf(lives)).formatted(color);
     }
+
     public void createScoreboards() {
         ScoreboardUtils.createObjective("Lives");
     }
+
     public void reloadAllPlayerTeams() {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             reloadPlayerTeam(player);
         }
     }
+
     public void reloadPlayerTeam(ServerPlayerEntity player) {
         if (!player.isDead()) {
             reloadPlayerTeamActual(player);
@@ -98,6 +107,7 @@ public abstract class Series extends Session {
             TaskScheduler.scheduleTask(2, () -> reloadPlayerTeamActual(player));
         }
     }
+
     public void reloadPlayerTeamActual(ServerPlayerEntity player) {
         Integer lives = getPlayerLives(player);
         if (lives == null) TeamUtils.addPlayerToTeam("Unassigned",player);
@@ -107,32 +117,40 @@ public abstract class Series extends Session {
         else if (lives == 3) TeamUtils.addPlayerToTeam("Green",player);
         else if (lives >= 4) TeamUtils.addPlayerToTeam("DarkGreen",player);
     }
+
     public Integer getPlayerLives(ServerPlayerEntity player) {
         return ScoreboardUtils.getScore(ScoreHolder.fromName(player.getNameForScoreboard()), "Lives");
     }
+
     public boolean hasAssignedLives(ServerPlayerEntity player) {
         Integer lives = getPlayerLives(player);
         return lives != null;
     }
+
     public boolean isAlive(ServerPlayerEntity player) {
         Integer lives = getPlayerLives(player);
         if (!hasAssignedLives(player)) return false;
         return lives > 0;
     }
+
     public void removePlayerLife(ServerPlayerEntity player) {
         addToPlayerLives(player,-1);
     }
+
     public void resetPlayerLife(ServerPlayerEntity player) {
         ScoreboardUtils.resetScore(ScoreHolder.fromName(player.getNameForScoreboard()), "Lives");
         reloadPlayerTeam(player);
     }
+
     public void resetAllPlayerLives() {
         ScoreboardUtils.removeObjective("Lives");
         createScoreboards();
     }
+
     public void addPlayerLife(ServerPlayerEntity player) {
         addToPlayerLives(player,1);
     }
+
     public void addToPlayerLives(ServerPlayerEntity player, int amount) {
         Integer currentLives = getPlayerLives(player);
         if (currentLives == null) currentLives = 0;
@@ -140,6 +158,7 @@ public abstract class Series extends Session {
         if (lives < 0) lives = 0;
         setPlayerLives(player,lives);
     }
+
     public void setPlayerLives(ServerPlayerEntity player, int lives) {
         ScoreboardUtils.setScore(ScoreHolder.fromName(player.getNameForScoreboard()), "Lives", lives);
         if (lives <= 0) {
@@ -150,26 +169,31 @@ public abstract class Series extends Session {
         }
         reloadPlayerTeam(player);
     }
+
     public Boolean isOnLastLife(ServerPlayerEntity player) {
         if (!isAlive(player)) return null;
         Integer lives = currentSeries.getPlayerLives(player);
         return lives == 1;
     }
+
     public boolean isOnLastLife(ServerPlayerEntity player, boolean fallback) {
         Boolean isOnLastLife = isOnLastLife(player);
         if (isOnLastLife == null) return fallback;
         return isOnLastLife;
     }
+
     public Boolean isOnSpecificLives(ServerPlayerEntity player, int check) {
         if (!isAlive(player)) return null;
         Integer lives = currentSeries.getPlayerLives(player);
         return lives == check;
     }
+
     public boolean isOnSpecificLives(ServerPlayerEntity player, int check, boolean fallback) {
         Boolean isOnLife = isOnSpecificLives(player, check);
         if (isOnLife == null) return fallback;
         return isOnLife;
     }
+
     private HashMap<UUID, HashMap<Vec3d,List<Float>>> respawnPositions = new HashMap<>();
     public void playerLostAllLives(ServerPlayerEntity player) {
         player.changeGameMode(GameMode.SPECTATOR);
@@ -180,6 +204,7 @@ public abstract class Series extends Session {
         info.put(pos, List.of(player.getYaw(),player.getPitch()));
         respawnPositions.put(player.getUuid(), info);
     }
+
     public void getRespawnTarget(ServerPlayerEntity player, TeleportTarget.PostDimensionTransition postDimensionTransition, CallbackInfoReturnable<TeleportTarget> cir) {
         if (!respawnPositions.containsKey(player.getUuid())) return;
         HashMap<Vec3d, List<Float>> info = respawnPositions.get(player.getUuid());
@@ -189,6 +214,7 @@ public abstract class Series extends Session {
             break;
         }
     }
+
     public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
         if (isOnLastLife(attacker, false)) return true;
         if (attacker.getPrimeAdversary() == victim && (isOnLastLife(victim, false))) return true;
@@ -220,20 +246,26 @@ public abstract class Series extends Session {
         }
         removePlayerLife(player);
     }
+
     public void onPlayerDiedNaturally(ServerPlayerEntity player) {
         if (playerNaturalDeathLog.containsKey(player.getUuid())) {
             playerNaturalDeathLog.remove(player.getUuid());
         }
         playerNaturalDeathLog.put(player.getUuid(), server.getTicks());
     }
+
     public void onClaimKill(ServerPlayerEntity killer, ServerPlayerEntity victim) {
     }
+
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
-
     }
+
     public void onPlayerHeal(ServerPlayerEntity player, float amount) {
-
     }
+
+    public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
+    }
+
     public void onMobDeath(LivingEntity entity, DamageSource damageSource) {
         if (!DROP_SPAWN_EGGS) return;
         if (entity.getEntityWorld().isClient() || !(damageSource.getAttacker() instanceof ServerPlayerEntity)) {
@@ -260,15 +292,14 @@ public abstract class Series extends Session {
             entity.dropStack(spawnEggItem);
         }
     }
-    public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
 
-    }
     public void onPlayerJoin(ServerPlayerEntity player) {
         if (getSeries() != SeriesList.SECRET_LIFE) {
             Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(20);
         }
         reloadPlayerTeam(player);
     }
+
     public List<ServerPlayerEntity> getNonRedPlayers() {
         List<ServerPlayerEntity> players = PlayerUtils.getAllPlayers();
         if (players == null) return new ArrayList<>();
@@ -282,6 +313,7 @@ public abstract class Series extends Session {
         }
         return nonRedPlayers;
     }
+
     public List<ServerPlayerEntity> getAlivePlayers() {
         List<ServerPlayerEntity> players = PlayerUtils.getAllPlayers();
         if (players == null) return new ArrayList<>();
@@ -293,12 +325,14 @@ public abstract class Series extends Session {
         }
         return alivePlayers;
     }
+
     public boolean anyGreenPlayers() {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             if (isOnSpecificLives(player, 3, false)) return true;
         }
         return false;
     }
+
     public boolean anyYellowPlayers() {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             if (isOnSpecificLives(player, 2, false)) return true;

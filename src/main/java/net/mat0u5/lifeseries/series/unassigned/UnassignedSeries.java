@@ -43,15 +43,18 @@ public class UnassignedSeries extends Series {
             }
         };
     }
+
     @Override
     public void onPlayerJoin(ServerPlayerEntity player) {
         TaskScheduler.scheduleTask(40, this::broadcastNotice);
     }
+
     @Override
     public void initialize() {
         super.initialize();
         broadcastNotice();
     }
+
     public void broadcastNotice() {
         OtherUtils.broadcastMessage(Text.literal("[LifeSeries] You must select a series with ").formatted(Formatting.RED)
                 .append(Text.literal("'/lifeseries setSeries <series>'").formatted(Formatting.GRAY)));

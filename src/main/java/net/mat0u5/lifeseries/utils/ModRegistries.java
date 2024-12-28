@@ -23,6 +23,7 @@ public class ModRegistries {
         registerEvents();
         TextUtils.setEmotes();
     }
+
     private static void registerCommands() {
         CommandRegistrationCallback.EVENT.register(DoubleLifeCommands::register);
         CommandRegistrationCallback.EVENT.register(LastLifeCommands::register);
@@ -35,6 +36,7 @@ public class ModRegistries {
         CommandRegistrationCallback.EVENT.register(ClaimKillCommand::register);
         CommandRegistrationCallback.EVENT.register(LifeSeriesCommand::register);
     }
+
     private static void registerEvents() {
         Events.register();
         TaskScheduler.registerTickHandler();

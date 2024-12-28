@@ -1,7 +1,6 @@
 package net.mat0u5.lifeseries.series.limitedlife;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.OtherUtils;
@@ -91,6 +90,7 @@ public class LimitedLifeCommands {
             )
         );
     }
+
     public static int showLives(ServerCommandSource source) {
 
         MinecraftServer server = source.getServer();
@@ -110,6 +110,7 @@ public class LimitedLifeCommands {
 
         return 1;
     }
+
     public static int getLivesFor(ServerCommandSource source, ServerPlayerEntity target) {
         if (target == null) return -1;
 
@@ -125,11 +126,13 @@ public class LimitedLifeCommands {
         source.sendMessage(pt1.append(pt2).append(pt3));
         return 1;
     }
+
     public static int reloadLives(ServerCommandSource source) {
         MinecraftServer server = source.getServer();
         currentSeries.reloadAllPlayerTeams();
         return 1;
     }
+
     public static int lifeManager(ServerCommandSource source, ServerPlayerEntity target, String timeArgument, boolean setNotGive, boolean reverse) {
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
@@ -150,6 +153,7 @@ public class LimitedLifeCommands {
         }
         return 1;
     }
+
     public static int resetLives(ServerCommandSource source, ServerPlayerEntity target) {
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
@@ -159,6 +163,7 @@ public class LimitedLifeCommands {
         source.sendMessage(Text.literal("Reset ").append(target.getStyledDisplayName()).append(Text.of("'s lives.")));
         return 1;
     }
+
     public static int resetAllLives(ServerCommandSource source) {
         MinecraftServer server = source.getServer();
 

@@ -6,6 +6,7 @@ public abstract class SessionAction {
     public SessionAction(int triggerAtTicks) {
         this.triggerAtTicks = triggerAtTicks;
     }
+
     public boolean tick(int currentTick, int sessionLength) {
         if (triggerAtTicks < 0) {
             int remaining = sessionLength-currentTick;

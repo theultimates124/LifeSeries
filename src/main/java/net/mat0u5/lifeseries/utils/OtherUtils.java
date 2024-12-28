@@ -1,6 +1,5 @@
 package net.mat0u5.lifeseries.utils;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
 import net.mat0u5.lifeseries.Main;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
@@ -14,16 +13,19 @@ import java.util.regex.Pattern;
 import static net.mat0u5.lifeseries.Main.server;
 
 public class OtherUtils {
+
     public static void broadcastMessage(MinecraftServer server, Text message) {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             player.sendMessage(message, false);
         }
     }
+
     public static void broadcastMessage(Text message) {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             player.sendMessage(message, false);
         }
     }
+
     public static void broadcastMessageToAdmins(Text message) {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             if (!PermissionManager.isAdmin(player)) continue;
@@ -39,14 +41,17 @@ public class OtherUtils {
 
         return hours+":"+ formatTimeNumber(minutes)+":"+ formatTimeNumber(seconds);
     }
+
     public static String formatTimeNumber(int time) {
         String value = String.valueOf(time);
         while (value.length() < 2) value = "0" + value;
         return value;
     }
+
     public static int minutesToTicks(int mins) {
         return mins*60*20;
     }
+
     public static int secondsToTicks(int secs) {
         return secs*20;
     }
@@ -64,6 +69,7 @@ public class OtherUtils {
 
         return (hours * 3600 + minutes * 60 + seconds) * 20;
     }
+
     public static int parseTimeSecondsFromArgument(String time) {
         Matcher matcher = TIME_PATTERN.matcher(time);
         if (!matcher.matches()) {
@@ -80,6 +86,7 @@ public class OtherUtils {
     private static int parseInt(String value) {
         return value == null ? 0 : Integer.parseInt(value);
     }
+
     public static void executeCommand(String command) {
         CommandManager manager = server.getCommandManager();
         ServerCommandSource commandSource = server.getCommandSource().withSilent();

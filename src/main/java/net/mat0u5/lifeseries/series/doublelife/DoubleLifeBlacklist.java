@@ -69,6 +69,7 @@ public class DoubleLifeBlacklist extends Blacklist {
     public List<Item> getItemBlacklist() {
         return BLACKLISTED_ITEMS;
     }
+
     @Override
     public List<Block> getBlockBlacklist() {
         return BLACKLISTED_BLOCKS;

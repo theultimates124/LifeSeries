@@ -6,6 +6,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 
 public class AnimationUtils {
+
     public static void playTotemAnimation(ServerPlayerEntity player) {
         //The animation lasts almost exactly 40 ticks.
         player.networkHandler.sendPacket(new EntityStatusS2CPacket(player, (byte) 35));

@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series;
 
+import net.mat0u5.lifeseries.utils.ItemStackUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -42,6 +43,7 @@ public abstract class Blacklist {
         }
         return ActionResult.PASS;
     }
+
     public ActionResult onBlockAttack(ServerPlayerEntity player, World world, BlockPos pos) {
         if (world.isClient()) return ActionResult.PASS;
         BlockState block = world.getBlockState(pos);
@@ -52,9 +54,11 @@ public abstract class Blacklist {
         }
         return ActionResult.PASS;
     }
+
     public void onCollision(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
         processItemStack(player, stack);
     }
+
     public void onInventoryUpdated(PlayerEntity player, PlayerInventory inventory, CallbackInfo ci) {
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack stack = inventory.getStack(i);
@@ -66,6 +70,7 @@ public abstract class Blacklist {
             }
         }
     }
+
     public boolean isBlacklistedItem(ItemStack itemStack) {
         return getItemBlacklist().contains(itemStack.getItem());
     }
@@ -73,7 +78,7 @@ public abstract class Blacklist {
     public ItemStack processItemStack(PlayerEntity player, ItemStack itemStack) {
         if (itemStack.isEmpty()) return itemStack;
         if (itemStack.getItem() == Items.AIR) return itemStack;
-        if (isBlacklistedItem(itemStack)) {
+        if (isBlacklistedItem(itemStack) && !ItemStackUtils.hasCustomComponentEntry(itemStack, "IgnoreBlacklist")) {
             itemStack.setCount(0);
             player.getInventory().updateItems();
             return ItemStack.EMPTY;
@@ -84,6 +89,7 @@ public abstract class Blacklist {
         if (enchantsStored != null) clampEnchantments(enchantsStored);
         return itemStack;
     }
+
     public void clampEnchantments(ItemEnchantmentsComponent enchants) {
         List<RegistryKey<Enchantment>> clamp = getClampedEnchants();
         for (it.unimi.dsi.fastutil.objects.Object2IntMap.Entry<RegistryEntry<Enchantment>> enchant : enchants.getEnchantmentEntries()) {
@@ -94,6 +100,7 @@ public abstract class Blacklist {
             }
         }
     }
+
     public List<EnchantmentLevelEntry> clampEnchantmentList(List<EnchantmentLevelEntry> list) {
         List<RegistryKey<Enchantment>> clamp = getClampedEnchants();
         List<EnchantmentLevelEntry> result = new ArrayList<>();

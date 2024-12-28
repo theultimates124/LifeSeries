@@ -16,8 +16,6 @@ import net.minecraft.registry.RegistryKey;
 
 import java.util.List;
 
-import static net.mat0u5.lifeseries.Main.server;
-
 public class LastLifeBlacklist extends Blacklist {
     public static final List<Item> BLACKLISTED_ITEMS = List.of(
             Items.LECTERN,
@@ -70,6 +68,7 @@ public class LastLifeBlacklist extends Blacklist {
     public List<Item> getItemBlacklist() {
         return BLACKLISTED_ITEMS;
     }
+
     @Override
     public List<Block> getBlockBlacklist() {
         return BLACKLISTED_BLOCKS;

@@ -7,21 +7,33 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.command.SetBlockCommand;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.RawFilteredPair;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
+import static net.mat0u5.lifeseries.Main.server;
 
 public class TaskManager {
+    public static BlockPos successButtonPos;
+    public static BlockPos rerollButtonPos;
+    public static BlockPos failButtonPos;
+    public static BlockPos itemSpawnerPos;
+
     public static SessionAction actionChooseTasks = new SessionAction(OtherUtils.minutesToTicks(1)) {
         @Override
         public void trigger() {
@@ -112,12 +124,10 @@ public class TaskManager {
             PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("3").formatted(Formatting.RED),0,35,0);
         });
         TaskScheduler.scheduleTask(70, () -> {
-            //PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvents.UI_BUTTON_CLICK.value());
             PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("2").formatted(Formatting.RED),0,35,0);
             PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvent.of(Identifier.of("minecraft","secretlife_task")));
         });
         TaskScheduler.scheduleTask(105, () -> {
-            //PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvents.UI_BUTTON_CLICK.value());
             PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("1").formatted(Formatting.RED),0,35,0);
         });
         TaskScheduler.scheduleTask(130, () -> {
@@ -174,11 +184,18 @@ public class TaskManager {
         if (addHealth <= remainderToMax && remainderToMax != 0) {
             series.addPlayerHealth(player, addHealth);
         }
-        else if (remainderToMax != 0) {
-            series.setPlayerHealth(player, SecretLife.MAX_HEALTH);
+        else {
+            if (remainderToMax != 0) series.setPlayerHealth(player, SecretLife.MAX_HEALTH);
             int itemsNum = (addHealth - remainderToMax)/2;
             if (itemsNum == 0) return;
-            System.out.println("Spawning " + itemsNum + " items.");
+            Vec3d spawnPos = itemSpawnerPos.toCenterPos();
+            for (int i = 0; i <= itemsNum; i++) {
+                if (i == 0) continue;
+                TaskScheduler.scheduleTask(3*i, () -> {
+                    server.getOverworld().playSound(null, spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 1.0F, 1.0F);
+                    series.itemSpawner.spawnRandomItemForPlayer(server.getOverworld(), spawnPos, player);
+                });
+            }
         }
     }
 
@@ -241,6 +258,80 @@ public class TaskManager {
             //TODO
             assignRandomTaskToPlayer(player, TaskType.RED);
         }
+    }
 
+    public static void positionFound(BlockPos pos) {
+        if (successButtonPos == null) {
+            successButtonPos = pos;
+            OtherUtils.broadcastMessage(Text.literal("§a[SecretLife setup 1/4] Location set."));
+        }
+        else if (rerollButtonPos == null) {
+            rerollButtonPos = pos;
+            OtherUtils.broadcastMessage(Text.literal("§a[SecretLife setup 2/4] Location set."));
+        }
+        else if (failButtonPos == null) {
+            failButtonPos = pos;
+            OtherUtils.broadcastMessage(Text.literal("§a[SecretLife setup 3/4] Location set."));
+        }
+        else if (itemSpawnerPos == null) {
+            itemSpawnerPos = pos;
+            OtherUtils.broadcastMessage(Text.literal("§a[SecretLife] All locations have been set. If you wish to change them in the future, use §2'/secretlife changeLocations'"));
+        }
+        SecretLifeDatabase.saveLocations();
+        checkSecretLifePositions();
+    }
+
+    public static boolean searchingForLocations = false;
+    public static boolean checkSecretLifePositions() {
+        if (successButtonPos == null) {
+            OtherUtils.broadcastMessage(Text.literal("§c[SecretLife setup 1/4] Location for the secret keeper task §4success button§c was not found. The next button you click will be set as the location."));
+            searchingForLocations = true;
+            return false;
+        }
+        if (rerollButtonPos == null) {
+            OtherUtils.broadcastMessage(Text.literal("§c[SecretLife setup 2/4] Location for the secret keeper task §4re-roll button§c was not found. The next button you click will be set as the location."));
+            searchingForLocations = true;
+            return false;
+        }
+        if (failButtonPos == null) {
+            OtherUtils.broadcastMessage(Text.literal("§c[SecretLife setup 3/4] Location for the secret keeper task §4fail button§c was not found. The next button you click will be set as the location."));
+            searchingForLocations = true;
+            return false;
+        }
+        if (itemSpawnerPos == null) {
+            OtherUtils.broadcastMessage(Text.literal("§c[SecretLife setup 4/4] Location for the secret keeper task §4item spawn block§c was not found. Please place a bedrock block at the desired spot to mark it."));
+            searchingForLocations = true;
+            return false;
+        }
+        searchingForLocations = false;
+        return true;
+    }
+
+    public static void onBlockUse(ServerPlayerEntity player, ServerWorld world, BlockHitResult hitResult) {
+        BlockPos pos = hitResult.getBlockPos();
+        if (world.getBlockState(pos).getBlock().getName().getString().contains("Button")) {
+            if (searchingForLocations) {
+                positionFound(pos);
+            }
+            else {
+                if (pos.equals(successButtonPos)) {
+                    succeedTask(player);
+                }
+                else if (pos.equals(rerollButtonPos)) {
+                    rerollTask(player);
+                }
+                else if (pos.equals(failButtonPos)) {
+                    failTask(player);
+                }
+            }
+        }
+        if (!searchingForLocations) return;
+        BlockPos placePos = pos.offset(hitResult.getSide());
+        TaskScheduler.scheduleTask(1, () -> {
+            if (world.getBlockState(placePos).getBlock().getName().getString().equalsIgnoreCase("Bedrock")) {
+                positionFound(placePos);
+                world.breakBlock(placePos, false);
+            }
+        });
     }
 }

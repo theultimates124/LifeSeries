@@ -7,15 +7,10 @@ import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.secretlife.TaskManager;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-
-import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.*;
 import static net.mat0u5.lifeseries.utils.PermissionManager.isAdmin;
@@ -61,7 +56,6 @@ public class LifeSeriesCommand {
         );
     }
 
-
     public static int setSeries(ServerCommandSource source, String setTo, boolean confirmed) {
         if (!ALLOWED_SERIES_NAMES.contains(setTo)) {
             source.sendError(Text.of("That is not a valid series!"));
@@ -84,6 +78,7 @@ public class LifeSeriesCommand {
         }
         return 1;
     }
+
     public static void setSeriesFinal(ServerCommandSource source, String setTo) {
         currentSeries.resetAllPlayerLives();
         config.setProperty("currentSeries", setTo);
@@ -92,14 +87,17 @@ public class LifeSeriesCommand {
         source.sendMessage(Text.literal("--- You must restart the server to fully finish setting up ---").formatted(Formatting.GREEN));
         source.sendMessage(Text.of("---------------"));
     }
+
     public static int getSeries(ServerCommandSource source) {
         source.sendMessage(Text.of("Current series: "+ SeriesList.getStringNameFromSeries(currentSeries.getSeries())));
         return 1;
     }
+
     public static int getVersion(ServerCommandSource source) {
         source.sendMessage(Text.of("Mod version: "+ Main.MOD_VERSION));
         return 1;
     }
+
     public static int reload(ServerCommandSource source) {
         if (currentSeries.getSeries() == SeriesList.SECRET_LIFE) {
             TaskManager.initialize();
@@ -107,6 +105,7 @@ public class LifeSeriesCommand {
         source.sendMessage(Text.of("Reloaded."));
         return 1;
     }
+
     public static int getCredits(ServerCommandSource source) {
         source.sendMessage(Text.of("The Life Series was originally created by " + Credits_IdeaCreator +
                 ", and this mod aims to implement every season of the Life Series. "));

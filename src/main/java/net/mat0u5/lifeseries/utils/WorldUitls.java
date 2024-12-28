@@ -16,6 +16,7 @@ import java.util.Random;
 
 public class WorldUitls {
     static Random rnd = new Random();
+
     public static boolean shouldChunkLoad(ServerWorld world, ChunkPos chunkPos) {
         var border = world.getWorldBorder();
         double minX = border.getBoundWest() - 32; // 2 chunks = 32 blocks
@@ -30,6 +31,7 @@ public class WorldUitls {
 
         return !(chunkMaxX < minX || chunkMinX > maxX || chunkMaxZ < minZ || chunkMinZ > maxZ);
     }
+
     public static BlockPos getRandomCoords(World world) {
         WorldBorder border = world.getWorldBorder();
         double minX = border.getBoundWest();
@@ -41,6 +43,7 @@ public class WorldUitls {
         int safeY = (int) findSafeY(world, new Vec3d(chosenX, world.getTopY(), chosenZ));
         return new BlockPos(chosenX, safeY, chosenZ);
     }
+
     public static double findSafeY(World world, Vec3d pos) {
         BlockPos.Mutable mutablePos = new BlockPos.Mutable(pos.getX(), pos.getY(), pos.getZ());
         for (boolean movingUp : List.of(true,false)) {
@@ -56,6 +59,7 @@ public class WorldUitls {
         // Fallback to original position if no safe spot found
         return pos.getY();
     }
+
     public static boolean isSafeSpot(World world, BlockPos.Mutable pos) {
         // Check if the block below is solid
         boolean isSolidBlockBelow = world.getBlockState(pos.down()).hasSolidTopSurface(world, pos.down(), new ZombieEntity(world));
@@ -66,6 +70,7 @@ public class WorldUitls {
 
         return isSolidBlockBelow && isNonCollisionAbove;
     }
+
     public static void summonHarmlessLightning(ServerWorld world, ServerPlayerEntity player) {
         Vec3d playerPos = player.getPos();
 

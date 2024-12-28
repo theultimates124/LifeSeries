@@ -3,7 +3,6 @@ package net.mat0u5.lifeseries.events;
 
 
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
@@ -14,8 +13,9 @@ import net.mat0u5.lifeseries.config.DatabaseManager;
 import net.mat0u5.lifeseries.config.DatapackManager;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
+import net.mat0u5.lifeseries.series.secretlife.SecretLife;
+import net.mat0u5.lifeseries.series.secretlife.TaskManager;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
-import net.mat0u5.lifeseries.utils.WorldUitls;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -50,25 +50,30 @@ public class Events {
 
         ServerLivingEntityEvents.AFTER_DEATH.register(Events::onEntityDeath);
     }
+
     private static void onPlayerJoin(MinecraftServer server, ServerPlayerEntity player) {
         currentSeries.onPlayerJoin(player);
         ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
         PlayerUtils.applyResorucepack(serverPlayer);
     }
+
     private static void onServerStopping(MinecraftServer server) {
     }
+
     private static void onServerStarting(MinecraftServer server) {
         Main.server = server;
     }
+
     private static void onServerStart(MinecraftServer server) {
         Main.server = server;
-        currentSeries.initialize();
         DatabaseManager.initialize();
+        currentSeries.initialize();
         if (currentSeries.getSeries() == SeriesList.DOUBLE_LIFE) {
             ((DoubleLife) currentSeries).loadSoulmates();
         }
         new DatapackManager().onServerStarted(server);
     }
+
     private static void onServerTickEnd(MinecraftServer server) {
         try {
             if (Main.currentSession != null) {
@@ -78,6 +83,7 @@ public class Events {
             e.printStackTrace();
         }
     }
+
     public static void onEntityDeath(LivingEntity entity, DamageSource source) {
         if (entity instanceof ServerPlayerEntity) {
             Events.onPlayerDeath((ServerPlayerEntity) entity, source);
@@ -85,17 +91,23 @@ public class Events {
         }
         onMobDeath(entity, source);
     }
+
     public static void onMobDeath(LivingEntity entity, DamageSource source) {
         currentSeries.onMobDeath(entity, source);
     }
+
     public static void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
         currentSeries.onPlayerDeath(player, source);
     }
 
     public static ActionResult onBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
+        if (currentSeries instanceof SecretLife) {
+            TaskManager.onBlockUse((ServerPlayerEntity) player, (ServerWorld) world, hitResult);
+        }
         if (blacklist == null) return ActionResult.PASS;
         return blacklist.onBlockUse(player,world,hand,hitResult);
     }
+
     public static ActionResult onBlockAttack(ServerPlayerEntity player, World world, BlockPos pos) {
         if (blacklist == null) return ActionResult.PASS;
         if (world.isClient()) return ActionResult.PASS;

@@ -1,6 +1,5 @@
 package net.mat0u5.lifeseries.utils;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
@@ -19,6 +18,7 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
 
 public class PlayerUtils {
+
     public static void sendTitleWithSubtitle(ServerPlayerEntity player, Text title, Text subtitle, int fadeIn, int stay, int fadeOut) {
         if (player == null) return;
         if (player.isDead()) {

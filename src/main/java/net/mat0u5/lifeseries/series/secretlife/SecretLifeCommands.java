@@ -132,25 +132,43 @@ public class SecretLifeCommands {
                     )
                 )
         );
+        dispatcher.register(
+            literal("secretlife")
+                .then(literal("changeLocations")
+                    .executes(context -> changeLocations(
+                        context.getSource())
+                    )
+                )
+        );
     }
+
+    public static int changeLocations(ServerCommandSource source) {
+        SecretLifeDatabase.deleteLocations();
+        TaskManager.checkSecretLifePositions();
+        return 1;
+    }
+
     public static int succeedTask(ServerCommandSource source, ServerPlayerEntity target) {
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
         TaskManager.succeedTask(target);
         return 1;
     }
+
     public static int failTask(ServerCommandSource source, ServerPlayerEntity target) {
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
         TaskManager.failTask(target);
         return 1;
     }
+
     public static int rerollTask(ServerCommandSource source, ServerPlayerEntity target) {
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
         TaskManager.rerollTask(target);
         return 1;
     }
+
     static List<UUID> playersGiven = new ArrayList<>();
     public static int gift(ServerCommandSource source, ServerPlayerEntity target) {
         MinecraftServer server = source.getServer();
@@ -184,6 +202,7 @@ public class SecretLifeCommands {
 
         return 1;
     }
+
     public static int showHealth(ServerCommandSource source) {
 
         MinecraftServer server = source.getServer();
@@ -203,6 +222,7 @@ public class SecretLifeCommands {
 
         return 1;
     }
+
     public static int getHealthFor(ServerCommandSource source, ServerPlayerEntity target) {
         if (target == null) return -1;
 
@@ -218,12 +238,14 @@ public class SecretLifeCommands {
         source.sendMessage(pt1.append(pt2));
         return 1;
     }
+
     public static int syncHealth(ServerCommandSource source) {
         MinecraftServer server = source.getServer();
         SecretLife secretLife = (SecretLife) currentSeries;
         secretLife.syncAllPlayerHealth();
         return 1;
     }
+
     public static int healthManager(ServerCommandSource source, ServerPlayerEntity target, double amount, boolean setNotGive) {
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
@@ -242,6 +264,7 @@ public class SecretLifeCommands {
         }
         return 1;
     }
+
     public static int resetHealth(ServerCommandSource source, ServerPlayerEntity target) {
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
@@ -252,6 +275,7 @@ public class SecretLifeCommands {
         source.sendMessage(Text.literal("Reset ").append(target.getStyledDisplayName()).append(Text.of("'s health to 30.")));
         return 1;
     }
+
     public static int resetAllHealth(ServerCommandSource source) {
         MinecraftServer server = source.getServer();
 

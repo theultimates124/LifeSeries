@@ -60,6 +60,7 @@ public class DoubleLifeCommands {
                 )
         );
     }
+
     public static int setSoulmate(ServerCommandSource source, ServerPlayerEntity player, ServerPlayerEntity soulmate) {
         if (!isValidCommand(source)) return -1;
         if (player == null) return -1;
@@ -82,6 +83,7 @@ public class DoubleLifeCommands {
 
         return 1;
     }
+
     public static int getSoulmate(ServerCommandSource source, ServerPlayerEntity player) {
         if (!isValidCommand(source)) return -1;
         if (player == null) return -1;
@@ -104,6 +106,7 @@ public class DoubleLifeCommands {
 
         return 1;
     }
+
     public static int resetSoulmate(ServerCommandSource source, ServerPlayerEntity player) {
         if (!isValidCommand(source)) return -1;
         if (player == null) return -1;
@@ -122,6 +125,7 @@ public class DoubleLifeCommands {
 
         return 1;
     }
+
     public static int resetAllSoulmates(ServerCommandSource source) {
         if (!isValidCommand(source)) return -1;
 
@@ -134,6 +138,7 @@ public class DoubleLifeCommands {
 
         return 1;
     }
+
     public static int listSoulmates(ServerCommandSource source) {
         if (!isValidCommand(source)) return -1;
 
@@ -159,6 +164,7 @@ public class DoubleLifeCommands {
 
         return 1;
     }
+
     public static int rollSoulmates(ServerCommandSource source) {
         if (!isValidCommand(source)) return -1;
 
@@ -168,7 +174,6 @@ public class DoubleLifeCommands {
 
         return 1;
     }
-
 
     public static boolean isValidCommand(ServerCommandSource source) {
         boolean isValid = currentSeries.getSeries() == SeriesList.DOUBLE_LIFE;

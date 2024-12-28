@@ -50,15 +50,18 @@ public class DoubleLife extends Series {
     public SeriesList getSeries() {
         return SeriesList.DOUBLE_LIFE;
     }
+
     @Override
     public Blacklist createBlacklist() {
         return new DoubleLifeBlacklist();
     }
+
     @Override
     public void initialize() {
         super.initialize();
         CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = true;
     }
+
     @Override
     public void onPlayerJoin(ServerPlayerEntity player) {
         super.onPlayerJoin(player);
@@ -74,6 +77,7 @@ public class DoubleLife extends Series {
         ServerPlayerEntity soulmate = getSoulmate(player);
         syncPlayers(player, soulmate);
     }
+
     @Override
     public void sessionStart() {
         super.sessionStart();
@@ -81,6 +85,7 @@ public class DoubleLife extends Series {
                 List.of(actionChooseSoulmates, actionRandomTP)
         );
     }
+
     @Override
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
         if (isAllowedToAttack(killer, victim)) return;
@@ -88,11 +93,11 @@ public class DoubleLife extends Series {
                 +killer.getNameForScoreboard() + ", who is not §cred name§f."));
     }
 
-
     public void loadSoulmates() {
         soulmates = DoubleLifeDatabase.getAllSoulmates();
         updateOrderedSoulmates();
     }
+
     public void updateOrderedSoulmates() {
         soulmatesOrdered = new HashMap<>();
         for (Map.Entry<UUID, UUID> entry : soulmates.entrySet()) {
@@ -101,36 +106,43 @@ public class DoubleLife extends Series {
             soulmatesOrdered.put(entry.getKey(),entry.getValue());
         }
     }
+
     public void saveSoulmates() {
         updateOrderedSoulmates();
         DoubleLifeDatabase.deleteDoubleLifeSoulmates();
         DoubleLifeDatabase.setAllSoulmates(soulmatesOrdered);
     }
+
     public boolean isMainSoulmate(ServerPlayerEntity player) {
         return soulmatesOrdered.containsKey(player.getUuid());
     }
+
     public boolean hasSoulmate(ServerPlayerEntity player) {
         if (player == null) return false;
         UUID playerUUID = player.getUuid();
         if (!soulmates.containsKey(playerUUID)) return false;
         return true;
     }
+
     public boolean isSoulmateOnline(ServerPlayerEntity player) {
         if (!hasSoulmate(player)) return false;
         UUID soulmateUUID = soulmates.get(player.getUuid());
         return server.getPlayerManager().getPlayer(soulmateUUID) != null;
     }
+
     public ServerPlayerEntity getSoulmate(ServerPlayerEntity player) {
         if (!isSoulmateOnline(player)) return null;
         UUID soulmateUUID = soulmates.get(player.getUuid());
         return server.getPlayerManager().getPlayer(soulmateUUID);
     }
+
     public void setSoulmate(ServerPlayerEntity player1, ServerPlayerEntity player2) {
         soulmates.put(player1.getUuid(), player2.getUuid());
         soulmates.put(player2.getUuid(), player1.getUuid());
         syncPlayers(player1, player2);
         updateOrderedSoulmates();
     }
+
     public void resetSoulmate(ServerPlayerEntity player) {
         UUID playerUUID = player.getUuid();
         Map<UUID, UUID> newSoulmates = new HashMap<>();
@@ -142,6 +154,7 @@ public class DoubleLife extends Series {
         soulmates = newSoulmates;
         updateOrderedSoulmates();
     }
+
     public void resetAllSoulmates() {
         soulmates = new HashMap<>();
         soulmatesOrdered = new HashMap<>();
@@ -170,6 +183,7 @@ public class DoubleLife extends Series {
             chooseRandomSoulmates();
         });
     }
+
     public List<ServerPlayerEntity> getNonAssignedPlayers() {
         List<ServerPlayerEntity> playersToRoll = new ArrayList<>();
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
@@ -179,6 +193,7 @@ public class DoubleLife extends Series {
         }
         return playersToRoll;
     }
+
     public void distributePlayers() {
         List<ServerPlayerEntity> players = getNonAssignedPlayers();
         PlayerUtils.playSoundToPlayers(players, SoundEvents.ENTITY_ENDERMAN_TELEPORT);
@@ -211,6 +226,7 @@ public class DoubleLife extends Series {
         }
         saveSoulmates();
     }
+
     @Override
     public void onPlayerHeal(ServerPlayerEntity player, float amount) {
         if (player == null) return;
@@ -225,6 +241,7 @@ public class DoubleLife extends Series {
         soulmate.setHealth(newHealth);
         TaskScheduler.scheduleTask(1,()-> syncPlayers(player, soulmate));
     }
+
     @Override
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
         if (source.getType().msgId().equalsIgnoreCase("soulmate")) return;
@@ -246,6 +263,7 @@ public class DoubleLife extends Series {
 
         TaskScheduler.scheduleTask(1,()-> syncPlayers(player, soulmate));
     }
+
     @Override
     public void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
         super.onPlayerDeath(player, source);
