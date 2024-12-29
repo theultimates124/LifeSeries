@@ -19,7 +19,9 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +39,7 @@ public class TaskManager {
     public static SessionAction actionChooseTasks = new SessionAction(OtherUtils.minutesToTicks(1)) {
         @Override
         public void trigger() {
-            chooseTasks(currentSeries.getAlivePlayers());
+            chooseTasks(currentSeries.getAlivePlayers(), null);
         }
     };
     public static List<String> easyTasks;
@@ -52,19 +54,40 @@ public class TaskManager {
         easyTasks = configEasyTasks.loadStrings();
         hardTasks = configHardTasks.loadStrings();
         redTasks = configRedTasks.loadStrings();
+        List<String> alreadySelected = SecretLifeDatabase.getUsedTasks();
+        for (String selected : alreadySelected) {
+            easyTasks.remove(selected);
+            hardTasks.remove(selected);
+        }
     }
 
     public static Task getRandomTask(TaskType type) {
-        //TODO don't give out tasks that have already been selected.
         String selectedTask = "";
+
+        if (easyTasks.isEmpty()) {
+            StringListManager configEasyTasks = new StringListManager("./config/lifeseries/secretlife","easy-tasks.json");
+            easyTasks = configEasyTasks.loadStrings();
+            SecretLifeDatabase.deleteAllTasks(easyTasks);
+        }
+        if (hardTasks.isEmpty()) {
+            StringListManager configHardTasks = new StringListManager("./config/lifeseries/secretlife","hard-tasks.json");
+            hardTasks = configHardTasks.loadStrings();
+            SecretLifeDatabase.deleteAllTasks(hardTasks);
+        }
+
         if (type == TaskType.EASY && !easyTasks.isEmpty()) {
             selectedTask = easyTasks.get(rnd.nextInt(easyTasks.size()));
+            easyTasks.remove(selectedTask);
         }
         else if (type == TaskType.HARD && !hardTasks.isEmpty()) {
             selectedTask = hardTasks.get(rnd.nextInt(hardTasks.size()));
+            hardTasks.remove(selectedTask);
         }
         else if (type == TaskType.RED && !redTasks.isEmpty()) {
             selectedTask = redTasks.get(rnd.nextInt(redTasks.size()));
+        }
+        if (type != TaskType.RED && !selectedTask.isEmpty()) {
+            SecretLifeDatabase.addUsedTask(selectedTask);
         }
         return new Task(selectedTask, type);
     }
@@ -102,21 +125,24 @@ public class TaskManager {
         if (!currentSeries.isAlive(player)) return;
         Task task = getRandomTask(type);
         ItemStack book = getTaskBook(player, task);
-        //TODO if player doesnt have space
-        player.giveItemStack(book);
+        if (!player.giveItemStack(book)) {
+            ItemStackUtils.spawnItemForPlayer(player.getServerWorld(), player.getPos(), book, player);
+        }
     }
 
-    public static void assignRandomTasks() {
+    public static void assignRandomTasks(TaskType type) {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             if (!currentSeries.isAlive(player)) continue;
-            TaskType type = TaskType.EASY;
-            if (currentSeries.isOnLastLife(player)) type = TaskType.RED;
+            if (type == null) {
+                type = TaskType.EASY;
+                if (currentSeries.isOnLastLife(player)) type = TaskType.RED;
+            }
             removePlayersTaskBook(player);
             assignRandomTaskToPlayer(player, type);
         }
     }
 
-    public static void chooseTasks(List<ServerPlayerEntity> allowedPlayers) {
+    public static void chooseTasks(List<ServerPlayerEntity> allowedPlayers, TaskType type) {
         PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("Your secret is...").formatted(Formatting.RED),20,35,0);
 
         TaskScheduler.scheduleTask(40, () -> {
@@ -135,7 +161,9 @@ public class TaskManager {
                 AnimationUtils.playTotemAnimation(player);
             }
         });
-        TaskScheduler.scheduleTask(165, TaskManager::assignRandomTasks);
+        TaskScheduler.scheduleTask(165, () -> {
+            assignRandomTasks(type);
+        });
     }
 
     public static ItemStack getPlayersTaskBook(ServerPlayerEntity player) {
@@ -200,64 +228,128 @@ public class TaskManager {
     }
 
     public static void succeedTask(ServerPlayerEntity player) {
-        //TODO animations
         SecretLife series = (SecretLife) currentSeries;
         TaskType type = getPlayersTaskType(player);
         if (type == null) return;
         removePlayersTaskBook(player);
 
-        if (type == TaskType.EASY) {
-            addHealthThenItems(player, 20);
-            return;
-        }
-        if (type == TaskType.HARD) {
-            addHealthThenItems(player, 40);
-            return;
-        }
-        if (type == TaskType.RED) {
-            addHealthThenItems(player, 10);
-            return;
-        }
-
+        Vec3d centerPos = itemSpawnerPos.toCenterPos();
+        AnimationUtils.createGlyphAnimation(server.getOverworld(), centerPos, 40);
+        server.getOverworld().playSound(null, centerPos.getX(), centerPos.getY(), centerPos.getZ(), SoundEvent.of(Identifier.of("minecraft","secretlife_task")), SoundCategory.PLAYERS, 1.0F, 1.0F);
+        TaskScheduler.scheduleTask(60, () -> {
+            server.getOverworld().playSound(null, centerPos.getX(), centerPos.getY(), centerPos.getZ(), SoundEvents.BLOCK_TRIAL_SPAWNER_EJECT_ITEM, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            AnimationUtils.spawnFireworkBall(server.getOverworld(), centerPos, 40, 0.3, new Vector3f(0, 1, 0));
+            if (type == TaskType.EASY) {
+                showHeartTitle(player, 20);
+                addHealthThenItems(player, 20);
+                return;
+            }
+            if (type == TaskType.HARD) {
+                showHeartTitle(player, 40);
+                addHealthThenItems(player, 40);
+                return;
+            }
+            if (type == TaskType.RED) {
+                showHeartTitle(player, 10);
+                addHealthThenItems(player, 10);
+                return;
+            }
+        });
         if (series.isOnLastLife(player)) {
-            //TODO
-            assignRandomTaskToPlayer(player, TaskType.RED);
+            TaskScheduler.scheduleTask(120, () -> {
+                chooseTasks(List.of(player), TaskType.RED);
+            });
         }
     }
 
     public static void rerollTask(ServerPlayerEntity player) {
-        //TODO animations
         SecretLife series = (SecretLife) currentSeries;
         TaskType type = getPlayersTaskType(player);
         if (type == null) return;
         if (type == TaskType.EASY) {
             removePlayersTaskBook(player);
             TaskType newType = TaskType.HARD;
-            if (series.isOnLastLife(player)) newType = TaskType.RED;
-            assignRandomTaskToPlayer(player, newType);
+            if (series.isOnLastLife(player)) {
+                chooseTasks(List.of(player), TaskType.RED);
+                return;
+            }
+
+            PlayerUtils.playSoundToPlayers(List.of(player), SoundEvents.UI_BUTTON_CLICK.value());
+            PlayerUtils.sendTitle(player, Text.literal("The reward is more").formatted(Formatting.DARK_GREEN).formatted(Formatting.BOLD),20,35,0);
+
+            TaskScheduler.scheduleTask(50, () -> {
+                PlayerUtils.playSoundToPlayers(List.of(player), SoundEvents.UI_BUTTON_CLICK.value());
+                PlayerUtils.sendTitle(player, Text.literal("The risk is great").formatted(Formatting.GREEN).formatted(Formatting.BOLD),20,35,0);
+            });
+            TaskScheduler.scheduleTask(100, () -> {
+                PlayerUtils.playSoundToPlayers(List.of(player), SoundEvents.UI_BUTTON_CLICK.value());
+                PlayerUtils.sendTitle(player, Text.literal("Let me open the door").formatted(Formatting.YELLOW).formatted(Formatting.BOLD),20,35,0);
+            });
+            TaskScheduler.scheduleTask(150, () -> {
+                PlayerUtils.playSoundToPlayers(List.of(player), SoundEvents.UI_BUTTON_CLICK.value());
+                PlayerUtils.sendTitle(player, Text.literal("Accept your fate").formatted(Formatting.RED).formatted(Formatting.BOLD),20,30,0);
+            });
+            TaskScheduler.scheduleTask(200, () -> {
+                AnimationUtils.playTotemAnimation(player);
+            });
+            TaskScheduler.scheduleTask(240, () -> {
+                assignRandomTaskToPlayer(player, newType);
+            });
         }
     }
 
     public static void failTask(ServerPlayerEntity player) {
-        //TODO animations
         SecretLife series = (SecretLife) currentSeries;
         TaskType type = getPlayersTaskType(player);
         if (type == null) return;
         removePlayersTaskBook(player);
-
-        if (type == TaskType.HARD) {
-            series.removePlayerHealth(player, 20);
-            return;
-        }
-        if (type == TaskType.RED) {
-            series.removePlayerHealth(player, 5);
-            return;
-        }
-
+        Vec3d centerPos = itemSpawnerPos.toCenterPos();
+        AnimationUtils.createGlyphAnimation(server.getOverworld(), centerPos, 40);
+        server.getOverworld().playSound(null, centerPos.getX(), centerPos.getY(), centerPos.getZ(), SoundEvent.of(Identifier.of("minecraft","secretlife_task")), SoundCategory.PLAYERS, 1.0F, 1.0F);
+        TaskScheduler.scheduleTask(60, () -> {
+            server.getOverworld().playSound(null, centerPos.getX(), centerPos.getY(), centerPos.getZ(), SoundEvents.BLOCK_TRIAL_SPAWNER_SPAWN_MOB, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            AnimationUtils.spawnFireworkBall(server.getOverworld(), centerPos, 40, 0.3, new Vector3f(1, 0, 0));
+            if (type == TaskType.HARD) {
+                showHeartTitle(player, -20);
+                series.removePlayerHealth(player, 20);
+                return;
+            }
+            if (type == TaskType.RED) {
+                showHeartTitle(player, -5);
+                series.removePlayerHealth(player, 5);
+            }
+        });
         if (series.isOnLastLife(player)) {
-            //TODO
-            assignRandomTaskToPlayer(player, TaskType.RED);
+            TaskScheduler.scheduleTask(120, () -> {
+                chooseTasks(List.of(player), TaskType.RED);
+            });
         }
+    }
+
+    public static void showHeartTitle(ServerPlayerEntity player, int amount) {
+        SecretLife series = (SecretLife) currentSeries;
+        if (amount > 0 && series.getPlayerHealth(player) >= SecretLife.MAX_HEALTH) return;
+        int healthBefore = MathHelper.ceil(series.getPlayerHealth(player));
+        int finalAmount = amount;
+        if (healthBefore + amount <= 0) {
+            finalAmount = -healthBefore+1;
+            if (healthBefore == 1) finalAmount = 0;
+        }
+        if (healthBefore + amount > SecretLife.MAX_HEALTH) {
+            if (amount > 0) finalAmount = (int) (SecretLife.MAX_HEALTH-healthBefore);
+            else finalAmount = amount;
+        }
+        double finalHearts = (double) finalAmount / 2;
+        if (finalHearts == 0) return;
+
+        String finalStr = String.valueOf(finalHearts);
+        if (finalAmount%2==0) finalStr = String.valueOf((int)finalHearts);
+
+
+        Formatting formatting = Formatting.GREEN;
+        if (finalAmount < 0) formatting = Formatting.RED;
+        else finalStr = "+"+finalStr;
+        PlayerUtils.sendTitle(player, Text.literal(finalStr+" Hearts").formatted(formatting), 20, 40, 20);
     }
 
     public static void positionFound(BlockPos pos) {

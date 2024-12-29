@@ -5,10 +5,16 @@ import net.mat0u5.lifeseries.utils.ItemStackUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.potion.Potions;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -54,22 +60,80 @@ public class SecretLife extends Series {
         itemSpawner.addItem(new ItemStack(Items.ANCIENT_DEBRIS), 10);
         itemSpawner.addItem(new ItemStack(Items.EXPERIENCE_BOTTLE, 16), 10);
         itemSpawner.addItem(new ItemStack(Items.PUFFERFISH_BUCKET), 10);
-        itemSpawner.addItem(new ItemStack(Items.DIAMOND, 2), 10);
-        itemSpawner.addItem(new ItemStack(Items.GOLD_BLOCK, 2), 10);
-        itemSpawner.addItem(new ItemStack(Items.IRON_BLOCK, 2), 10);
+        itemSpawner.addItem(new ItemStack(Items.DIAMOND, 2), 20);
+        itemSpawner.addItem(new ItemStack(Items.GOLD_BLOCK, 2), 20);
+        itemSpawner.addItem(new ItemStack(Items.IRON_BLOCK, 2), 20);
         itemSpawner.addItem(new ItemStack(Items.COAL_BLOCK, 2), 10);
         itemSpawner.addItem(new ItemStack(Items.GOLDEN_APPLE), 10);
-        itemSpawner.addItem(new ItemStack(Items.INFESTED_STONE, 16), 10);
+        itemSpawner.addItem(new ItemStack(Items.INFESTED_STONE, 16), 7);
         itemSpawner.addItem(new ItemStack(Items.SCULK_SHRIEKER, 2), 10);
         itemSpawner.addItem(new ItemStack(Items.SCULK_SENSOR, 8), 10);
-        itemSpawner.addItem(new ItemStack(Items.TNT, 8), 10);
+        itemSpawner.addItem(new ItemStack(Items.TNT, 4), 10);
         itemSpawner.addItem(new ItemStack(Items.OBSIDIAN, 8), 10);
         itemSpawner.addItem(new ItemStack(Items.ARROW, 32), 10);
+        itemSpawner.addItem(new ItemStack(Items.WOLF_ARMOR), 10);
+        itemSpawner.addItem(new ItemStack(Items.BUNDLE), 10);
+        itemSpawner.addItem(new ItemStack(Items.ENDER_PEARL, 2), 10);
 
         //Potions
-        //Enchanted Books
-        //Spawn Eggs
+        ItemStack pot = new ItemStack(Items.POTION);
+        ItemStack pot2 = new ItemStack(Items.POTION);
+        ItemStack pot3 = new ItemStack(Items.POTION);
+        pot.set(DataComponentTypes.POTION_CONTENTS, new PotionContentsComponent(Potions.INVISIBILITY));
+        pot2.set(DataComponentTypes.POTION_CONTENTS, new PotionContentsComponent(Potions.SLOW_FALLING));
+        pot3.set(DataComponentTypes.POTION_CONTENTS, new PotionContentsComponent(Potions.FIRE_RESISTANCE));
+        itemSpawner.addItem(pot, 10);
+        itemSpawner.addItem(pot2, 10);
+        itemSpawner.addItem(pot3, 10);
 
+        //Enchanted Books
+        itemSpawner.addItem(ItemStackUtils.createEnchantedBook(Enchantments.PROTECTION, 3), 10);
+        itemSpawner.addItem(ItemStackUtils.createEnchantedBook(Enchantments.FEATHER_FALLING, 3), 10);
+        itemSpawner.addItem(ItemStackUtils.createEnchantedBook(Enchantments.SILK_TOUCH, 1), 10);
+        itemSpawner.addItem(ItemStackUtils.createEnchantedBook(Enchantments.FORTUNE, 3), 10);
+        itemSpawner.addItem(ItemStackUtils.createEnchantedBook(Enchantments.LOOTING, 3), 10);
+        itemSpawner.addItem(ItemStackUtils.createEnchantedBook(Enchantments.EFFICIENCY, 4), 10);
+
+
+        //Spawn Eggs
+        itemSpawner.addItem(new ItemStack(Items.WOLF_SPAWN_EGG), 15);
+        itemSpawner.addItem(new ItemStack(Items.PANDA_SPAWN_EGG), 5);
+        itemSpawner.addItem(new ItemStack(Items.SNIFFER_SPAWN_EGG), 3);
+        itemSpawner.addItem(new ItemStack(Items.TURTLE_SPAWN_EGG), 5);
+
+        ItemStack camel = new ItemStack(Items.CAMEL_SPAWN_EGG);
+        ItemStack zombieHorse = new ItemStack(Items.ZOMBIE_HORSE_SPAWN_EGG);
+        ItemStack skeletonHorse = new ItemStack(Items.SKELETON_HORSE_SPAWN_EGG);
+        NbtCompound saddleItemComp = new NbtCompound();
+        saddleItemComp.putInt("Count", 1);
+        saddleItemComp.putString("id", "saddle");
+
+        NbtCompound nbtCompSkeleton = new NbtCompound();
+        nbtCompSkeleton.putInt("Tame", 1);
+        nbtCompSkeleton.putString("id", "skeleton_horse");
+        nbtCompSkeleton.put("SaddleItem", saddleItemComp);
+        NbtComponent nbtSkeleton = NbtComponent.of(nbtCompSkeleton);
+
+        NbtCompound nbtCompZombie= new NbtCompound();
+        nbtCompZombie.putInt("Tame", 1);
+        nbtCompZombie.putString("id", "zombie_horse");
+        nbtCompZombie.put("SaddleItem", saddleItemComp);
+        NbtComponent nbtZombie = NbtComponent.of(nbtCompZombie);
+
+        NbtCompound nbtCompCamel = new NbtCompound();
+        nbtCompCamel.putInt("Tame", 1);
+        nbtCompCamel.putString("id", "camel");
+        nbtCompCamel.put("SaddleItem", saddleItemComp);
+        NbtComponent nbtCamel= NbtComponent.of(nbtCompCamel);
+
+        zombieHorse.set(DataComponentTypes.ENTITY_DATA, nbtZombie);
+        skeletonHorse.set(DataComponentTypes.ENTITY_DATA, nbtSkeleton);
+        camel.set(DataComponentTypes.ENTITY_DATA, nbtCamel);
+        itemSpawner.addItem(zombieHorse, 10);
+        itemSpawner.addItem(skeletonHorse, 10);
+        itemSpawner.addItem(camel, 10);
+
+        //Other Stuff
         ItemStack endCrystal = new ItemStack(Items.END_CRYSTAL);
         ItemStackUtils.setCustomComponentBoolean(endCrystal, "IgnoreBlacklist", true);
         itemSpawner.addItem(endCrystal, 10);
@@ -84,7 +148,7 @@ public class SecretLife extends Series {
         ItemStackUtils.addLoreToItemStack(patat,
                 List.of(Text.of("§5§oEating this might help you. Or maybe not..."))
         );
-        itemSpawner.addItem(patat, 100);
+        itemSpawner.addItem(patat, 1);
     }
 
     @Override
@@ -120,14 +184,19 @@ public class SecretLife extends Series {
     }
 
     @Override
-    public void sessionStart() {
+    public boolean sessionStart() {
         if (TaskManager.checkSecretLifePositions()) {
-            super.sessionStart();
-            activeActions.clear(); // To remove default 5 min warning
-            activeActions.addAll(
-                    List.of(TaskManager.actionChooseTasks, taskWarningAction)
-            );
+            if (super.sessionStart()) {
+                activeActions.clear(); // To remove default 5 min warning
+                activeActions.addAll(
+                        List.of(TaskManager.actionChooseTasks, taskWarningAction)
+                );
+                SecretLifeCommands.playersGiven.clear();
+                return true;
+            }
+            return false;
         }
+        return false;
     }
 
     @Override
@@ -159,30 +228,17 @@ public class SecretLife extends Series {
         addPlayerHealth(player,-health);
     }
 
-    public void removePlayerHealthClamped(ServerPlayerEntity player, double health) {
-        addPlayerHealthClamped(player,-health);
-    }
-
     public void addPlayerHealth(ServerPlayerEntity player, double health) {
         double currentHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
         setPlayerHealth(player, currentHealth + health);
     }
 
-    public void addPlayerHealthClamped(ServerPlayerEntity player, double health) {
-        double currentHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
-        setPlayerHealthClamped(player, currentHealth + health);
-    }
-
     public void setPlayerHealth(ServerPlayerEntity player, double health) {
+        if (health < 0.1) health = 0.1;
         Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(health);
         if (player.getMaxHealth() > player.getHealth() && !player.isDead()) {
             player.setHealth(player.getMaxHealth());
         }
-    }
-
-    public void setPlayerHealthClamped(ServerPlayerEntity player, double health) {
-        if (health > MAX_HEALTH) health = MAX_HEALTH;
-        setPlayerHealth(player, health);
     }
 
     public double getPlayerHealth(ServerPlayerEntity player) {

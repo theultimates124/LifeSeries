@@ -29,7 +29,7 @@ public class LastLifeLivesManager {
         target.playSoundToPlayer(SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.MASTER, 10, 1);
         target.sendMessage(Text.literal("You received a life from ").append(playerName));
         PlayerUtils.sendTitle(target, Text.of("You received a life"), 10, 30, 10);
-        AnimationUtils.createSpiral(target);
+        AnimationUtils.createSpiral(target, 175);
         currentSeries.addPlayerLife(target);
     }
 

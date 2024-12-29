@@ -4,16 +4,27 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.NbtComponent;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentLevelEntry;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static net.mat0u5.lifeseries.Main.server;
 
 public class ItemStackUtils {
     public static void clearItemLore(ItemStack itemStack) {
@@ -125,16 +136,26 @@ public class ItemStackUtils {
     public static void spawnItem(ServerWorld world, Vec3d position, ItemStack stack) {
         spawnItemForPlayer(world, position, stack, null);
     }
+
     public static void spawnItemForPlayer(ServerWorld world, Vec3d position, ItemStack stack, PlayerEntity player) {
         if (world == null || stack.isEmpty()) {
             return;
         }
         ItemEntity itemEntity = new ItemEntity(world, position.x, position.y, position.z, stack);
         itemEntity.setPickupDelay(20);
-        System.out.println(itemEntity.getVelocity());
         itemEntity.setVelocity(itemEntity.getVelocity().getX()/4, 0.2, itemEntity.getVelocity().getZ()/4);
         if (player != null) itemEntity.setOwner(player.getUuid());
 
         world.spawnEntity(itemEntity);
+    }
+
+    public static ItemStack createEnchantedBook(RegistryKey<Enchantment> enchantment, int level) {
+        RegistryEntry<Enchantment> entry = server.getRegistryManager()
+                .getWrapperOrThrow(RegistryKeys.ENCHANTMENT)
+                .getOrThrow(enchantment);
+        ItemStack enchantedBook = EnchantedBookItem.forEnchantment(
+                new EnchantmentLevelEntry(entry, level)
+        );
+        return enchantedBook;
     }
 }

@@ -9,10 +9,12 @@ public class DatabaseManager {
     public static Database db = null;
     public static DataStore doublelife = null;
     public static DataStore secretlife = null;
+    public static DataStore secretlifeUsedTasks = null;
 
     public static void initialize() {
         db = SQLib.getDatabase();
         doublelife = db.dataStore(Main.MOD_ID, "doublelife");
         secretlife = db.dataStore(Main.MOD_ID, "secretlife");
+        secretlifeUsedTasks = db.dataStore(Main.MOD_ID, "secretlifeUsedTasks");
     }
 }

@@ -29,15 +29,18 @@ public class LastLife extends Series {
     }
 
     @Override
-    public void sessionStart() {
-        super.sessionStart();
-        boogeymanManager.resetBoogeymen();
-        activeActions.addAll(List.of(
-                livesManager.actionChooseLives,
-                boogeymanManager.actionBoogeymanWarn1,
-                boogeymanManager.actionBoogeymanWarn2,
-                boogeymanManager.actionBoogeymanChoose
-        ));
+    public boolean sessionStart() {
+        if (super.sessionStart()) {
+            boogeymanManager.resetBoogeymen();
+            activeActions.addAll(List.of(
+                    livesManager.actionChooseLives,
+                    boogeymanManager.actionBoogeymanWarn1,
+                    boogeymanManager.actionBoogeymanWarn2,
+                    boogeymanManager.actionBoogeymanChoose
+            ));
+            return true;
+        }
+        return false;
     }
 
     @Override

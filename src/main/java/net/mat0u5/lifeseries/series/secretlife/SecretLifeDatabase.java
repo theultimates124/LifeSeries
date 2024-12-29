@@ -1,8 +1,13 @@
 package net.mat0u5.lifeseries.series.secretlife;
 
 import me.mrnavastar.sqlib.api.DataContainer;
+import me.mrnavastar.sqlib.api.types.JavaTypes;
 import me.mrnavastar.sqlib.api.types.MinecraftTypes;
 import net.mat0u5.lifeseries.config.DatabaseManager;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class SecretLifeDatabase extends DatabaseManager {
     public static void loadLocations() {
@@ -34,5 +39,37 @@ public class SecretLifeDatabase extends DatabaseManager {
         for (DataContainer container : secretlife.getContainers()) {
             container.delete();
         }
+    }
+
+    public static void deleteUsedTasks() {
+        for (DataContainer container : secretlifeUsedTasks.getContainers()) {
+            container.delete();
+        }
+    }
+
+    public static void deleteAllTasks(List<String> tasks) {
+        if (tasks.isEmpty()) return;
+        for (DataContainer container : secretlifeUsedTasks.getContainers()) {
+            Optional<String> task = container.get(JavaTypes.STRING, "task");
+            if (task.isEmpty()) continue;
+            if (tasks.contains(task.get())) {
+                container.delete();
+            }
+        }
+    }
+
+    public static void addUsedTask(String task) {
+        DataContainer container = secretlifeUsedTasks.createContainer();
+        container.put(JavaTypes.STRING, "task", task);
+    }
+
+    public static List<String> getUsedTasks() {
+        List<String> result = new ArrayList<>();
+        for (DataContainer container : secretlifeUsedTasks.getContainers()) {
+            Optional<String> task = container.get(JavaTypes.STRING, "task");
+            if (task.isEmpty()) continue;
+            result.add(task.get());
+        }
+        return result;
     }
 }

@@ -134,7 +134,10 @@ public class SessionCommand {
             currentSession.sessionPause();
             return 1;
         }
-        currentSession.sessionStart();
+        if (!currentSession.sessionStart()) {
+            source.sendError(Text.of("Could not start session."));
+            return -1;
+        }
 
         return 1;
     }

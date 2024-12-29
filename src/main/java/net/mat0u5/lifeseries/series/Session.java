@@ -34,8 +34,8 @@ public class Session {
         }
     };
 
-    public void sessionStart() {
-        if (!canStartSession()) return;
+    public boolean sessionStart() {
+        if (!canStartSession()) return false;
         status = SessionStatus.STARTED;
         passedTime = 0;
         MutableText sessionStartedText = Text.literal("Session started!").formatted(Formatting.GOLD);
@@ -47,6 +47,7 @@ public class Session {
         OtherUtils.broadcastMessage(infoText2);
         activeActions.clear();
         activeActions.add(defaultWarningAction);
+        return true;
     }
 
     public void sessionEnd() {

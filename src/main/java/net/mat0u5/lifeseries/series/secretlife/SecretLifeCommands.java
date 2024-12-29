@@ -3,6 +3,8 @@ package net.mat0u5.lifeseries.series.secretlife;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import net.mat0u5.lifeseries.series.SeriesList;
+import net.mat0u5.lifeseries.series.SessionStatus;
+import net.mat0u5.lifeseries.utils.AnimationUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -169,7 +171,7 @@ public class SecretLifeCommands {
         return 1;
     }
 
-    static List<UUID> playersGiven = new ArrayList<>();
+    public static List<UUID> playersGiven = new ArrayList<>();
     public static int gift(ServerCommandSource source, ServerPlayerEntity target) {
         MinecraftServer server = source.getServer();
         final ServerPlayerEntity self = source.getPlayer();
@@ -189,6 +191,10 @@ public class SecretLifeCommands {
             source.sendError(Text.of("That player is not alive."));
             return -1;
         }
+        if (secretLife.status != SessionStatus.STARTED) {
+            source.sendError(Text.of("The session has not started."));
+            return -1;
+        }
         playersGiven.add(self.getUuid());
         secretLife.addPlayerHealth(target, 2);
         Text senderMessage = Text.literal("You have gifted a heart to ").append(target.getStyledDisplayName()).append(Text.of("."));
@@ -197,6 +203,7 @@ public class SecretLifeCommands {
         self.sendMessage(senderMessage);
         PlayerUtils.sendTitle(target, recipientMessage, 20, 20, 20);
         target.sendMessage(recipientMessage);
+        AnimationUtils.createSpiral(target, 40);
 
         PlayerUtils.playSoundToPlayers(List.of(self,target), SoundEvent.of(Identifier.of("minecraft","secretlife_life")));
 

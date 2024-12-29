@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.utils;
 
+import net.mat0u5.lifeseries.Main;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -41,7 +42,7 @@ public class TeamUtils {
 
         Team team = scoreboard.getScoreHolderTeam(playerName);
         if (team == null) {
-            System.out.println("Player " + playerName + " is not part of any team!");
+            Main.LOGGER.warn("Player " + playerName + " is not part of any team!");
             return false;
         }
 
@@ -54,7 +55,7 @@ public class TeamUtils {
         Team team = scoreboard.getTeam(teamName);
 
         if (team == null) {
-            System.out.println("Team with name " + teamName + " does not exist!");
+            Main.LOGGER.warn("Team with name " + teamName + " does not exist!");
             return false;
         }
 

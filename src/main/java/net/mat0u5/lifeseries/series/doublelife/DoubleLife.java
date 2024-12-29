@@ -79,11 +79,14 @@ public class DoubleLife extends Series {
     }
 
     @Override
-    public void sessionStart() {
-        super.sessionStart();
-        activeActions.addAll(
-                List.of(actionChooseSoulmates, actionRandomTP)
-        );
+    public boolean sessionStart() {
+        if (super.sessionStart()) {
+            activeActions.addAll(
+                    List.of(actionChooseSoulmates, actionRandomTP)
+            );
+            return true;
+        }
+        return false;
     }
 
     @Override
