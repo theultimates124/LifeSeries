@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series.secretlife;
 
+import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.config.StringListManager;
 import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.utils.*;
@@ -26,6 +27,7 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
@@ -35,11 +37,19 @@ public class TaskManager {
     public static BlockPos rerollButtonPos;
     public static BlockPos failButtonPos;
     public static BlockPos itemSpawnerPos;
+    public static boolean tasksChosen = false;
+    public static List<UUID> tasksChosenFor = new ArrayList<>();
+    public static List<UUID> submittedOrFailed = new ArrayList<>();
+    public static boolean secretKeeperBeingUsed = false;
+    public static int secretKeeperBeingUsedFor = 0;
 
-    public static SessionAction actionChooseTasks = new SessionAction(OtherUtils.minutesToTicks(1)) {
+    public static SessionAction actionChooseTasks = new SessionAction(
+            OtherUtils.minutesToTicks(1),"§7Assign Tasks §f[00:01:00]"
+    ) {
         @Override
         public void trigger() {
             chooseTasks(currentSeries.getAlivePlayers(), null);
+            tasksChosen = true;
         }
     };
     public static List<String> easyTasks;
@@ -130,19 +140,26 @@ public class TaskManager {
         }
     }
 
-    public static void assignRandomTasks(TaskType type) {
-        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+    public static void assignRandomTasks(List<ServerPlayerEntity> allowedPlayers, TaskType type) {
+        for (ServerPlayerEntity player : allowedPlayers) {
             if (!currentSeries.isAlive(player)) continue;
-            if (type == null) {
-                type = TaskType.EASY;
-                if (currentSeries.isOnLastLife(player)) type = TaskType.RED;
+            TaskType thisType = type;
+            if (thisType == null) {
+                thisType = TaskType.EASY;
+                if (currentSeries.isOnLastLife(player)) thisType = TaskType.RED;
             }
             removePlayersTaskBook(player);
-            assignRandomTaskToPlayer(player, type);
+            assignRandomTaskToPlayer(player, thisType);
         }
     }
 
     public static void chooseTasks(List<ServerPlayerEntity> allowedPlayers, TaskType type) {
+        secretKeeperBeingUsed = true;
+        for (ServerPlayerEntity player : allowedPlayers) {
+            if (!tasksChosenFor.contains(player.getUuid())) {
+                tasksChosenFor.add(player.getUuid());
+            }
+        }
         PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("Your secret is...").formatted(Formatting.RED),20,35,0);
 
         TaskScheduler.scheduleTask(40, () -> {
@@ -162,7 +179,8 @@ public class TaskManager {
             }
         });
         TaskScheduler.scheduleTask(165, () -> {
-            assignRandomTasks(type);
+            assignRandomTasks(allowedPlayers, type);
+            secretKeeperBeingUsed = false;
         });
     }
 
@@ -173,12 +191,25 @@ public class TaskManager {
         return null;
     }
 
-    public static void removePlayersTaskBook(ServerPlayerEntity player) {
+    public static boolean hasNonRedTaskBook(ServerPlayerEntity player) {
+        for (ItemStack item : PlayerUtils.getPlayerInventory(player)) {
+            if (!ItemStackUtils.hasCustomComponentEntry(item,"SecretTask")) continue;
+            if (!ItemStackUtils.hasCustomComponentEntry(item,"TaskDifficulty")) continue;
+            int difficulty = ItemStackUtils.getCustomComponentInt(item, "TaskDifficulty");
+            if (difficulty == 1 || difficulty == 2) return true;
+        }
+        return false;
+    }
+
+    public static boolean removePlayersTaskBook(ServerPlayerEntity player) {
+        boolean success = false;
         for (ItemStack item : PlayerUtils.getPlayerInventory(player)) {
             if (ItemStackUtils.hasCustomComponentEntry(item,"SecretTask")) {
                 PlayerUtils.clearItemStack(player, item);
+                success = true;
             }
         }
+        return success;
     }
 
     public static boolean getPlayerKillPermitted(ServerPlayerEntity player) {
@@ -203,6 +234,7 @@ public class TaskManager {
     }
 
     public static void addHealthThenItems(ServerPlayerEntity player, int addHealth) {
+        secretKeeperBeingUsed = true;
         SecretLife series = (SecretLife) currentSeries;
         double currentHealth = series.getPlayerHealth(player);
         if (currentHealth > SecretLife.MAX_HEALTH) currentHealth = SecretLife.MAX_HEALTH;
@@ -224,14 +256,32 @@ public class TaskManager {
                     series.itemSpawner.spawnRandomItemForPlayer(server.getOverworld(), spawnPos, player);
                 });
             }
+            TaskScheduler.scheduleTask(3*itemsNum+20, () -> {
+                secretKeeperBeingUsed = false;
+            });
         }
     }
 
+    public static boolean isBeingUsed(ServerPlayerEntity player) {
+        if (!secretKeeperBeingUsed) return false;
+        player.sendMessage(Text.of("§cSomeone else is using the Secret Keeper right now."));
+        return true;
+    }
+
+    public static boolean hasTaskBook(ServerPlayerEntity player, TaskType type) {
+        if (type != null) return true;
+        player.sendMessage(Text.of("§cYou do not have a secret task book in your inventory."));
+        return false;
+    }
+
     public static void succeedTask(ServerPlayerEntity player) {
+        if (isBeingUsed(player)) return;
         SecretLife series = (SecretLife) currentSeries;
         TaskType type = getPlayersTaskType(player);
-        if (type == null) return;
+        if (!hasTaskBook(player, type)) return;
         removePlayersTaskBook(player);
+        submittedOrFailed.add(player.getUuid());
+        secretKeeperBeingUsed = true;
 
         Vec3d centerPos = itemSpawnerPos.toCenterPos();
         AnimationUtils.createGlyphAnimation(server.getOverworld(), centerPos, 40);
@@ -263,11 +313,17 @@ public class TaskManager {
     }
 
     public static void rerollTask(ServerPlayerEntity player) {
+        if (isBeingUsed(player)) return;
         SecretLife series = (SecretLife) currentSeries;
         TaskType type = getPlayersTaskType(player);
-        if (type == null) return;
+        if (!hasTaskBook(player, type)) return;
+        if (type == TaskType.RED) {
+            failTask(player);
+            return;
+        }
         if (type == TaskType.EASY) {
             removePlayersTaskBook(player);
+            secretKeeperBeingUsed = true;
             TaskType newType = TaskType.HARD;
             if (series.isOnLastLife(player)) {
                 chooseTasks(List.of(player), TaskType.RED);
@@ -294,15 +350,29 @@ public class TaskManager {
             });
             TaskScheduler.scheduleTask(240, () -> {
                 assignRandomTaskToPlayer(player, newType);
+                secretKeeperBeingUsed = false;
             });
+            return;
+        }
+        if (type == TaskType.HARD) {
+            if (series.isOnLastLife(player)) {
+                player.sendMessage(Text.of("§cYou cannot re-roll a Hard task."));
+            }
+            else {
+                player.sendMessage(Text.of("§cYou cannot re-roll a Hard task. If you want your red task instead, click the Fail button."));
+            }
         }
     }
 
     public static void failTask(ServerPlayerEntity player) {
+        if (isBeingUsed(player)) return;
         SecretLife series = (SecretLife) currentSeries;
         TaskType type = getPlayersTaskType(player);
-        if (type == null) return;
+        if (!hasTaskBook(player, type)) return;
         removePlayersTaskBook(player);
+        submittedOrFailed.add(player.getUuid());
+        secretKeeperBeingUsed = true;
+
         Vec3d centerPos = itemSpawnerPos.toCenterPos();
         AnimationUtils.createGlyphAnimation(server.getOverworld(), centerPos, 40);
         server.getOverworld().playSound(null, centerPos.getX(), centerPos.getY(), centerPos.getZ(), SoundEvent.of(Identifier.of("minecraft","secretlife_task")), SoundCategory.PLAYERS, 1.0F, 1.0F);
@@ -317,6 +387,9 @@ public class TaskManager {
             if (type == TaskType.RED) {
                 showHeartTitle(player, -5);
                 series.removePlayerHealth(player, 5);
+            }
+            if (!series.isOnLastLife(player)) {
+                secretKeeperBeingUsed = false;
             }
         });
         if (series.isOnLastLife(player)) {
@@ -425,5 +498,19 @@ public class TaskManager {
                 world.breakBlock(placePos, false);
             }
         });
+    }
+
+    public static void tick() {
+        if (secretKeeperBeingUsed) {
+            secretKeeperBeingUsedFor++;
+        }
+        else {
+            secretKeeperBeingUsedFor = 0;
+        }
+        if (secretKeeperBeingUsedFor > 500) {
+            secretKeeperBeingUsed = false;
+            secretKeeperBeingUsedFor = 0;
+            Main.LOGGER.error("Resetting Secret Keeper.");
+        }
     }
 }

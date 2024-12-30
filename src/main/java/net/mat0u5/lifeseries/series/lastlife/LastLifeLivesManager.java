@@ -17,7 +17,9 @@ import java.util.*;
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
 public class LastLifeLivesManager {
-    public SessionAction actionChooseLives = new SessionAction(OtherUtils.minutesToTicks(1)) {
+    public SessionAction actionChooseLives = new SessionAction(
+            OtherUtils.minutesToTicks(1),"§7Assign lives if necessary §f[00:01:00]"
+    ) {
         @Override
         public void trigger() {
             assignRandomLivesToUnassignedPlayers();

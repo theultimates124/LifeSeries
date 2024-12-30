@@ -15,9 +15,9 @@ Join the [Discord](https://discord.gg/QWJxfb4zQZ) or make an issue if you want t
 
 Currently, the first four seasons of the Life Series are implemented, the last two are much more complicated, but they are planned to be released.
 
-| Third Life | Last Life | Double Life | Limited Life | | Secret Life | Wild Life   |
-|------------|-----------|-------------|--------------|-|-------------|-------------|
-| Completed  | Completed | Completed   | Completed    | | In Progress | Not Started |
+| Third Life | Last Life | Double Life | Limited Life | Secret Life | | Wild Life  |
+|------------|-----------|-------------|--------------|-------------|-|------------|
+| Completed  | Completed | Completed   | Completed    | Completed | | Next up :/ |
 -----
 ## Usage
 ### Selecting a series
@@ -103,7 +103,7 @@ This command **always** available
 </details>
 
 <details open>
-<summary>/lives</summary>
+<summary>/health</summary>
 
 *This command is only available when playing Secret Life.*
 - `/health` - Shows you the amount of health you have (pr useless huh xD). *No permissions required.*
@@ -122,6 +122,14 @@ This command **always** available
 - `/givelife <player>` - Gives one of your lives to `<player>`. *This command is only available when playing Last Life.* *No permissions required.*
 - `/lives rollLives [<player>]` - Rolls 2-6 lives for everyone or for the `[<player>]`, if specified. *This command is only available when playing Last Life.*
 
+- `/gift <player>` - Gives one free heart to `<player>`. *This command is only available when playing Secret Life.* *No permissions required.*
+
+- `/task` - *These commands are only available when playing Secret Life.*
+  - `/task succeed <player>` - Succeeds `<player>`'s task.
+  - `/task fail <player>` - Fails `<player>`'s task.
+  - `/task reroll <player>` - Re-rolls `<player>`'s task.
+  - `/task assignRandom <player/s>` - Assigns a random task to `<player/s>`.
+  - `/task clearTask <player>` - Clears the task book from `<player>`.
 
 - `/soulmate` - *These commands are only available when playing Double Life.*
   - `/soulmate get <player>` - Shows you who `<player>`'s soulmate is.

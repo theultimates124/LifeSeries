@@ -3,8 +3,15 @@ package net.mat0u5.lifeseries.series;
 public abstract class SessionAction {
     public boolean hasTriggered = false;
     public int triggerAtTicks;
+    public String sessionMessage;
+
     public SessionAction(int triggerAtTicks) {
         this.triggerAtTicks = triggerAtTicks;
+    }
+
+    public SessionAction(int triggerAtTicks, String message) {
+        this.triggerAtTicks = triggerAtTicks;
+        this.sessionMessage = message;
     }
 
     public boolean tick(int currentTick, int sessionLength) {

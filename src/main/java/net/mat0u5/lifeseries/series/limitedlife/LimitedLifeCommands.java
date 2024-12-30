@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
@@ -12,6 +13,8 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+
+import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.utils.PermissionManager.isAdmin;
@@ -37,6 +40,7 @@ public class LimitedLifeCommands {
                     .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                     .then(argument("player", EntityArgumentType.player())
                             .then(argument("time", StringArgumentType.string())
+                                    .suggests((context, builder) -> CommandSource.suggestMatching(List.of("30m", "1h"), builder))
                                     .executes(context -> lifeManager(
                                             context.getSource(), EntityArgumentType.getPlayer(context, "player"),
                                             StringArgumentType.getString(context, "time"), false, false)
@@ -48,6 +52,7 @@ public class LimitedLifeCommands {
                     .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                     .then(argument("player", EntityArgumentType.player())
                             .then(argument("time", StringArgumentType.string())
+                                    .suggests((context, builder) -> CommandSource.suggestMatching(List.of("30m", "1h"), builder))
                                     .executes(context -> lifeManager(
                                             context.getSource(), EntityArgumentType.getPlayer(context, "player"),
                                             StringArgumentType.getString(context, "time"), false, true)
@@ -59,6 +64,7 @@ public class LimitedLifeCommands {
                     .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                     .then(argument("player", EntityArgumentType.player())
                             .then(argument("time", StringArgumentType.string())
+                                    .suggests((context, builder) -> CommandSource.suggestMatching(List.of("8h", "16h", "24h"), builder))
                                     .executes(context -> lifeManager(
                                             context.getSource(), EntityArgumentType.getPlayer(context, "player"),
                                             StringArgumentType.getString(context, "time"), true, false)

@@ -1,7 +1,6 @@
 package net.mat0u5.lifeseries.mixin;
 
 import com.google.common.collect.Lists;
-import net.mat0u5.lifeseries.series.SeriesList;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
@@ -26,8 +25,36 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 public class EnchantmentHelperMixin {
     @Inject(method = "getPossibleEntries", at = @At("HEAD"), cancellable = true)
     private static void getPossibleEntries(int level, ItemStack stack, Stream<RegistryEntry<Enchantment>> possibleEnchantments, CallbackInfoReturnable<List<EnchantmentLevelEntry>> cir) {
-        if (!currentSeries.CUSTOM_ENCHANTMENT_TABLE_ALGORITHM) return;
+        if (currentSeries.CUSTOM_ENCHANTMENT_TABLE_ALGORITHM) {
+            customEnchantmentTableAlgorithm(level, stack, possibleEnchantments, cir);
+        }
+        if (currentSeries.BLACKLIST_ENCHANTMENT_TABLE) {
+            blacklistEnchantments(level, stack, possibleEnchantments, cir);
+        }
+    }
+    private static void blacklistEnchantments(int level, ItemStack stack, Stream<RegistryEntry<Enchantment>> possibleEnchantments, CallbackInfoReturnable<List<EnchantmentLevelEntry>> cir) {
+        List<EnchantmentLevelEntry> list = Lists.<EnchantmentLevelEntry>newArrayList();
+        boolean bl = stack.isOf(Items.BOOK);
+        possibleEnchantments.filter(enchantment -> ((Enchantment)enchantment.value()).isPrimaryItem(stack) || bl).forEach(enchantmentx -> {
+            Enchantment enchantment = (Enchantment)enchantmentx.value();
+            Optional<RegistryKey<Enchantment>> enchantRegistryKey = enchantmentx.getKey();
+            boolean isRegistryPresent = enchantRegistryKey.isPresent();
+            for (int j = enchantment.getMaxLevel(); j >= enchantment.getMinLevel(); j--) {
+                if (level >= enchantment.getMinPower(j) && level <= enchantment.getMaxPower(j)) {
+                    if (isRegistryPresent && blacklist.getClampedEnchants().contains(enchantRegistryKey.get())) {
+                        list.add(new EnchantmentLevelEntry(enchantmentx, 1));
+                    }
+                    else {
+                        list.add(new EnchantmentLevelEntry(enchantmentx, j));
+                    }
+                    break;
+                }
+            }
+        });
+        cir.setReturnValue(list);
+    }
 
+    private static void customEnchantmentTableAlgorithm(int level, ItemStack stack, Stream<RegistryEntry<Enchantment>> possibleEnchantments, CallbackInfoReturnable<List<EnchantmentLevelEntry>> cir) {
         List<EnchantmentLevelEntry> list = new ArrayList<>();
         boolean bl = stack.isOf(Items.BOOK);
         possibleEnchantments.filter(enchantment -> ((Enchantment)enchantment.value()).isPrimaryItem(stack) || bl).forEach(enchantmentx -> {

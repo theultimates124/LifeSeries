@@ -4,6 +4,7 @@ import net.mat0u5.lifeseries.series.*;
 import net.mat0u5.lifeseries.utils.ItemStackUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
+import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.component.type.PotionContentsComponent;
@@ -13,12 +14,13 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.potion.Potions;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,10 +29,16 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 public class SecretLife extends Series {
     public static final double MAX_HEALTH = 60.0d;
     public ItemSpawner itemSpawner;
-    SessionAction taskWarningAction = new SessionAction(OtherUtils.minutesToTicks(-5)) {
+    SessionAction taskWarningAction = new SessionAction(OtherUtils.minutesToTicks(-5)+1) {
         @Override
         public void trigger() {
-            OtherUtils.broadcastMessage(Text.literal("Session ends in 5 minutes, you better finish your secret tasks if you haven't!").formatted(Formatting.GOLD));
+            OtherUtils.broadcastMessage(Text.literal("Go submit / fail your secret tasks if you haven't!").formatted(Formatting.GRAY));
+        }
+    };
+    SessionAction taskWarningAction2 = new SessionAction(OtherUtils.minutesToTicks(-30)+1) {
+        @Override
+        public void trigger() {
+            OtherUtils.broadcastMessage(Text.literal("You better start finishing your secret tasks if you haven't already!").formatted(Formatting.GRAY));
         }
     };
 
@@ -47,8 +55,8 @@ public class SecretLife extends Series {
     @Override
     public void initialize() {
         super.initialize();
-        CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = true;
         NO_HEALING = true;
+        BLACKLIST_ENCHANTMENT_TABLE = true;
         TaskManager.initialize();
         SecretLifeDatabase.loadLocations();
         initializeItemSpawner();
@@ -74,6 +82,8 @@ public class SecretLife extends Series {
         itemSpawner.addItem(new ItemStack(Items.WOLF_ARMOR), 10);
         itemSpawner.addItem(new ItemStack(Items.BUNDLE), 10);
         itemSpawner.addItem(new ItemStack(Items.ENDER_PEARL, 2), 10);
+        itemSpawner.addItem(new ItemStack(Items.BOOKSHELF, 4), 10);
+        itemSpawner.addItem(new ItemStack(Items.SWEET_BERRIES, 16), 10);
 
         //Potions
         ItemStack pot = new ItemStack(Items.POTION);
@@ -181,17 +191,24 @@ public class SecretLife extends Series {
             player.setHealth((float) MAX_HEALTH);
         }
         TaskManager.checkSecretLifePositions();
+        if (TaskManager.tasksChosen && !TaskManager.tasksChosenFor.contains(player.getUuid())) {
+            TaskScheduler.scheduleTask(100, () -> {
+                TaskManager.chooseTasks(List.of(player), null);
+            });
+        }
     }
 
     @Override
     public boolean sessionStart() {
         if (TaskManager.checkSecretLifePositions()) {
             if (super.sessionStart()) {
-                activeActions.clear(); // To remove default 5 min warning
                 activeActions.addAll(
-                        List.of(TaskManager.actionChooseTasks, taskWarningAction)
+                        List.of(TaskManager.actionChooseTasks, taskWarningAction, taskWarningAction2)
                 );
                 SecretLifeCommands.playersGiven.clear();
+                TaskManager.tasksChosen = false;
+                TaskManager.tasksChosenFor.clear();
+                TaskManager.submittedOrFailed.clear();
                 return true;
             }
             return false;
@@ -202,6 +219,17 @@ public class SecretLife extends Series {
     @Override
     public void sessionEnd() {
         super.sessionEnd();
+        List<String> playersWithTaskBooks = new ArrayList<>();
+        for (ServerPlayerEntity player : getNonRedPlayers()) {
+            if (!isAlive(player)) continue;
+            if (TaskManager.submittedOrFailed.contains(player.getUuid())) continue;
+            playersWithTaskBooks.add(player.getNameForScoreboard());
+        }
+        if (!playersWithTaskBooks.isEmpty()) {
+            boolean isOne = playersWithTaskBooks.size() == 1;
+            String playerNames = String.join(", ", playersWithTaskBooks);
+            OtherUtils.broadcastMessageToAdmins(Text.of("§4"+playerNames+"§c still " + (isOne?"has":"have") + " not submitted / failed any tasks this session."));
+        }
     }
 
     @Override
@@ -222,6 +250,12 @@ public class SecretLife extends Series {
         if (currentSeries.isOnLastLife(attacker)) return true;
         if (attacker.getPrimeAdversary() == victim && (currentSeries.isOnLastLife(victim))) return true;
         return false;
+    }
+
+    @Override
+    public void tick(MinecraftServer server) {
+        super.tick(server);
+        TaskManager.tick();
     }
 
     public void removePlayerHealth(ServerPlayerEntity player, double health) {

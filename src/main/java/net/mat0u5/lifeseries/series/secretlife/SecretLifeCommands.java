@@ -18,6 +18,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -125,6 +126,20 @@ public class SecretLifeCommands {
                                     )
                             )
                     )
+                    .then(literal("assignRandom")
+                            .then(argument("player", EntityArgumentType.players())
+                                    .executes(context -> assignTask(
+                                            context.getSource(), EntityArgumentType.getPlayers(context, "player"))
+                                    )
+                            )
+                    )
+                    .then(literal("clearTask")
+                            .then(argument("player", EntityArgumentType.players())
+                                    .executes(context -> clearTask(
+                                            context.getSource(), EntityArgumentType.getPlayers(context, "player"))
+                                    )
+                            )
+                    )
         );
         dispatcher.register(
             literal("gift")
@@ -136,6 +151,7 @@ public class SecretLifeCommands {
         );
         dispatcher.register(
             literal("secretlife")
+                .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                 .then(literal("changeLocations")
                     .executes(context -> changeLocations(
                         context.getSource())
@@ -147,6 +163,22 @@ public class SecretLifeCommands {
     public static int changeLocations(ServerCommandSource source) {
         SecretLifeDatabase.deleteLocations();
         TaskManager.checkSecretLifePositions();
+        return 1;
+    }
+
+    public static int clearTask(ServerCommandSource source, Collection<ServerPlayerEntity> targets) {
+        MinecraftServer server = source.getServer();
+        int removedFrom = 0;
+        for (ServerPlayerEntity player : targets) {
+            if (TaskManager.removePlayersTaskBook(player)) removedFrom++;
+        }
+        source.sendMessage(Text.of("Removed task book from " + removedFrom + " target"+(targets.size()==1?".":"s.")));
+        return 1;
+    }
+
+    public static int assignTask(ServerCommandSource source, Collection<ServerPlayerEntity> targets) {
+        MinecraftServer server = source.getServer();
+        TaskManager.chooseTasks(targets.stream().toList(), null);
         return 1;
     }
 

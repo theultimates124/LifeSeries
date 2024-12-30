@@ -33,6 +33,7 @@ public abstract class Blacklist {
     public abstract List<RegistryKey<Enchantment>> getClampedEnchants();
 
     public ActionResult onBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
+        if (player.isCreative()) return ActionResult.PASS;
         processItemStack(player, player.getStackInHand(hand));
         BlockPos blockPos = hitResult.getBlockPos();
         BlockState block = world.getBlockState(blockPos);
@@ -45,6 +46,7 @@ public abstract class Blacklist {
     }
 
     public ActionResult onBlockAttack(ServerPlayerEntity player, World world, BlockPos pos) {
+        if (player.isCreative()) return ActionResult.PASS;
         if (world.isClient()) return ActionResult.PASS;
         BlockState block = world.getBlockState(pos);
         if (block.isAir()) return ActionResult.PASS;
@@ -60,6 +62,7 @@ public abstract class Blacklist {
     }
 
     public void onInventoryUpdated(PlayerEntity player, PlayerInventory inventory, CallbackInfo ci) {
+        if (player.isCreative()) return;
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack stack = inventory.getStack(i);
             ItemStack newItem = processItemStack(player, stack);

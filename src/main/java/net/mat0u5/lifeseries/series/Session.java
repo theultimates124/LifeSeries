@@ -4,12 +4,10 @@ import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.WorldUitls;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.TeleportCommand;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.border.WorldBorder;
 
@@ -27,10 +25,22 @@ public class Session {
     public int passedTime;
     public SessionStatus status = SessionStatus.NOT_STARTED;
 
-    SessionAction defaultWarningAction = new SessionAction(OtherUtils.minutesToTicks(-5)) {
+    SessionAction endWarning1 = new SessionAction(OtherUtils.minutesToTicks(-5)) {
         @Override
         public void trigger() {
             OtherUtils.broadcastMessage(Text.literal("Session ends in 5 minutes!").formatted(Formatting.GOLD));
+        }
+    };
+    SessionAction endWarning2 = new SessionAction(OtherUtils.minutesToTicks(-30)) {
+        @Override
+        public void trigger() {
+            OtherUtils.broadcastMessage(Text.literal("Session ends in 30 minutes!").formatted(Formatting.GOLD));
+        }
+    };
+    SessionAction actionInfoAction = new SessionAction(OtherUtils.secondsToTicks(5)) {
+        @Override
+        public void trigger() {
+            showActionInfo();
         }
     };
 
@@ -46,7 +56,9 @@ public class Session {
         OtherUtils.broadcastMessage(infoText1);
         OtherUtils.broadcastMessage(infoText2);
         activeActions.clear();
-        activeActions.add(defaultWarningAction);
+        activeActions.add(endWarning1);
+        activeActions.add(endWarning2);
+        activeActions.add(actionInfoAction);
         return true;
     }
 
@@ -205,6 +217,16 @@ public class Session {
             ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
             if (player == null) continue;
             player.sendMessage(Text.literal(message).formatted(Formatting.GRAY), true);
+        }
+    }
+
+    public void showActionInfo() {
+        OtherUtils.broadcastMessageToAdmins(Text.of("§7Queued session actions:"));
+        for (SessionAction action : activeActions) {
+            String actionMessage = action.sessionMessage;
+            if (actionMessage == null) continue;
+            if (actionMessage.isEmpty()) continue;
+            OtherUtils.broadcastMessageToAdmins(Text.of("§7- "+actionMessage));
         }
     }
 }

@@ -11,6 +11,7 @@ import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.mat0u5.lifeseries.utils.WorldUitls;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -21,22 +22,27 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import org.apache.logging.log4j.core.jmx.Server;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
 
+import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
 
 public class DoubleLife extends Series {
     public static final RegistryKey<DamageType> SOULMATE_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(Main.MOD_ID, "soulmate"));
 
 
-    public SessionAction actionChooseSoulmates = new SessionAction(OtherUtils.minutesToTicks(1)) {
+    public SessionAction actionChooseSoulmates = new SessionAction(
+            OtherUtils.minutesToTicks(1), "§7Assign soulmates if necessary §f[00:01:00]"
+    ) {
         @Override
         public void trigger() {
             rollSoulmates();
         }
     };
-    public SessionAction actionRandomTP = new SessionAction(5) {
+    public SessionAction actionRandomTP = new SessionAction(5, "§7Random teleport distribution §f[00:00:01]") {
         @Override
         public void trigger() {
             distributePlayers();
@@ -92,6 +98,10 @@ public class DoubleLife extends Series {
     @Override
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
         if (isAllowedToAttack(killer, victim)) return;
+        ServerPlayerEntity soulmate = getSoulmate(victim);
+        if (soulmate != null) {
+            if (soulmate == killer) return;
+        }
         OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + " was killed by "
                 +killer.getNameForScoreboard() + ", who is not §cred name§f."));
     }
@@ -303,6 +313,32 @@ public class DoubleLife extends Series {
                 setPlayerLives(player, minLives);
                 setPlayerLives(soulmate, minLives);
             }
+        }
+    }
+
+    public void canFoodHeal(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
+        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+        boolean orig =  player.getHealth() > 0.0F && player.getHealth() < player.getMaxHealth();
+        if (!orig) {
+            cir.setReturnValue(false);
+            return;
+        }
+
+        DoubleLife doubleLife = ((DoubleLife) currentSeries);
+        if (!doubleLife.hasSoulmate(serverPlayer)) return;
+        if (!doubleLife.isSoulmateOnline(serverPlayer)) return;
+        if (doubleLife.isMainSoulmate(serverPlayer)) return;
+        ServerPlayerEntity soulmate = doubleLife.getSoulmate(serverPlayer);
+        if (soulmate == null) return;
+        if (soulmate.isDead()) return;
+
+        boolean canHealWithSaturationOther =  soulmate.getHungerManager().getSaturationLevel() > 2.0F && soulmate.getHungerManager().getFoodLevel() >= 20;
+
+        if (canHealWithSaturationOther) {
+            cir.setReturnValue(false);
+        }
+        else {
+            cir.setReturnValue(true);
         }
     }
 }

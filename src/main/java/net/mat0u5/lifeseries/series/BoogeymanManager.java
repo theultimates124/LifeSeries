@@ -33,7 +33,9 @@ public class BoogeymanManager {
             PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER);
         }
     };
-    public SessionAction actionBoogeymanChoose = new SessionAction(OtherUtils.minutesToTicks(10)) {
+    public SessionAction actionBoogeymanChoose = new SessionAction(
+            OtherUtils.minutesToTicks(10),"§7Choose Boogeymen §f[00:10:00]"
+    ) {
         @Override
         public void trigger() {
             if (boogeymanChosen) return;
