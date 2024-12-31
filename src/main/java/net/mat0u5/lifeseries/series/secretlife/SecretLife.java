@@ -150,8 +150,9 @@ public class SecretLife extends Series {
 
         ItemStack mace = new ItemStack(Items.MACE);
         ItemStackUtils.setCustomComponentBoolean(mace, "IgnoreBlacklist", true);
+        ItemStackUtils.setCustomComponentBoolean(mace, "NoMending", true);
         mace.setDamage(mace.getMaxDamage()-1);
-        itemSpawner.addItem(mace, 3);
+        itemSpawner.addItem(mace, 1);
 
         ItemStack patat = new ItemStack(Items.POISONOUS_POTATO);
         patat.set(DataComponentTypes.CUSTOM_NAME,Text.of("§6§l§nThe Sacred Patat"));

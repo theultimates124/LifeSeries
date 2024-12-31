@@ -22,7 +22,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
@@ -104,6 +103,17 @@ public class DoubleLife extends Series {
         }
         OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + " was killed by "
                 +killer.getNameForScoreboard() + ", who is not §cred name§f."));
+    }
+
+    @Override
+    public void onPlayerRespawn(ServerPlayerEntity player) {
+        TaskScheduler.scheduleTask(1, () -> {
+            ServerPlayerEntity newPlayer = player.server.getPlayerManager().getPlayer(player.getUuid());
+            if (newPlayer == null) return;
+            ServerPlayerEntity soulmate = getSoulmate(newPlayer);
+            if (soulmate == null) return;
+            syncPlayers(newPlayer, soulmate);
+        });
     }
 
     public void loadSoulmates() {
@@ -270,11 +280,11 @@ public class DoubleLife extends Series {
         DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE));
         soulmate.damage(damageSource, 0.0000001F);
 
-        float newHealth =player.getHealth();
+        float newHealth = player.getHealth();
         if (newHealth <= 0.0F) newHealth = 0.01F;
         soulmate.setHealth(newHealth);
 
-        TaskScheduler.scheduleTask(1,()-> syncPlayers(player, soulmate));
+        TaskScheduler.scheduleTask(1,() -> syncPlayers(player, soulmate));
     }
 
     @Override

@@ -221,9 +221,50 @@ public abstract class Series extends Session {
         if (attacker.getPrimeAdversary() == victim && (isOnLastLife(victim, false))) return true;
         return false;
     }
+
+    public List<ServerPlayerEntity> getNonRedPlayers() {
+        List<ServerPlayerEntity> players = PlayerUtils.getAllPlayers();
+        if (players == null) return new ArrayList<>();
+        if (players.isEmpty()) return new ArrayList<>();
+        List<ServerPlayerEntity> nonRedPlayers = new ArrayList<>();
+        for (ServerPlayerEntity player : players) {
+            Boolean isOnLastLife = currentSeries.isOnLastLife(player);
+            if (isOnLastLife == null) continue;
+            if (isOnLastLife) continue;
+            nonRedPlayers.add(player);
+        }
+        return nonRedPlayers;
+    }
+
+    public List<ServerPlayerEntity> getAlivePlayers() {
+        List<ServerPlayerEntity> players = PlayerUtils.getAllPlayers();
+        if (players == null) return new ArrayList<>();
+        if (players.isEmpty()) return new ArrayList<>();
+        List<ServerPlayerEntity> alivePlayers = new ArrayList<>();
+        for (ServerPlayerEntity player : players) {
+            if (!isAlive(player)) continue;
+            alivePlayers.add(player);
+        }
+        return alivePlayers;
+    }
+
+    public boolean anyGreenPlayers() {
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            if (isOnSpecificLives(player, 3, false)) return true;
+        }
+        return false;
+    }
+
+    public boolean anyYellowPlayers() {
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            if (isOnSpecificLives(player, 2, false)) return true;
+        }
+        return false;
+    }
     /*
         Events
      */
+
     public void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
         boolean killedByPlayer = false;
         if (source != null) {
@@ -253,6 +294,9 @@ public abstract class Series extends Session {
             playerNaturalDeathLog.remove(player.getUuid());
         }
         playerNaturalDeathLog.put(player.getUuid(), server.getTicks());
+    }
+
+    public void onPlayerRespawn(ServerPlayerEntity player) {
     }
 
     public void onClaimKill(ServerPlayerEntity killer, ServerPlayerEntity victim) {
@@ -299,45 +343,5 @@ public abstract class Series extends Session {
             Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(20);
         }
         reloadPlayerTeam(player);
-    }
-
-    public List<ServerPlayerEntity> getNonRedPlayers() {
-        List<ServerPlayerEntity> players = PlayerUtils.getAllPlayers();
-        if (players == null) return new ArrayList<>();
-        if (players.isEmpty()) return new ArrayList<>();
-        List<ServerPlayerEntity> nonRedPlayers = new ArrayList<>();
-        for (ServerPlayerEntity player : players) {
-            Boolean isOnLastLife = currentSeries.isOnLastLife(player);
-            if (isOnLastLife == null) continue;
-            if (isOnLastLife) continue;
-            nonRedPlayers.add(player);
-        }
-        return nonRedPlayers;
-    }
-
-    public List<ServerPlayerEntity> getAlivePlayers() {
-        List<ServerPlayerEntity> players = PlayerUtils.getAllPlayers();
-        if (players == null) return new ArrayList<>();
-        if (players.isEmpty()) return new ArrayList<>();
-        List<ServerPlayerEntity> alivePlayers = new ArrayList<>();
-        for (ServerPlayerEntity player : players) {
-            if (!isAlive(player)) continue;
-            alivePlayers.add(player);
-        }
-        return alivePlayers;
-    }
-
-    public boolean anyGreenPlayers() {
-        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
-            if (isOnSpecificLives(player, 3, false)) return true;
-        }
-        return false;
-    }
-
-    public boolean anyYellowPlayers() {
-        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
-            if (isOnSpecificLives(player, 2, false)) return true;
-        }
-        return false;
     }
 }

@@ -11,7 +11,9 @@
 		"LivingEntityMixin",
 		"PlayerEntityMixin",
 		"EnchantmentHelperMixin",
-		"ServerPlayerEntityMixin"
+		"ServerPlayerEntityMixin",
+		"AnvilScreenHandlerMixin",
+		"ForgingScreenHandlerAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

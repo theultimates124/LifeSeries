@@ -15,5 +15,6 @@ public class ServerPlayerEntityMixin {
     private void getRespawnTarget(boolean alive, TeleportTarget.PostDimensionTransition postDimensionTransition, CallbackInfoReturnable<TeleportTarget> cir) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         currentSeries.getRespawnTarget(player, postDimensionTransition, cir);
+        currentSeries.onPlayerRespawn(player);
     }
 }
