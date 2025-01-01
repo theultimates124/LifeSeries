@@ -1,3 +1,5 @@
+![Banner](images/banner.png)
+
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/Mat0u5/LifeSeries/graphs/commit-activity)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![Discord](https://badgen.net/discord/online-members/QWJxfb4zQZ?icon=discord&label=Discord&list=what)](https://discord.gg/QWJxfb4zQZ)
@@ -7,7 +9,7 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/mat0u5)
 
 
-# Life Series
+# Life Series Mod
 This server-side mod aims to recreate [Grian](https://www.youtube.com/c/Grian)'s Life Series in minecraft fabric, with as many QOL features as possible. 
 This includes automated lives tracking, automated team colors, automated session timer, automatic Boogeyman selection and kill tracking, and much more.<br>
 Join the [Discord](https://discord.gg/QWJxfb4zQZ) or make an issue if you want to submit any bugs / give suggestions.
@@ -33,8 +35,11 @@ Every session has certain blacklisted items to prevent players from getting to o
 Since I am creating this mod mainly for the group of players I am playing with, the Blacklists are catered to how we feel a balanced series should look like.<br>
 For Example most of the series have maces, end crystals, strength pots,... banned.<br>
 A similar feature to the item blacklist is enchantment clamping, which limits specific (mainly combat) enchantments to level 1.<br>
-**I understand that some people might want these banned features in the game, and I am planning to make the blacklists configurable, but this has not yet been implemented.**<br>
 On series where bookshelves are banned, the enchantment table has been modified a little bit to give all enchantments (because in vanilla its impossible to get some without bookshelves), and its also possible to get higher levels on some enchants directly from the table (like efficiency, unbreaking, fortune,...)
+
+### Config
+Currently, the only configurable thing is tasks in Secret Life. In the `config/lifeseries/secretlife/` folder, there are three files, where you can modify / add / remove the tasks.
+**I am planning to make almost everything configurable (blacklists, series configuration, ...). COMING SOON :)**<br>
 
 ## Commands & Subcommands
 Unless specified otherwise (using "*No permissions required.*"), all commands can only be used by opped players (permissionLevel >= 2)

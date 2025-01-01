@@ -146,6 +146,7 @@ public abstract class Series extends Session {
     public void resetAllPlayerLives() {
         ScoreboardUtils.removeObjective("Lives");
         createScoreboards();
+        currentSeries.reloadAllPlayerTeams();
     }
 
     public void addPlayerLife(ServerPlayerEntity player) {
