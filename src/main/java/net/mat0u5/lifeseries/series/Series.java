@@ -24,13 +24,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
 
-import static net.mat0u5.lifeseries.Main.currentSeries;
-import static net.mat0u5.lifeseries.Main.server;
+import static net.mat0u5.lifeseries.Main.*;
 
 public abstract class Series extends Session {
-    public boolean DROP_SPAWN_EGGS = true;
-    public boolean CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = false;
-    public boolean BLACKLIST_ENCHANTMENT_TABLE = false;
     public boolean NO_HEALING = false;
 
     public abstract SeriesList getSeries();
@@ -52,13 +48,16 @@ public abstract class Series extends Session {
         createTeams();
         createScoreboards();
         updateStuff();
+        reload();
     }
 
     public void updateStuff() {
-        if (server.getOverworld().getWorldBorder().getSize() > 1000000) {
+        if (server.getOverworld().getWorldBorder().getSize() > 1000000 && seriesConfig.getOrCreateBoolean("auto_set_worldborder", true)) {
             OtherUtils.executeCommand("worldborder set 500");
         }
-        OtherUtils.executeCommand("gamerule keepInventory true");
+        if (seriesConfig.getOrCreateBoolean("auto_keep_inventory", true)) {
+            OtherUtils.executeCommand("gamerule keepInventory true");
+        }
         if (NO_HEALING) {
             OtherUtils.executeCommand("gamerule naturalRegeneration false");
         }
@@ -66,6 +65,8 @@ public abstract class Series extends Session {
             OtherUtils.executeCommand("gamerule naturalRegeneration true");
         }
     }
+
+    public void reload() {}
 
     public void createTeams() {
         TeamUtils.createTeam("Dead", Formatting.DARK_GRAY);
@@ -319,7 +320,8 @@ public abstract class Series extends Session {
     }
 
     public void onMobDeath(LivingEntity entity, DamageSource damageSource) {
-        if (!DROP_SPAWN_EGGS) return;
+        double chance = seriesConfig.getOrCreateDouble("spawn_egg_drop_chance", 0.05);
+        if (chance <= 0) return;
         if (entity.getEntityWorld().isClient() || !(damageSource.getAttacker() instanceof ServerPlayerEntity)) {
             return;
         }
@@ -340,7 +342,7 @@ public abstract class Series extends Session {
         if (spawnEggItem.isEmpty()) return;
 
         // Drop the spawn egg with a 5% chance
-        if (Math.random() <= 0.05d) {
+        if (Math.random() <= chance) {
             entity.dropStack(spawnEggItem);
         }
     }

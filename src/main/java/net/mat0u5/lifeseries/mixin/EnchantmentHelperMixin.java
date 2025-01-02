@@ -18,17 +18,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static net.mat0u5.lifeseries.Main.blacklist;
-import static net.mat0u5.lifeseries.Main.currentSeries;
+import static net.mat0u5.lifeseries.Main.*;
 
 @Mixin(EnchantmentHelper.class)
 public class EnchantmentHelperMixin {
     @Inject(method = "getPossibleEntries", at = @At("HEAD"), cancellable = true)
     private static void getPossibleEntries(int level, ItemStack stack, Stream<RegistryEntry<Enchantment>> possibleEnchantments, CallbackInfoReturnable<List<EnchantmentLevelEntry>> cir) {
-        if (currentSeries.CUSTOM_ENCHANTMENT_TABLE_ALGORITHM) {
+        if (seriesConfig.getOrCreateBoolean("custom_enchanter_algorithm", false)) {
             customEnchantmentTableAlgorithm(level, stack, possibleEnchantments, cir);
         }
-        if (currentSeries.BLACKLIST_ENCHANTMENT_TABLE) {
+        else {
             blacklistEnchantments(level, stack, possibleEnchantments, cir);
         }
     }

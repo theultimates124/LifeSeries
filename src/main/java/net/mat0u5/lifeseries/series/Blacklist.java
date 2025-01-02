@@ -159,7 +159,7 @@ public class Blacklist {
 
 
     public ActionResult onBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
-        if (player.isCreative()) return ActionResult.PASS;
+        if (player.isCreative() && seriesConfig.getOrCreateBoolean("creative_ignore_blacklist", true)) return ActionResult.PASS;
         processItemStack(player, player.getStackInHand(hand));
         BlockPos blockPos = hitResult.getBlockPos();
         BlockState block = world.getBlockState(blockPos);
@@ -172,7 +172,7 @@ public class Blacklist {
     }
 
     public ActionResult onBlockAttack(ServerPlayerEntity player, World world, BlockPos pos) {
-        if (player.isCreative()) return ActionResult.PASS;
+        if (player.isCreative() && seriesConfig.getOrCreateBoolean("creative_ignore_blacklist", true)) return ActionResult.PASS;
         if (world.isClient()) return ActionResult.PASS;
         BlockState block = world.getBlockState(pos);
         if (block.isAir()) return ActionResult.PASS;
@@ -188,7 +188,7 @@ public class Blacklist {
     }
 
     public void onInventoryUpdated(PlayerEntity player, PlayerInventory inventory, CallbackInfo ci) {
-        if (player.isCreative()) return;
+        if (player.isCreative() && seriesConfig.getOrCreateBoolean("creative_ignore_blacklist", true)) return;
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack stack = inventory.getStack(i);
             ItemStack newItem = processItemStack(player, stack);

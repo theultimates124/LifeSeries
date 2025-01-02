@@ -1,6 +1,5 @@
 package net.mat0u5.lifeseries.mixin;
 
-import net.mat0u5.lifeseries.series.SeriesList;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;

@@ -102,6 +102,7 @@ public class LifeSeriesCommand {
         if (currentSeries.getSeries() == SeriesList.SECRET_LIFE) {
             TaskManager.initialize();
         }
+        currentSeries.reload();
         seriesConfig.loadProperties();
         blacklist.reloadBlacklist();
         source.sendMessage(Text.of("Reloaded."));

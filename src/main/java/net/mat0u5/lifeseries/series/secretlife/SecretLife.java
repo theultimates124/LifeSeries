@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
+import static net.mat0u5.lifeseries.Main.seriesConfig;
 
 public class SecretLife extends Series {
     public static final double MAX_HEALTH = 60.0d;
@@ -57,7 +58,6 @@ public class SecretLife extends Series {
     public void initialize() {
         super.initialize();
         NO_HEALING = true;
-        BLACKLIST_ENCHANTMENT_TABLE = true;
         TaskManager.initialize();
         SecretLifeDatabase.loadLocations();
         initializeItemSpawner();
@@ -188,7 +188,8 @@ public class SecretLife extends Series {
     public void onPlayerJoin(ServerPlayerEntity player) {
         super.onPlayerJoin(player);
         if (!hasAssignedLives(player)) {
-            setPlayerLives(player,3);
+            int lives = seriesConfig.getOrCreateInt("default_lives", 3);
+            setPlayerLives(player, lives);
             setPlayerHealth(player, MAX_HEALTH);
             player.setHealth((float) MAX_HEALTH);
         }

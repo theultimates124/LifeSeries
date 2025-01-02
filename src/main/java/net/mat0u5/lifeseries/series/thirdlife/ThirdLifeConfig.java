@@ -54,6 +54,9 @@ public class ThirdLifeConfig extends ConfigManager {
 
     @Override
     public void defaultProperties() {
+        defaultSessionProperties();
+        properties.setProperty("default_lives", "3");
+        properties.setProperty("custom_enchanter_algorithm", "true");
         properties.setProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
         properties.setProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
         properties.setProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");

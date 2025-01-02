@@ -7,6 +7,8 @@ import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
+import static net.mat0u5.lifeseries.Main.seriesConfig;
+
 public class ThirdLife extends Series {
     @Override
     public SeriesList getSeries() {
@@ -23,7 +25,8 @@ public class ThirdLife extends Series {
         super.onPlayerJoin(player);
 
         if (!hasAssignedLives(player)) {
-            setPlayerLives(player,3);
+            int lives = seriesConfig.getOrCreateInt("default_lives", 3);
+            setPlayerLives(player, lives);
         }
     }
 

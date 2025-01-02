@@ -19,11 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
+import static net.mat0u5.lifeseries.Main.seriesConfig;
 
 public class LimitedLife extends Series {
+    
+    private int DEFAULT_TIME = 86400;
+    private int YELLOW_TIME = 57600;
+    private int RED_TIME = 28800;
 
     public LimitedLifeBoogeymanManager boogeymanManager = new LimitedLifeBoogeymanManager();
-    public static int ticksUntilSecond = 20;
 
     @Override
     public SeriesList getSeries() {
@@ -33,12 +37,6 @@ public class LimitedLife extends Series {
     @Override
     public ConfigManager getConfig() {
         return new LimitedLifeConfig();
-    }
-
-    @Override
-    public void initialize() {
-        super.initialize();
-        CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = true;
     }
 
     @Override
@@ -79,8 +77,8 @@ public class LimitedLife extends Series {
     @Override
     public Formatting getColorForLives(Integer lives) {
         if (lives == null) return Formatting.GRAY;
-        if (lives >= 57600) return Formatting.GREEN;
-        if (lives >= 28800) return Formatting.YELLOW;
+        if (lives >= YELLOW_TIME) return Formatting.GREEN;
+        if (lives >= RED_TIME) return Formatting.YELLOW;
         if (lives >= 1) return Formatting.DARK_RED;
         return Formatting.DARK_GRAY;
     }
@@ -97,8 +95,8 @@ public class LimitedLife extends Series {
         Integer lives = getPlayerLives(player);
         if (lives == null) TeamUtils.addPlayerToTeam("Unassigned",player);
         else if (lives <= 0) TeamUtils.addPlayerToTeam("Dead",player);
-        else if (lives >= 57600) TeamUtils.addPlayerToTeam("Green",player);
-        else if (lives >= 28800) TeamUtils.addPlayerToTeam("Yellow",player);
+        else if (lives >= YELLOW_TIME) TeamUtils.addPlayerToTeam("Green",player);
+        else if (lives >= RED_TIME) TeamUtils.addPlayerToTeam("Yellow",player);
         else if (lives >= 1) TeamUtils.addPlayerToTeam("Red",player);
     }
 
@@ -122,16 +120,16 @@ public class LimitedLife extends Series {
     public Boolean isOnLastLife(ServerPlayerEntity player) {
         if (!isAlive(player)) return null;
         Integer lives = currentSeries.getPlayerLives(player);
-        return lives < 28800;
+        return lives < RED_TIME;
     }
 
     @Override
     public Boolean isOnSpecificLives(ServerPlayerEntity player, int check) {
         if (!isAlive(player)) return null;
         Integer lives = currentSeries.getPlayerLives(player);
-        if (check == 1) return 0 < lives && lives < 28800;
-        if (check == 2) return 28800 <= lives && lives < 57600;
-        if (check == 3) return lives >= 57600;
+        if (check == 1) return 0 < lives && lives < RED_TIME;
+        if (check == 2) return RED_TIME <= lives && lives < YELLOW_TIME;
+        if (check == 3) return lives >= YELLOW_TIME;
         return null;
     }
 
@@ -250,8 +248,15 @@ public class LimitedLife extends Series {
         super.onPlayerJoin(player);
         boogeymanManager.onPlayerJoin(player);
         if (!hasAssignedLives(player)) {
-            setPlayerLives(player,86400);
+            setPlayerLives(player, DEFAULT_TIME);
         }
+    }
+
+    @Override
+    public void reload() {
+        DEFAULT_TIME = seriesConfig.getOrCreateInt("time_default", 86400);
+        YELLOW_TIME = seriesConfig.getOrCreateInt("time_yellow", 57600);
+        RED_TIME = seriesConfig.getOrCreateInt("time_red", 28800);
     }
 
     @Override

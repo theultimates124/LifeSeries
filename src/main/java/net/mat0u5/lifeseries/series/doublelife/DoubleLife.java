@@ -26,8 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
 
-import static net.mat0u5.lifeseries.Main.currentSeries;
-import static net.mat0u5.lifeseries.Main.server;
+import static net.mat0u5.lifeseries.Main.*;
 
 public class DoubleLife extends Series {
     public static final RegistryKey<DamageType> SOULMATE_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(Main.MOD_ID, "soulmate"));
@@ -62,17 +61,12 @@ public class DoubleLife extends Series {
     }
 
     @Override
-    public void initialize() {
-        super.initialize();
-        CUSTOM_ENCHANTMENT_TABLE_ALGORITHM = true;
-    }
-
-    @Override
     public void onPlayerJoin(ServerPlayerEntity player) {
         super.onPlayerJoin(player);
 
         if (!hasAssignedLives(player)) {
-            setPlayerLives(player,4);
+            int lives = seriesConfig.getOrCreateInt("default_lives", 3);
+            setPlayerLives(player, lives);
         }
 
         if (player == null) return;

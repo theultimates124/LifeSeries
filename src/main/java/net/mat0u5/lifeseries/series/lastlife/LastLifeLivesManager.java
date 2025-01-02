@@ -15,6 +15,7 @@ import net.minecraft.util.Formatting;
 import java.util.*;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
+import static net.mat0u5.lifeseries.Main.seriesConfig;
 
 public class LastLifeLivesManager {
     public SessionAction actionChooseLives = new SessionAction(
@@ -80,7 +81,10 @@ public class LastLifeLivesManager {
                     lives.put(player, chosenNotRandomly);
                     continue;
                 }
-                int randomLives = rnd.nextInt(5)+2;// Random number from 2->6
+
+                int minLives = seriesConfig.getOrCreateInt("default_lives_min", 2);
+                int maxLives = seriesConfig.getOrCreateInt("default_lives_max", 6);
+                int randomLives = rnd.nextInt(maxLives-1)+minLives;// Random number, default 2->6
                 lives.put(player, randomLives);
             }
 
@@ -113,10 +117,12 @@ public class LastLifeLivesManager {
             currentSeries. reloadAllPlayerTeams();
             return;
         }
-        int displayLives = rnd.nextInt(5)+2;// Random number from 2->6
+        int minLives = seriesConfig.getOrCreateInt("default_lives_min", 2);
+        int maxLives = seriesConfig.getOrCreateInt("default_lives_max", 6);
+        int displayLives = rnd.nextInt(maxLives-1)+minLives;// Random number, default 2->6
         while (displayLives == lastNum) {
             // Just so that the random cycle can't have two of the same number in a row
-            displayLives = rnd.nextInt(5)+2;
+            displayLives = rnd.nextInt(maxLives-1)+minLives;
         }
         int finalDisplayLives = displayLives;
         PlayerUtils.sendTitleToPlayers(lives.keySet(), currentSeries.getFormattedLives(finalDisplayLives), 0, 25, 0);
