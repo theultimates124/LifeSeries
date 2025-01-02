@@ -1,6 +1,6 @@
 package net.mat0u5.lifeseries.series.thirdlife;
 
-import net.mat0u5.lifeseries.series.Blacklist;
+import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.OtherUtils;
@@ -14,8 +14,8 @@ public class ThirdLife extends Series {
     }
 
     @Override
-    public Blacklist createBlacklist() {
-        return new ThirdLifeBlacklist();
+    public ConfigManager getConfig() {
+        return new ThirdLifeConfig();
     }
 
     @Override
@@ -33,4 +33,5 @@ public class ThirdLife extends Series {
         OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + " was killed by "
                 +killer.getNameForScoreboard() + ", who is not §cred name§f."));
     }
+
 }

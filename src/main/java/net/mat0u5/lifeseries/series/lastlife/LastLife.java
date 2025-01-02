@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series.lastlife;
 
+import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.*;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,8 +19,8 @@ public class LastLife extends Series {
     }
 
     @Override
-    public Blacklist createBlacklist() {
-        return new LastLifeBlacklist();
+    public ConfigManager getConfig() {
+        return new LastLifeConfig();
     }
 
     @Override

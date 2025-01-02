@@ -1,7 +1,7 @@
 package net.mat0u5.lifeseries.series.doublelife;
 
 import net.mat0u5.lifeseries.Main;
-import net.mat0u5.lifeseries.series.Blacklist;
+import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.SessionAction;
@@ -57,8 +57,8 @@ public class DoubleLife extends Series {
     }
 
     @Override
-    public Blacklist createBlacklist() {
-        return new DoubleLifeBlacklist();
+    public ConfigManager getConfig() {
+        return new DoubleLifeConfig();
     }
 
     @Override

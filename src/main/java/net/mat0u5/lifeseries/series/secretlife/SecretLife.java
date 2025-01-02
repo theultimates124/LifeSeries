@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series.secretlife;
 
+import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.*;
 import net.mat0u5.lifeseries.utils.ItemStackUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
@@ -48,8 +49,8 @@ public class SecretLife extends Series {
     }
 
     @Override
-    public Blacklist createBlacklist() {
-        return new SecretLifeBlacklist();
+    public ConfigManager getConfig() {
+        return new SecretLifeConfig();
     }
 
     @Override

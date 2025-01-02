@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series.limitedlife;
 
+import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.*;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
@@ -30,8 +31,8 @@ public class LimitedLife extends Series {
     }
 
     @Override
-    public Blacklist createBlacklist() {
-        return new LimitedLifeBlacklist();
+    public ConfigManager getConfig() {
+        return new LimitedLifeConfig();
     }
 
     @Override

@@ -92,4 +92,9 @@ public class OtherUtils {
         ServerCommandSource commandSource = server.getCommandSource().withSilent();
         manager.executeWithPrefix(commandSource, command);
     }
+
+    public static void throwError(String error) {
+        broadcastMessageToAdmins(Text.of("§c"+error));
+        Main.LOGGER.error(error);
+    }
 }

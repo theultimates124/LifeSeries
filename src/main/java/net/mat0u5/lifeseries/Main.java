@@ -3,11 +3,17 @@ package net.mat0u5.lifeseries;
 import net.fabricmc.api.ModInitializer;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
+import net.mat0u5.lifeseries.config.MainConfig;
 import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.Session;
+import net.mat0u5.lifeseries.series.doublelife.DoubleLifeConfig;
+import net.mat0u5.lifeseries.series.lastlife.LastLifeConfig;
+import net.mat0u5.lifeseries.series.limitedlife.LimitedLifeConfig;
 import net.mat0u5.lifeseries.series.secretlife.SecretLife;
+import net.mat0u5.lifeseries.series.secretlife.SecretLifeConfig;
+import net.mat0u5.lifeseries.series.thirdlife.ThirdLifeConfig;
 import net.mat0u5.lifeseries.series.unassigned.UnassignedSeries;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.mat0u5.lifeseries.series.lastlife.LastLife;
@@ -23,7 +29,7 @@ import java.util.List;
 
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "1.2.1";
+	public static final String MOD_VERSION = "1.2.1.1";
 	public static final String MOD_ID = "lifeseries";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ConfigManager config;
@@ -31,15 +37,16 @@ public class Main implements ModInitializer {
 	public static Series currentSeries;
 	public static Session currentSession;
 	public static Blacklist blacklist;
+	public static ConfigManager seriesConfig;
 	public static final List<String> ALLOWED_SERIES_NAMES = SeriesList.getImplementedSeriesNames();
 
 	@Override
 	public void onInitialize() {
-		config = new ConfigManager("./config/"+MOD_ID+".properties", null);
+		config = new MainConfig();
 
-		String series = config.getProperty("currentSeries");
-		if (series == null) parseSeries("");
-		else parseSeries(series);
+		String series = config.getOrCreateProperty("currentSeries", "unassigned");
+		parseSeries(series);
+		createConfigs();
 
 		ModRegistries.registerModStuff();
 		LOGGER.info("Initializing Life Series...");
@@ -65,6 +72,15 @@ public class Main implements ModInitializer {
 			currentSeries = new SecretLife();
 		}
 		currentSession = currentSeries;
+		seriesConfig = currentSeries.getConfig();
 		blacklist = currentSeries.createBlacklist();
+	}
+
+	public void createConfigs() {
+		new ThirdLifeConfig();
+		new LastLifeConfig();
+		new DoubleLifeConfig();
+		new LimitedLifeConfig();
+		new SecretLifeConfig();
 	}
 }

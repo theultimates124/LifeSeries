@@ -1,32 +1,27 @@
 package net.mat0u5.lifeseries.config;
 
-import net.mat0u5.lifeseries.series.SeriesList;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Properties;
 
-public class ConfigManager {
+public abstract class ConfigManager {
 
-    private Properties properties = new Properties();
-    public String filePath;
-    public SeriesList series;
+    protected Properties properties = new Properties();
+    protected String folderPath;
+    protected String filePath;
 
-    public ConfigManager(String filePath, SeriesList series) {
-        this.filePath = filePath;
-        this.series = series;
+    protected ConfigManager(String folderPath, String filePath) {
+        this.folderPath = folderPath;
+        this.filePath = folderPath + "/" + filePath;
         createFileIfNotExists();
         loadProperties();
     }
+    protected abstract void defaultProperties();
 
     private void createFileIfNotExists() {
-        File configDir = new File("./config");
+        if (filePath == null) return;
+        File configDir = new File(folderPath);
         if (!configDir.exists()) {
-            if (!configDir.mkdir()) return;
+            if (!configDir.mkdirs()) return;
         }
 
         File configFile = new File(filePath);
@@ -34,11 +29,7 @@ public class ConfigManager {
             try {
                 configFile.createNewFile();
                 try (OutputStream output = new FileOutputStream(configFile)) {
-                    if (series == null) {
-                        //Main config
-                        properties.setProperty("currentSeries","unassigned");
-                    }
-
+                    defaultProperties();
                     properties.store(output, null);
                 }
             } catch (IOException ex) {
@@ -48,6 +39,9 @@ public class ConfigManager {
     }
 
     public void loadProperties() {
+        if (filePath == null) return;
+
+        properties = new Properties();
         try (InputStream input = new FileInputStream(filePath)) {
             properties.load(input);
         } catch (IOException ex) {
@@ -56,10 +50,23 @@ public class ConfigManager {
     }
 
     public String getProperty(String key) {
+        if (filePath == null) return "";
+
         return properties.getProperty(key);
     }
 
+    public String getOrCreateProperty(String key, String defaultValue) {
+        if (filePath == null) return "";
+
+        if (properties.containsKey(key)) {
+            return properties.getProperty(key);
+        }
+        setProperty(key, defaultValue);
+        return defaultValue;
+    }
+
     public void setProperty(String key, String value) {
+        if (filePath == null) return;
         properties.setProperty(key, value);
         try (OutputStream output = new FileOutputStream(filePath)) {
             properties.store(output, null);

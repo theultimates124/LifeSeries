@@ -1,20 +1,14 @@
 package net.mat0u5.lifeseries.series.unassigned;
 
-import net.mat0u5.lifeseries.series.Blacklist;
+import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
-import net.minecraft.block.Block;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-
-import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.server;
 
@@ -23,24 +17,11 @@ public class UnassignedSeries extends Series {
     public SeriesList getSeries() {
         return SeriesList.UNASSIGNED;
     }
-
     @Override
-    public Blacklist createBlacklist() {
-        return new Blacklist() {
+    public ConfigManager getConfig() {
+        return new ConfigManager(null, null) {
             @Override
-            public List<Item> getItemBlacklist() {
-                return List.of();
-            }
-
-            @Override
-            public List<Block> getBlockBlacklist() {
-                return List.of();
-            }
-
-            @Override
-            public List<RegistryKey<Enchantment>> getClampedEnchants() {
-                return List.of();
-            }
+            public void defaultProperties() {}
         };
     }
 

@@ -30,7 +30,7 @@ After you select your series, you must restart the server.
 To start a session, you must first set its length using `/session timer set <time>`. The `<time>` field is a string, which includes the hours, minutes and seconds you want the session to last - example valid values: `30m`,`1h`, `1h45m`, `2h35m20s` <br>
 After you set your session time, you can simply run `/session start` to start the session.<br>
 
-## The Blacklists
+### The Blacklists
 Every session has certain blacklisted items to prevent players from getting to overpowered, just like Grian's series, where some for example banned enchantment tables and similar OP items.<br>
 Since I am creating this mod mainly for the group of players I am playing with, the Blacklists are catered to how we feel a balanced series should look like.<br>
 For Example most of the series have maces, end crystals, strength pots,... banned.<br>
@@ -38,8 +38,10 @@ A similar feature to the item blacklist is enchantment clamping, which limits sp
 On series where bookshelves are banned, the enchantment table has been modified a little bit to give all enchantments (because in vanilla its impossible to get some without bookshelves), and its also possible to get higher levels on some enchants directly from the table (like efficiency, unbreaking, fortune,...)
 
 ### Config
-Currently, the only configurable thing is tasks in Secret Life. In the `config/lifeseries/secretlife/` folder, there are three files, where you can modify / add / remove the tasks.
-**I am planning to make almost everything configurable (blacklists, series configuration, ...). COMING SOON :)**<br>
+- The config files are all located in the `config/lifeseries/*` folder. There are files for every series, where you can modify the gameplay for each one of them.<br>
+- Currently, you can modify these (more configuration features coming soon):
+  - The blacklists, Clamped enchants.
+  - Tasks in Secret Life (`config/lifeseries/secretlife/` folder) - there are three files, where you can modify / add / remove the easy, hard and red tasks.
 
 ## Commands & Subcommands
 Unless specified otherwise (using "*No permissions required.*"), all commands can only be used by opped players (permissionLevel >= 2)

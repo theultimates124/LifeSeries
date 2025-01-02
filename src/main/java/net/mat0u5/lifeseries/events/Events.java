@@ -68,6 +68,7 @@ public class Events {
         Main.server = server;
         DatabaseManager.initialize();
         currentSeries.initialize();
+        blacklist.reloadBlacklist();
         if (currentSeries.getSeries() == SeriesList.DOUBLE_LIFE) {
             ((DoubleLife) currentSeries).loadSoulmates();
         }

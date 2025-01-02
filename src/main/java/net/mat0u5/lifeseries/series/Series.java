@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series;
 
+import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -33,13 +34,18 @@ public abstract class Series extends Session {
     public boolean NO_HEALING = false;
 
     public abstract SeriesList getSeries();
-    public abstract Blacklist createBlacklist();
+    public abstract ConfigManager getConfig();
 
     public String getResourcepackURL() {
         return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-main-0c89c6fd068f52aeb882e1c0bda935eb46f24331/RP.zip";
     }
+
     public String getResourcepackSHA1() {
         return "7f4eba01453f6cf58bf08131fc5576f5ed873679";
+    }
+
+    public Blacklist createBlacklist() {
+        return new Blacklist();
     }
 
     public void initialize() {
