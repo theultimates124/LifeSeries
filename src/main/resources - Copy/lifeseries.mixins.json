@@ -1,0 +1,21 @@
+{
+	"required": true,
+	"package": "net.mat0u5.lifeseries.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"ItemEntityMixin",
+		"PlayerInventoryMixin",
+		"ServerPlayNetworkHandlerMixin",
+		"MobEntityMixin",
+		"SpawnEggItemMixin",
+		"LivingEntityMixin",
+		"PlayerEntityMixin",
+		"EnchantmentHelperMixin",
+		"ServerPlayerEntityMixin",
+		"AnvilScreenHandlerMixin",
+		"ForgingScreenHandlerAccessor"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

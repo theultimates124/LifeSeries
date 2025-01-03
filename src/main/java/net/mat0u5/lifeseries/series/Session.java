@@ -3,6 +3,7 @@ package net.mat0u5.lifeseries.series;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.WorldUitls;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
@@ -195,7 +196,13 @@ public class Session {
             double safeY = WorldUitls.findSafeY(player.getWorld(), new Vec3d(clampedX, player.getY(), clampedZ));
 
             // Teleport player inside the world border
-            player.teleport(player.getServerWorld(),clampedX, safeY, clampedZ, player.getYaw(), player.getPitch());
+            //? if <=1.21 {
+            /*player.teleport(player.getServerWorld(),clampedX, safeY, clampedZ, player.getYaw(), player.getPitch());
+            *///?} else {
+                //TODO test
+                Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
+                player.teleport(player.getServerWorld(),clampedX, safeY, clampedZ, flags, player.getYaw(), player.getPitch(), false);
+            //?}
         }
     }
 

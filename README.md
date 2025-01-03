@@ -39,8 +39,8 @@ On series where bookshelves are banned, the enchantment table has been modified 
 
 ### Config
 - The config files are all located in the `config/lifeseries/*` folder. There are files for every series, where you can modify the gameplay for each one of them.<br>
-- Currently, you can modify these (more configuration features coming soon):
-  - The blacklists, Clamped enchants.
+- Currently, you can modify these (check the config files themselves for more info):
+  - Default number of lives, the blacklists, Clamped enchants, spawn egg drop rates & much, much more.
   - Tasks in Secret Life (`config/lifeseries/secretlife/` folder) - there are three files, where you can modify / add / remove the easy, hard and red tasks.
 
 ## Commands & Subcommands

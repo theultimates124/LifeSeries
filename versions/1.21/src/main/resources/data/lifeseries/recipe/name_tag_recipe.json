@@ -10,7 +10,7 @@
             "item": "minecraft:string"
         },
         "P": {
-            "item": "minecraft:paper"
+            "item": "minecraft:ancient_debris"
         }
     },
     "result": {

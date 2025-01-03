@@ -12,8 +12,10 @@ import net.minecraft.entity.mob.ElderGuardianEntity;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -343,13 +345,20 @@ public abstract class Series extends Session {
 
         // Drop the spawn egg with a 5% chance
         if (Math.random() <= chance) {
-            entity.dropStack(spawnEggItem);
+            //? if <=1.21 {
+            /*entity.dropStack(spawnEggItem);
+            *///?} else
+            entity.dropStack((ServerWorld) entity.getWorld(), spawnEggItem);
+            //TODO TEST
         }
     }
 
     public void onPlayerJoin(ServerPlayerEntity player) {
         if (getSeries() != SeriesList.SECRET_LIFE) {
-            Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(20);
+            //? if <=1.21 {
+            /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(20);
+             *///?} else
+            Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(20);
         }
         reloadPlayerTeam(player);
     }

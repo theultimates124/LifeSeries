@@ -42,6 +42,7 @@ public class Main implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		//Test 1.21.1
 		config = new MainConfig();
 
 		String series = config.getOrCreateProperty("currentSeries", "unassigned");

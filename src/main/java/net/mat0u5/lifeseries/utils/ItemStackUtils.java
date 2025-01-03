@@ -5,21 +5,21 @@ import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+//? if <=1.21
+/*import net.minecraft.item.EnchantedBookItem;*/
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,12 +150,24 @@ public class ItemStackUtils {
     }
 
     public static ItemStack createEnchantedBook(RegistryKey<Enchantment> enchantment, int level) {
-        RegistryEntry<Enchantment> entry = server.getRegistryManager()
+        //? if <=1.21 {
+        /*RegistryEntry<Enchantment> entry = server.getRegistryManager()
                 .getWrapperOrThrow(RegistryKeys.ENCHANTMENT)
                 .getOrThrow(enchantment);
         ItemStack enchantedBook = EnchantedBookItem.forEnchantment(
                 new EnchantmentLevelEntry(entry, level)
         );
         return enchantedBook;
+        *///?} else {
+        //TODO test
+        RegistryEntry<Enchantment> entry = server.getRegistryManager()
+                .getOrThrow(RegistryKeys.ENCHANTMENT)
+                .getOrThrow(enchantment);
+        ItemStack enchantedBook = EnchantmentHelper.getEnchantedBookWith(
+                new EnchantmentLevelEntry(entry, level)
+        );
+        return enchantedBook;
+        //?}
+
     }
 }

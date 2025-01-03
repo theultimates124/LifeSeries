@@ -40,7 +40,7 @@ public class WorldUitls {
         double maxZ = border.getBoundSouth();
         int chosenX = (int) rnd.nextDouble(minX, maxX);
         int chosenZ = (int) rnd.nextDouble(minZ, maxZ);
-        int safeY = (int) findSafeY(world, new Vec3d(chosenX, world.getTopY(), chosenZ));
+        int safeY = (int) findSafeY(world, new Vec3d(chosenX, world.getHeight(), chosenZ));
         return new BlockPos(chosenX, safeY, chosenZ);
     }
 

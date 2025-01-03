@@ -10,6 +10,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import org.joml.Vector3f;
 
+import java.awt.*;
+
 public class AnimationUtils {
     public static int SPIRAL_DURATION = 175;
     public static void playTotemAnimation(ServerPlayerEntity player) {
@@ -134,7 +136,10 @@ public class AnimationUtils {
                     double z = r * Math.cos(phi);
 
                     // Create the particle effect with the generated color and size
-                    DustParticleEffect particleEffect = new DustParticleEffect(color, 1.0f);
+                    //? if <=1.21 {
+                    /*DustParticleEffect particleEffect = new DustParticleEffect(color, 1.0f);
+                     *///?} else
+                    DustParticleEffect particleEffect = new DustParticleEffect(new Color(color.x, color.y, color.z).getRGB(), 1.0f);
 
                     // Spawn particle with random offset
                     world.spawnParticles(
