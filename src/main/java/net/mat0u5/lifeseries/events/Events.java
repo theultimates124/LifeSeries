@@ -19,6 +19,7 @@ import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.resource.LifecycledResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -37,6 +38,9 @@ public class Events {
         ServerLifecycleEvents.SERVER_STARTING.register(Events::onServerStarting);
         ServerLifecycleEvents.SERVER_STARTED.register(Events::onServerStart);
         ServerLifecycleEvents.SERVER_STOPPING.register(Events::onServerStopping);
+
+        ServerLifecycleEvents.START_DATA_PACK_RELOAD.register(Events::onReload);
+
         AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
             if (!(player instanceof ServerPlayerEntity)) {
                 return ActionResult.PASS; // Only handle server-side events
@@ -49,6 +53,10 @@ public class Events {
         ServerTickEvents.END_SERVER_TICK.register(Events::onServerTickEnd);
 
         ServerLivingEntityEvents.AFTER_DEATH.register(Events::onEntityDeath);
+    }
+
+    private static void onReload(MinecraftServer server, LifecycledResourceManager resourceManager) {
+        Main.reload();
     }
 
     private static void onPlayerJoin(MinecraftServer server, ServerPlayerEntity player) {

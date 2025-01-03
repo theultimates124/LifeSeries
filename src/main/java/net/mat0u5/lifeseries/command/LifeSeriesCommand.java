@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.secretlife.TaskManager;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.CommandManager;
@@ -99,13 +100,8 @@ public class LifeSeriesCommand {
     }
 
     public static int reload(ServerCommandSource source) {
-        if (currentSeries.getSeries() == SeriesList.SECRET_LIFE) {
-            TaskManager.initialize();
-        }
-        currentSeries.reload();
-        seriesConfig.loadProperties();
-        blacklist.reloadBlacklist();
-        source.sendMessage(Text.of("Reloaded."));
+        source.sendMessage(Text.of("Reloading!"));
+        OtherUtils.executeCommand("reload");
         return 1;
     }
 

@@ -13,7 +13,8 @@
 		"EnchantmentHelperMixin",
 		"ServerPlayerEntityMixin",
 		"AnvilScreenHandlerMixin",
-		"ForgingScreenHandlerAccessor"
+		"ForgingScreenHandlerAccessor",
+		"RecipeManagerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

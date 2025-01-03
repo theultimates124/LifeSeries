@@ -13,6 +13,7 @@ import net.mat0u5.lifeseries.series.lastlife.LastLifeConfig;
 import net.mat0u5.lifeseries.series.limitedlife.LimitedLifeConfig;
 import net.mat0u5.lifeseries.series.secretlife.SecretLife;
 import net.mat0u5.lifeseries.series.secretlife.SecretLifeConfig;
+import net.mat0u5.lifeseries.series.secretlife.TaskManager;
 import net.mat0u5.lifeseries.series.thirdlife.ThirdLifeConfig;
 import net.mat0u5.lifeseries.series.unassigned.UnassignedSeries;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
@@ -29,7 +30,7 @@ import java.util.List;
 
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "1.2.1.2";
+	public static final String MOD_VERSION = "1.2.1.3";
 	public static final String MOD_ID = "lifeseries";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ConfigManager config;
@@ -53,7 +54,7 @@ public class Main implements ModInitializer {
 		LOGGER.info("Initializing Life Series...");
 	}
 
-	public void parseSeries(String series) {
+	public static void parseSeries(String series) {
 		if (!ALLOWED_SERIES_NAMES.contains(series)) {
 			currentSeries = new UnassignedSeries();
 		}
@@ -77,11 +78,20 @@ public class Main implements ModInitializer {
 		blacklist = currentSeries.createBlacklist();
 	}
 
-	public void createConfigs() {
+	public static void createConfigs() {
 		new ThirdLifeConfig();
 		new LastLifeConfig();
 		new DoubleLifeConfig();
 		new LimitedLifeConfig();
 		new SecretLifeConfig();
+	}
+
+	public static void reload() {
+		if (currentSeries.getSeries() == SeriesList.SECRET_LIFE) {
+			TaskManager.initialize();
+		}
+		currentSeries.reload();
+		seriesConfig.loadProperties();
+		blacklist.reloadBlacklist();
 	}
 }

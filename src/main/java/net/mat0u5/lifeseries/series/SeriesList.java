@@ -40,7 +40,7 @@ public enum SeriesList {
         if (series == DOUBLE_LIFE) return "Double Life Recipe Datapack.zip";
         if (series == LIMITED_LIFE) return "Limited Life Recipe Datapack.zip";
         if (series == SECRET_LIFE) return "Secret Life Recipe Datapack.zip";
-        if (series == WILD_LIFE) return "";
+        if (series == WILD_LIFE) return "Wild Life Recipe Datapack.zip";
         return "";
     }
 }

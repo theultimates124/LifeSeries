@@ -37,6 +37,7 @@ import static net.mat0u5.lifeseries.Main.seriesConfig;
 import static net.mat0u5.lifeseries.Main.server;
 
 public class Blacklist {
+    public List<Identifier> loadedListItemIdentifier;
     private List<Item> loadedListItem;
     private List<Block> loadedListBlock;
     private List<RegistryKey<Enchantment>> loadedListEnchants;
@@ -68,6 +69,7 @@ public class Blacklist {
     public List<Item> getItemBlacklist() {
         if (loadedListItem != null) return loadedListItem;
         List<Item> newList = new ArrayList<>();
+        List<Identifier> newListIdentifier = new ArrayList<>();
 
         for (String itemId : loadItemBlacklist()) {
             if (!itemId.startsWith("minecraft:")) itemId = "minecraft:" + itemId;
@@ -79,6 +81,7 @@ public class Blacklist {
                 // Check if the block exists in the registry
                 Item item = Registries.ITEM.get(key);
                 if (item != null) {
+                    newListIdentifier.add(id);
                     newList.add(item);
                 } else {
                     OtherUtils.throwError("[CONFIG] Invalid item: " + itemId);
@@ -89,6 +92,7 @@ public class Blacklist {
         }
 
         loadedListItem = newList;
+        loadedListItemIdentifier = newListIdentifier;
         return newList;
     }
 
@@ -203,6 +207,10 @@ public class Blacklist {
                 player.playerScreenHandler.onContentChanged(player.getInventory());
             }
         }
+    }
+
+    public boolean isBlacklistedItemSimple(ItemStack itemStack) {
+        return getItemBlacklist().contains(itemStack.getItem());
     }
 
     public boolean isBlacklistedItem(ItemStack itemStack) {
