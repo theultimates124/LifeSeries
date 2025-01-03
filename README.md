@@ -34,11 +34,13 @@ After you set your session time, you can simply run `/session start` to start th
 Every session has certain blacklisted items to prevent players from getting to overpowered, just like Grian's series, where some for example banned enchantment tables and similar OP items.<br>
 Since I am creating this mod mainly for the group of players I am playing with, the Blacklists are catered to how we feel a balanced series should look like.<br>
 For Example most of the series have maces, end crystals, strength pots,... banned.<br>
+Blacklisted items are automatically deleted from inventories, and cannot even be crafted.<br>
 A similar feature to the item blacklist is enchantment clamping, which limits specific (mainly combat) enchantments to level 1.<br>
 On series where bookshelves are banned, the enchantment table has been modified a little bit to give all enchantments (because in vanilla its impossible to get some without bookshelves), and its also possible to get higher levels on some enchants directly from the table (like efficiency, unbreaking, fortune,...)
 
 ### Config
 - The config files are all located in the `config/lifeseries/*` folder. There are files for every series, where you can modify the gameplay for each one of them.<br>
+- Reload the config using `/lifeseries reload` or simply the vanilla `/reload`
 - Currently, you can modify these (check the config files themselves for more info):
   - Default number of lives, the blacklists, Clamped enchants, spawn egg drop rates & much, much more.
   - Tasks in Secret Life (`config/lifeseries/secretlife/` folder) - there are three files, where you can modify / add / remove the easy, hard and red tasks.

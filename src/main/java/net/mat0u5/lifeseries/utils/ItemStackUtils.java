@@ -129,10 +129,6 @@ public class ItemStackUtils {
         return nbt.contains(componentEntry);
     }
 
-    public static void setModelData(ItemStack itemStack, int modelData) {
-        itemStack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(modelData));
-    }
-
     public static void spawnItem(ServerWorld world, Vec3d position, ItemStack stack) {
         spawnItemForPlayer(world, position, stack, null);
     }

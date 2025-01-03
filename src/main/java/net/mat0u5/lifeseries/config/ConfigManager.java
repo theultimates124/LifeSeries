@@ -26,7 +26,7 @@ public abstract class ConfigManager {
     }
 
     private void createFileIfNotExists() {
-        if (filePath == null) return;
+        if (folderPath == null || filePath == null) return;
         File configDir = new File(folderPath);
         if (!configDir.exists()) {
             if (!configDir.mkdirs()) return;
@@ -47,7 +47,7 @@ public abstract class ConfigManager {
     }
 
     public void loadProperties() {
-        if (filePath == null) return;
+        if (folderPath == null || filePath == null) return;
 
         properties = new Properties();
         try (InputStream input = new FileInputStream(filePath)) {
@@ -58,7 +58,7 @@ public abstract class ConfigManager {
     }
 
     public void setProperty(String key, String value) {
-        if (filePath == null) return;
+        if (folderPath == null || filePath == null) return;
         properties.setProperty(key, value);
         try (OutputStream output = new FileOutputStream(filePath)) {
             properties.store(output, null);
@@ -72,7 +72,7 @@ public abstract class ConfigManager {
      */
 
     public String getOrCreateProperty(String key, String defaultValue) {
-        if (filePath == null) return "";
+        if (folderPath == null || filePath == null) return "";
 
         if (properties.containsKey(key)) {
             return properties.getProperty(key);

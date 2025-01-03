@@ -27,7 +27,7 @@ public class UnassignedSeries extends Series {
 
     @Override
     public void onPlayerJoin(ServerPlayerEntity player) {
-        TaskScheduler.scheduleTask(40, this::broadcastNotice);
+        TaskScheduler.scheduleTask(100, this::broadcastNotice);
     }
 
     @Override
