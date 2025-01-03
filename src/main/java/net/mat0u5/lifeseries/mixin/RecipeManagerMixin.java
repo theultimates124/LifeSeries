@@ -12,7 +12,7 @@ import java.util.List;
 import static net.mat0u5.lifeseries.Main.blacklist;
 
 //? if <=1.21 {
-/*import net.minecraft.recipe.RecipeManager;
+import net.minecraft.recipe.RecipeManager;
 import com.google.gson.JsonElement;
 import net.minecraft.util.Identifier;
 import java.util.ArrayList;
@@ -43,8 +43,8 @@ public class RecipeManagerMixin {
     }
 
 }
- *///?} else {
-import net.minecraft.recipe.ServerRecipeManager;
+ //?} else {
+/*import net.minecraft.recipe.ServerRecipeManager;
 import net.minecraft.recipe.PreparedRecipes;
 import net.mat0u5.lifeseries.Main;
 import net.minecraft.recipe.RecipeEntry;
@@ -78,4 +78,4 @@ public abstract class RecipeManagerMixin {
     }
 
 }
-//?}
+*///?}

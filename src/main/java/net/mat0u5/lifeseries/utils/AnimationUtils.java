@@ -137,9 +137,9 @@ public class AnimationUtils {
 
                     // Create the particle effect with the generated color and size
                     //? if <=1.21 {
-                    /*DustParticleEffect particleEffect = new DustParticleEffect(color, 1.0f);
-                     *///?} else
-                    DustParticleEffect particleEffect = new DustParticleEffect(new Color(color.x, color.y, color.z).getRGB(), 1.0f);
+                    DustParticleEffect particleEffect = new DustParticleEffect(color, 1.0f);
+                     //?} else
+                    /*DustParticleEffect particleEffect = new DustParticleEffect(new Color(color.x, color.y, color.z).getRGB(), 1.0f);*/
 
                     // Spawn particle with random offset
                     world.spawnParticles(

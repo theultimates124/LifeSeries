@@ -224,11 +224,11 @@ public class DoubleLife extends Series {
             while(player.getServerWorld().getBlockState(pos).isLiquid());
             Vec3d tpPos = pos.toBottomCenterPos();
             //? if <=1.21 {
-            /*player.teleport(player.getServerWorld(), tpPos.getX(), tpPos.getY(), tpPos.getZ(), player.getYaw(), player.getPitch());
-             *///?} else {
-            Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
+            player.teleport(player.getServerWorld(), tpPos.getX(), tpPos.getY(), tpPos.getZ(), player.getYaw(), player.getPitch());
+             //?} else {
+            /*Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
             player.teleport(player.getServerWorld(), tpPos.getX(), tpPos.getY(), tpPos.getZ(), flags, player.getYaw(), player.getPitch(), false);
-            //?}
+            *///?}
 
         }
     }
@@ -280,14 +280,14 @@ public class DoubleLife extends Series {
 
         //? if <=1.21 {
         
-        /*DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager()
+        DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager()
                 .get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE));
         soulmate.damage(damageSource, 0.0000001F);
-         *///?} else {
-        DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager()
+         //?} else {
+        /*DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager()
                 .getOrThrow(RegistryKeys.DAMAGE_TYPE).getOrThrow(SOULMATE_DAMAGE));
         soulmate.damage(soulmate.getServerWorld(), damageSource, 0.0000001F);
-        //?}
+        *///?}
 
         float newHealth = player.getHealth();
         if (newHealth <= 0.0F) newHealth = 0.01F;
@@ -310,18 +310,18 @@ public class DoubleLife extends Series {
 
         //? if <=1.21 {
         
-        /*DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager()
+        DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager()
                 .get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE));
         soulmate.setAttacker(player);
         soulmate.setAttacking(player);
         soulmate.damage(damageSource, 1000);
-         *///?} else {
-        DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager()
+         //?} else {
+        /*DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager()
                 .getOrThrow(RegistryKeys.DAMAGE_TYPE).getOrThrow(SOULMATE_DAMAGE));
         soulmate.setAttacker(player);
         soulmate.setAttacking(player);
         soulmate.damage(soulmate.getServerWorld(), damageSource, 1000);
-        //?}
+        *///?}
 
     }
 

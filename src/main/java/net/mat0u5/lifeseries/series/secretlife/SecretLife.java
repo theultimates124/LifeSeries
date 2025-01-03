@@ -267,18 +267,18 @@ public class SecretLife extends Series {
 
     public void addPlayerHealth(ServerPlayerEntity player, double health) {
         //? if <=1.21 {
-        /*double currentHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
-         *///?} else
-        double currentHealth = player.getAttributeBaseValue(EntityAttributes.MAX_HEALTH);
+        double currentHealth = player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
+         //?} else
+        /*double currentHealth = player.getAttributeBaseValue(EntityAttributes.MAX_HEALTH);*/
         setPlayerHealth(player, currentHealth + health);
     }
 
     public void setPlayerHealth(ServerPlayerEntity player, double health) {
         if (health < 0.1) health = 0.1;
         //? if <=1.21 {
-        /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(health);
-         *///?} else
-        Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(health);
+        Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(health);
+         //?} else
+        /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(health);*/
 
         if (player.getMaxHealth() > player.getHealth() && !player.isDead()) {
             player.setHealth(player.getMaxHealth());
@@ -287,16 +287,16 @@ public class SecretLife extends Series {
 
     public double getPlayerHealth(ServerPlayerEntity player) {
         //? if <=1.21 {
-        /*return player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
-         *///?} else
-        return player.getAttributeBaseValue(EntityAttributes.MAX_HEALTH);
+        return player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
+         //?} else
+        /*return player.getAttributeBaseValue(EntityAttributes.MAX_HEALTH);*/
     }
 
     public double getRoundedHealth(ServerPlayerEntity player) {
         //? if <=1.21 {
-        /*return Math.floor(player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH)*10)/10.0;
-         *///?} else
-        return Math.floor(player.getAttributeBaseValue(EntityAttributes.MAX_HEALTH)*10)/10.0;
+        return Math.floor(player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH)*10)/10.0;
+         //?} else
+        /*return Math.floor(player.getAttributeBaseValue(EntityAttributes.MAX_HEALTH)*10)/10.0;*/
     }
 
     public void syncPlayerHealth(ServerPlayerEntity player) {

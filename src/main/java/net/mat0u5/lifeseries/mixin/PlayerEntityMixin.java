@@ -18,9 +18,9 @@ public abstract class PlayerEntityMixin {
 
     @Inject(method = "applyDamage", at = @At("TAIL"))
     //? if <=1.21 {
-    /*private void onApplyDamage(DamageSource source, float amount, CallbackInfo info) {
-     *///?} else
-    private void onApplyDamage(ServerWorld world, DamageSource source, float amount, CallbackInfo info) {
+    private void onApplyDamage(DamageSource source, float amount, CallbackInfo info) {
+     //?} else
+    /*private void onApplyDamage(ServerWorld world, DamageSource source, float amount, CallbackInfo info) {*/
         PlayerEntity player = (PlayerEntity) (Object) this;
         currentSeries.onPlayerDamage((ServerPlayerEntity) player, source, amount);
     }

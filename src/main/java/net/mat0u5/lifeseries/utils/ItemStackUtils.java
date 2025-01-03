@@ -18,7 +18,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 //? if <=1.21
-/*import net.minecraft.item.EnchantedBookItem;*/
+import net.minecraft.item.EnchantedBookItem;
 
 
 import java.util.ArrayList;
@@ -147,15 +147,15 @@ public class ItemStackUtils {
 
     public static ItemStack createEnchantedBook(RegistryKey<Enchantment> enchantment, int level) {
         //? if <=1.21 {
-        /*RegistryEntry<Enchantment> entry = server.getRegistryManager()
+        RegistryEntry<Enchantment> entry = server.getRegistryManager()
                 .getWrapperOrThrow(RegistryKeys.ENCHANTMENT)
                 .getOrThrow(enchantment);
         ItemStack enchantedBook = EnchantedBookItem.forEnchantment(
                 new EnchantmentLevelEntry(entry, level)
         );
         return enchantedBook;
-        *///?} else {
-        //TODO test
+        //?} else {
+        /*//TODO test
         RegistryEntry<Enchantment> entry = server.getRegistryManager()
                 .getOrThrow(RegistryKeys.ENCHANTMENT)
                 .getOrThrow(enchantment);
@@ -163,7 +163,7 @@ public class ItemStackUtils {
                 new EnchantmentLevelEntry(entry, level)
         );
         return enchantedBook;
-        //?}
+        *///?}
 
     }
 }

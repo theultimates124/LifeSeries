@@ -131,9 +131,9 @@ public class Blacklist {
         Registry<Enchantment> enchantmentRegistry = server.getRegistryManager()
 
                 //? if <=1.21 {
-                /*.get(RegistryKey.ofRegistry(Identifier.of("minecraft", "enchantment")));
-                 *///?} else
-                .getOrThrow(RegistryKey.ofRegistry(Identifier.of("minecraft", "enchantment")));
+                .get(RegistryKey.ofRegistry(Identifier.of("minecraft", "enchantment")));
+                 //?} else
+                /*.getOrThrow(RegistryKey.ofRegistry(Identifier.of("minecraft", "enchantment")));*/
 
 
         for (String enchantmentId : loadClampedEnchants()) {

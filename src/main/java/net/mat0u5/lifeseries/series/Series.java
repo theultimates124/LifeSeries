@@ -346,9 +346,9 @@ public abstract class Series extends Session {
         // Drop the spawn egg with a 5% chance
         if (Math.random() <= chance) {
             //? if <=1.21 {
-            /*entity.dropStack(spawnEggItem);
-            *///?} else
-            entity.dropStack((ServerWorld) entity.getWorld(), spawnEggItem);
+            entity.dropStack(spawnEggItem);
+            //?} else
+            /*entity.dropStack((ServerWorld) entity.getWorld(), spawnEggItem);*/
             //TODO TEST
         }
     }
@@ -356,9 +356,9 @@ public abstract class Series extends Session {
     public void onPlayerJoin(ServerPlayerEntity player) {
         if (getSeries() != SeriesList.SECRET_LIFE) {
             //? if <=1.21 {
-            /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(20);
-             *///?} else
-            Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(20);
+            Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(20);
+             //?} else
+            /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(20);*/
         }
         reloadPlayerTeam(player);
     }
