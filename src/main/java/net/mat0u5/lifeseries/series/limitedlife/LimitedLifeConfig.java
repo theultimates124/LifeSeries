@@ -58,6 +58,7 @@ public class LimitedLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
+        properties.setProperty("max_player_health", "20");
         properties.setProperty("time_default", "86400");
         properties.setProperty("time_yellow", "57600");
         properties.setProperty("time_red", "28800");

@@ -155,8 +155,8 @@ public class ItemStackUtils {
         );
         return enchantedBook;
         //?} else {
-        /*//TODO test
-        RegistryEntry<Enchantment> entry = server.getRegistryManager()
+        
+        /*RegistryEntry<Enchantment> entry = server.getRegistryManager()
                 .getOrThrow(RegistryKeys.ENCHANTMENT)
                 .getOrThrow(enchantment);
         ItemStack enchantedBook = EnchantmentHelper.getEnchantedBookWith(

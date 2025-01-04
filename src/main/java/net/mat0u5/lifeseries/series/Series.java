@@ -349,16 +349,16 @@ public abstract class Series extends Session {
             entity.dropStack(spawnEggItem);
             //?} else
             /*entity.dropStack((ServerWorld) entity.getWorld(), spawnEggItem);*/
-            //TODO TEST
         }
     }
 
     public void onPlayerJoin(ServerPlayerEntity player) {
         if (getSeries() != SeriesList.SECRET_LIFE) {
+            double health = seriesConfig.getOrCreateDouble("max_player_health", 20.0d);
             //? if <=1.21 {
-            Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(20);
+            Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(health);
              //?} else
-            /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(20);*/
+            /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(health);*/
         }
         reloadPlayerTeam(player);
     }

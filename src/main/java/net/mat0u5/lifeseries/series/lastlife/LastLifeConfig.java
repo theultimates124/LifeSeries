@@ -60,6 +60,7 @@ public class LastLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
+        properties.setProperty("max_player_health", "20");
         properties.setProperty("default_lives_min", "2");
         properties.setProperty("default_lives_max", "6");
         properties.setProperty("custom_enchanter_algorithm", "true");

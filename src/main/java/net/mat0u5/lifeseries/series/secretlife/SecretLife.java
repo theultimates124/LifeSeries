@@ -29,7 +29,7 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.seriesConfig;
 
 public class SecretLife extends Series {
-    public static final double MAX_HEALTH = 60.0d;
+    public static double MAX_HEALTH = 60.0d;
     public ItemSpawner itemSpawner;
     SessionAction taskWarningAction = new SessionAction(OtherUtils.minutesToTicks(-5)+1) {
         @Override
@@ -61,6 +61,28 @@ public class SecretLife extends Series {
         TaskManager.initialize();
         SecretLifeDatabase.loadLocations();
         initializeItemSpawner();
+    }
+
+    @Override
+    public void reload() {
+        MAX_HEALTH = seriesConfig.getOrCreateDouble("max_player_health", 60.0d);
+        TaskManager.EASY_SUCCESS = seriesConfig.getOrCreateInt("task_health_easy_pass", 20);
+        TaskManager.EASY_FAIL = seriesConfig.getOrCreateInt("task_health_easy_fail", 0);
+        TaskManager.HARD_SUCCESS = seriesConfig.getOrCreateInt("task_health_hard_pass", 40);
+        TaskManager.HARD_FAIL = seriesConfig.getOrCreateInt("task_health_hard_fail", -20);
+        TaskManager.RED_SUCCESS = seriesConfig.getOrCreateInt("task_health_red_pass", 10);
+        TaskManager.RED_FAIL = seriesConfig.getOrCreateInt("task_health_red_fail", -5);
+    }
+
+    @Override
+    public void onPlayerRespawn(ServerPlayerEntity oldPlayer) {
+        TaskScheduler.scheduleTask(1, () -> {
+            ServerPlayerEntity player = oldPlayer.server.getPlayerManager().getPlayer(oldPlayer.getUuid());
+            TaskType type = TaskManager.getPlayersTaskType(player);
+            if (isOnLastLife(player) && TaskManager.submittedOrFailed.contains(player.getUuid()) && type == null) {
+                TaskManager.chooseTasks(List.of(player), TaskType.RED);
+            }
+        });
     }
 
     public void initializeItemSpawner() {

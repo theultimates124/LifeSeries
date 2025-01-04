@@ -199,8 +199,7 @@ public class Session {
             //? if <=1.21 {
             player.teleport(player.getServerWorld(),clampedX, safeY, clampedZ, player.getYaw(), player.getPitch());
             //?} else {
-                /*//TODO test
-                Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
+                /*Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
                 player.teleport(player.getServerWorld(),clampedX, safeY, clampedZ, flags, player.getYaw(), player.getPitch(), false);
             *///?}
         }

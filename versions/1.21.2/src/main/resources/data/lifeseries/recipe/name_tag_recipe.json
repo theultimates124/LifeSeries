@@ -7,7 +7,7 @@
     ],
     "key": {
         "#": "minecraft:string",
-        "P": "minecraft:stone"
+        "P": "minecraft:paper"
     },
     "result": {
         "id": "minecraft:name_tag",

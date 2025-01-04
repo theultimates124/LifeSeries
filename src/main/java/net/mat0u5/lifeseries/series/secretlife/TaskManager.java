@@ -3,12 +3,12 @@ package net.mat0u5.lifeseries.series.secretlife;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.config.StringListManager;
 import net.mat0u5.lifeseries.series.SessionAction;
+import net.mat0u5.lifeseries.series.SessionStatus;
 import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.server.command.SetBlockCommand;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -29,10 +29,16 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import static net.mat0u5.lifeseries.Main.currentSeries;
-import static net.mat0u5.lifeseries.Main.server;
+import static net.mat0u5.lifeseries.Main.*;
 
 public class TaskManager {
+    public static int EASY_SUCCESS = 20;
+    public static int EASY_FAIL = 0;
+    public static int HARD_SUCCESS = 40;
+    public static int HARD_FAIL = -20;
+    public static int RED_SUCCESS = 10;
+    public static int RED_FAIL = -5;
+
     public static BlockPos successButtonPos;
     public static BlockPos rerollButtonPos;
     public static BlockPos failButtonPos;
@@ -234,6 +240,10 @@ public class TaskManager {
     }
 
     public static void addHealthThenItems(ServerPlayerEntity player, int addHealth) {
+        if (addHealth == 0) {
+            secretKeeperBeingUsed = false;
+            return;
+        }
         secretKeeperBeingUsed = true;
         SecretLife series = (SecretLife) currentSeries;
         double currentHealth = series.getPlayerHealth(player);
@@ -243,11 +253,15 @@ public class TaskManager {
 
         if (addHealth <= remainderToMax && remainderToMax != 0) {
             series.addPlayerHealth(player, addHealth);
+            secretKeeperBeingUsed = false;
         }
         else {
             if (remainderToMax != 0) series.setPlayerHealth(player, SecretLife.MAX_HEALTH);
             int itemsNum = (addHealth - remainderToMax)/2;
-            if (itemsNum == 0) return;
+            if (itemsNum == 0) {
+                secretKeeperBeingUsed = false;
+                return;
+            }
             Vec3d spawnPos = itemSpawnerPos.toCenterPos();
             for (int i = 0; i <= itemsNum; i++) {
                 if (i == 0) continue;
@@ -262,23 +276,32 @@ public class TaskManager {
         }
     }
 
+    public static boolean hasSessionStarted(ServerPlayerEntity player) {
+        if (currentSession.status == SessionStatus.NOT_STARTED) {
+            player.sendMessage(Text.of("§cThe session has not started yet."));
+            return false;
+        }
+        return true;
+    }
+
     public static boolean isBeingUsed(ServerPlayerEntity player) {
         if (!secretKeeperBeingUsed) return false;
         player.sendMessage(Text.of("§cSomeone else is using the Secret Keeper right now."));
         return true;
     }
 
-    public static boolean hasTaskBook(ServerPlayerEntity player, TaskType type) {
+    public static boolean hasTaskBookCheck(ServerPlayerEntity player, TaskType type) {
         if (type != null) return true;
         player.sendMessage(Text.of("§cYou do not have a secret task book in your inventory."));
         return false;
     }
 
     public static void succeedTask(ServerPlayerEntity player) {
+        if (!hasSessionStarted(player)) return;
         if (isBeingUsed(player)) return;
         SecretLife series = (SecretLife) currentSeries;
         TaskType type = getPlayersTaskType(player);
-        if (!hasTaskBook(player, type)) return;
+        if (!hasTaskBookCheck(player, type)) return;
         removePlayersTaskBook(player);
         submittedOrFailed.add(player.getUuid());
         secretKeeperBeingUsed = true;
@@ -290,19 +313,16 @@ public class TaskManager {
             server.getOverworld().playSound(null, centerPos.getX(), centerPos.getY(), centerPos.getZ(), SoundEvents.BLOCK_TRIAL_SPAWNER_EJECT_ITEM, SoundCategory.PLAYERS, 1.0F, 1.0F);
             AnimationUtils.spawnFireworkBall(server.getOverworld(), centerPos, 40, 0.3, new Vector3f(0, 1, 0));
             if (type == TaskType.EASY) {
-                showHeartTitle(player, 20);
-                addHealthThenItems(player, 20);
-                return;
+                showHeartTitle(player, EASY_SUCCESS);
+                addHealthThenItems(player, EASY_SUCCESS);
             }
             if (type == TaskType.HARD) {
-                showHeartTitle(player, 40);
-                addHealthThenItems(player, 40);
-                return;
+                showHeartTitle(player, HARD_SUCCESS);
+                addHealthThenItems(player, HARD_SUCCESS);
             }
             if (type == TaskType.RED) {
-                showHeartTitle(player, 10);
-                addHealthThenItems(player, 10);
-                return;
+                showHeartTitle(player, RED_SUCCESS);
+                addHealthThenItems(player, RED_SUCCESS);
             }
         });
         if (series.isOnLastLife(player)) {
@@ -313,10 +333,11 @@ public class TaskManager {
     }
 
     public static void rerollTask(ServerPlayerEntity player) {
+        if (!hasSessionStarted(player)) return;
         if (isBeingUsed(player)) return;
         SecretLife series = (SecretLife) currentSeries;
         TaskType type = getPlayersTaskType(player);
-        if (!hasTaskBook(player, type)) return;
+        if (!hasTaskBookCheck(player, type)) return;
         if (type == TaskType.RED) {
             failTask(player);
             return;
@@ -355,7 +376,7 @@ public class TaskManager {
             return;
         }
         if (type == TaskType.HARD) {
-            if (series.isOnLastLife(player)) {
+            if (!series.isOnLastLife(player)) {
                 player.sendMessage(Text.of("§cYou cannot re-roll a Hard task."));
             }
             else {
@@ -365,10 +386,11 @@ public class TaskManager {
     }
 
     public static void failTask(ServerPlayerEntity player) {
+        if (!hasSessionStarted(player)) return;
         if (isBeingUsed(player)) return;
         SecretLife series = (SecretLife) currentSeries;
         TaskType type = getPlayersTaskType(player);
-        if (!hasTaskBook(player, type)) return;
+        if (!hasTaskBookCheck(player, type)) return;
         removePlayersTaskBook(player);
         submittedOrFailed.add(player.getUuid());
         secretKeeperBeingUsed = true;
@@ -379,14 +401,17 @@ public class TaskManager {
         TaskScheduler.scheduleTask(60, () -> {
             server.getOverworld().playSound(null, centerPos.getX(), centerPos.getY(), centerPos.getZ(), SoundEvents.BLOCK_TRIAL_SPAWNER_SPAWN_MOB, SoundCategory.PLAYERS, 1.0F, 1.0F);
             AnimationUtils.spawnFireworkBall(server.getOverworld(), centerPos, 40, 0.3, new Vector3f(1, 0, 0));
+            if (type == TaskType.EASY) {
+                showHeartTitle(player, EASY_FAIL);
+                series.removePlayerHealth(player, -EASY_FAIL);
+            }
             if (type == TaskType.HARD) {
-                showHeartTitle(player, -20);
-                series.removePlayerHealth(player, 20);
-                return;
+                showHeartTitle(player, HARD_FAIL);
+                series.removePlayerHealth(player, -HARD_FAIL);
             }
             if (type == TaskType.RED) {
-                showHeartTitle(player, -5);
-                series.removePlayerHealth(player, 5);
+                showHeartTitle(player, RED_FAIL);
+                series.removePlayerHealth(player, -RED_FAIL);
             }
             if (!series.isOnLastLife(player)) {
                 secretKeeperBeingUsed = false;
@@ -400,6 +425,7 @@ public class TaskManager {
     }
 
     public static void showHeartTitle(ServerPlayerEntity player, int amount) {
+        if (amount == 0) return;
         SecretLife series = (SecretLife) currentSeries;
         if (amount > 0 && series.getPlayerHealth(player) >= SecretLife.MAX_HEALTH) return;
         int healthBefore = MathHelper.ceil(series.getPlayerHealth(player));

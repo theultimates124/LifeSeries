@@ -60,6 +60,7 @@ public class DoubleLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
+        properties.setProperty("max_player_health", "20");
         properties.setProperty("default_lives", "3");
         properties.setProperty("custom_enchanter_algorithm", "true");
         properties.setProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
