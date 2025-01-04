@@ -61,8 +61,9 @@ public class LastLifeConfig extends ConfigManager {
     public void defaultProperties() {
         defaultSessionProperties();
         properties.setProperty("max_player_health", "20");
-        properties.setProperty("default_lives_min", "2");
-        properties.setProperty("default_lives_max", "6");
+        properties.setProperty("random_lives_min", "2");
+        properties.setProperty("random_lives_max", "6");
+        properties.setProperty("givelife_lives_max", "99");
         properties.setProperty("custom_enchanter_algorithm", "true");
         properties.setProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
         properties.setProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");

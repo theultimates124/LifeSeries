@@ -33,7 +33,7 @@ public class LastLifeLivesManager {
         target.sendMessage(Text.literal("You received a life from ").append(playerName));
         PlayerUtils.sendTitle(target, Text.of("You received a life"), 10, 30, 10);
         AnimationUtils.createSpiral(target, 175);
-        currentSeries.addPlayerLife(target);
+        currentSeries.reloadPlayerTeam(target);
     }
 
     public void assignRandomLivesToUnassignedPlayers() {
@@ -82,8 +82,8 @@ public class LastLifeLivesManager {
                     continue;
                 }
 
-                int minLives = seriesConfig.getOrCreateInt("default_lives_min", 2);
-                int maxLives = seriesConfig.getOrCreateInt("default_lives_max", 6);
+                int minLives = LastLife.ROLL_MIN_LIVES;
+                int maxLives = LastLife.ROLL_MAX_LIVES;
                 int randomLives = rnd.nextInt(maxLives-1)+minLives;// Random number, default 2->6
                 lives.put(player, randomLives);
             }
@@ -117,8 +117,8 @@ public class LastLifeLivesManager {
             currentSeries. reloadAllPlayerTeams();
             return;
         }
-        int minLives = seriesConfig.getOrCreateInt("default_lives_min", 2);
-        int maxLives = seriesConfig.getOrCreateInt("default_lives_max", 6);
+        int minLives = LastLife.ROLL_MIN_LIVES;
+        int maxLives = LastLife.ROLL_MAX_LIVES;
         int displayLives = rnd.nextInt(maxLives-1)+minLives;// Random number, default 2->6
         while (displayLives == lastNum) {
             // Just so that the random cycle can't have two of the same number in a row

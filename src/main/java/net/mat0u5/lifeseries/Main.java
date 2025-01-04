@@ -30,7 +30,7 @@ import java.util.List;
 
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "1.2.1.4";
+	public static final String MOD_VERSION = "1.2.1.5";
 	public static final String MOD_ID = "lifeseries";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ConfigManager config;
@@ -43,7 +43,6 @@ public class Main implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		//Test 1.21.1
 		config = new MainConfig();
 
 		String series = config.getOrCreateProperty("currentSeries", "unassigned");
@@ -90,8 +89,8 @@ public class Main implements ModInitializer {
 		if (currentSeries.getSeries() == SeriesList.SECRET_LIFE) {
 			TaskManager.initialize();
 		}
-		currentSeries.reload();
 		seriesConfig.loadProperties();
 		blacklist.reloadBlacklist();
+		currentSeries.reload();
 	}
 }

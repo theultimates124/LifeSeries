@@ -3,12 +3,20 @@ package net.mat0u5.lifeseries.series.lastlife;
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.*;
 import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.utils.ScoreboardUtils;
+import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.world.GameMode;
 
 import java.util.*;
 
+import static net.mat0u5.lifeseries.Main.seriesConfig;
+
 public class LastLife extends Series {
+    public static int ROLL_MAX_LIVES = 6;
+    public static int ROLL_MIN_LIVES = 2;
+    public static int GIVELIFE_MAX_LIVES = 99;
 
     public LastLifeLivesManager livesManager = new LastLifeLivesManager();
     public BoogeymanManager boogeymanManager = new BoogeymanManager();
@@ -84,5 +92,20 @@ public class LastLife extends Series {
     public void onPlayerJoin(ServerPlayerEntity player) {
         super.onPlayerJoin(player);
         boogeymanManager.onPlayerJoin(player);
+    }
+
+    @Override
+    public void reload() {
+        ROLL_MIN_LIVES = seriesConfig.getOrCreateInt("random_lives_min", 2);
+        ROLL_MAX_LIVES = seriesConfig.getOrCreateInt("random_lives_max", 6);
+        GIVELIFE_MAX_LIVES = seriesConfig.getOrCreateInt("givelife_lives_max", 99);
+    }
+
+    public void addToLifeNoUpdate(ServerPlayerEntity player) {
+        Integer currentLives = getPlayerLives(player);
+        if (currentLives == null) currentLives = 0;
+        int lives = currentLives + 1;
+        if (lives < 0) lives = 0;
+        ScoreboardUtils.setScore(ScoreHolder.fromName(player.getNameForScoreboard()), "Lives", lives);
     }
 }
