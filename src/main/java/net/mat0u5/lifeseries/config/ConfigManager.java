@@ -23,6 +23,7 @@ public abstract class ConfigManager {
         setProperty("creative_ignore_blacklist", "true");
         setProperty("auto_set_worldborder", "true");
         setProperty("auto_keep_inventory", "true");
+        setProperty("players_drop_items_on_last_death", "false");
     }
 
     private void createFileIfNotExists() {

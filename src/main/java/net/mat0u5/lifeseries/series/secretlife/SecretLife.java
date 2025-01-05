@@ -79,7 +79,7 @@ public class SecretLife extends Series {
         TaskScheduler.scheduleTask(1, () -> {
             ServerPlayerEntity player = oldPlayer.server.getPlayerManager().getPlayer(oldPlayer.getUuid());
             TaskType type = TaskManager.getPlayersTaskType(player);
-            if (isOnLastLife(player) && TaskManager.submittedOrFailed.contains(player.getUuid()) && type == null) {
+            if (isOnLastLife(player, false) && TaskManager.submittedOrFailed.contains(player.getUuid()) && type == null) {
                 TaskManager.chooseTasks(List.of(player), TaskType.RED);
             }
         });
@@ -260,7 +260,7 @@ public class SecretLife extends Series {
     @Override
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
         if (isAllowedToAttack(killer, victim)) {
-            if (currentSeries.isOnLastLife(killer)) {
+            if (currentSeries.isOnLastLife(killer, false)) {
                 addPlayerHealth(killer, 20);
                 PlayerUtils.sendTitle(killer, Text.literal("+10 Hearts").formatted(Formatting.RED), 0, 40, 20);
             }
@@ -272,8 +272,8 @@ public class SecretLife extends Series {
 
     @Override
     public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
-        if (currentSeries.isOnLastLife(attacker)) return true;
-        if (attacker.getPrimeAdversary() == victim && (currentSeries.isOnLastLife(victim))) return true;
+        if (currentSeries.isOnLastLife(attacker, false)) return true;
+        if (attacker.getPrimeAdversary() == victim && (currentSeries.isOnLastLife(victim, false))) return true;
         return false;
     }
 

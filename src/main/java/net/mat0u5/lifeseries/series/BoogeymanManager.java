@@ -132,9 +132,7 @@ public class BoogeymanManager {
             PlayerUtils.playSoundToPlayers(allowedPlayers, SoundEvent.of(Identifier.of("minecraft","lastlife_boogeyman_wait")));
             PlayerUtils.sendTitleToPlayers(allowedPlayers, Text.literal("You are...").formatted(Formatting.YELLOW),10,50,20);
         });
-        TaskScheduler.scheduleTask(180, () -> {
-            boogeymenChooseRandom(allowedPlayers, currentChance);
-        });
+        TaskScheduler.scheduleTask(180, () -> boogeymenChooseRandom(allowedPlayers, currentChance));
     }
 
     public void boogeymenChooseRandom(List<ServerPlayerEntity> allowedPlayers, double currentChance) {
@@ -194,7 +192,7 @@ public class BoogeymanManager {
 
     public void playerFailBoogeyman(ServerPlayerEntity player) {
         if (!currentSeries.isAlive(player)) return;
-        if (currentSeries.isOnLastLife(player)) return;
+        if (currentSeries.isOnLastLife(player, true)) return;
         player.sendMessage(Text.of("§7You failed to kill a green or yellow name last session as the Boogeyman. As punishment, you have dropped to your §cLast Life§7. " +
                 "All alliances are severed and you are now hostile to all players. You may team with others on their Last Life if you wish."));
         OtherUtils.broadcastMessage(player.getStyledDisplayName().copy().append(Text.of("§7 failed to kill a player while being the §cBoogeyman§7. They have been dropped to their §cLast Life§7")));

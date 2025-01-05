@@ -11,6 +11,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.ElderGuardianEntity;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.scoreboard.ScoreHolder;
@@ -21,7 +22,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.TeleportTarget;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
@@ -181,6 +184,7 @@ public abstract class Series extends Session {
         reloadPlayerTeam(player);
     }
 
+    @Nullable
     public Boolean isOnLastLife(ServerPlayerEntity player) {
         if (!isAlive(player)) return null;
         Integer lives = currentSeries.getPlayerLives(player);
@@ -193,6 +197,7 @@ public abstract class Series extends Session {
         return isOnLastLife;
     }
 
+    @Nullable
     public Boolean isOnSpecificLives(ServerPlayerEntity player, int check) {
         if (!isAlive(player)) return null;
         Integer lives = currentSeries.getPlayerLives(player);
@@ -214,6 +219,17 @@ public abstract class Series extends Session {
         HashMap<Vec3d, List<Float>> info = new HashMap<>();
         info.put(pos, List.of(player.getYaw(),player.getPitch()));
         respawnPositions.put(player.getUuid(), info);
+
+        boolean doDrop = seriesConfig.getOrCreateBoolean("players_drop_items_on_last_death", false);
+        boolean keepInventory = player.server.getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
+        if (doDrop && keepInventory) {
+            for (ItemStack item : PlayerUtils.getPlayerInventory(player)) {
+                //? if <= 1.21 {
+                player.dropStack(item);
+                //?} else
+                /*player.dropStack(player.getServerWorld(), item);*/
+            }
+        }
     }
 
     public void getRespawnTarget(ServerPlayerEntity player, TeleportTarget.PostDimensionTransition postDimensionTransition, CallbackInfoReturnable<TeleportTarget> cir) {

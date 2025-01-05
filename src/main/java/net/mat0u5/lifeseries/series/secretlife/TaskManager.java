@@ -152,7 +152,7 @@ public class TaskManager {
             TaskType thisType = type;
             if (thisType == null) {
                 thisType = TaskType.EASY;
-                if (currentSeries.isOnLastLife(player)) thisType = TaskType.RED;
+                if (currentSeries.isOnLastLife(player, false)) thisType = TaskType.RED;
             }
             removePlayersTaskBook(player);
             assignRandomTaskToPlayer(player, thisType);
@@ -325,7 +325,7 @@ public class TaskManager {
                 addHealthThenItems(player, RED_SUCCESS);
             }
         });
-        if (series.isOnLastLife(player)) {
+        if (series.isOnLastLife(player, false)) {
             TaskScheduler.scheduleTask(120, () -> {
                 chooseTasks(List.of(player), TaskType.RED);
             });
@@ -346,7 +346,7 @@ public class TaskManager {
             removePlayersTaskBook(player);
             secretKeeperBeingUsed = true;
             TaskType newType = TaskType.HARD;
-            if (series.isOnLastLife(player)) {
+            if (series.isOnLastLife(player, false)) {
                 chooseTasks(List.of(player), TaskType.RED);
                 return;
             }
@@ -376,7 +376,7 @@ public class TaskManager {
             return;
         }
         if (type == TaskType.HARD) {
-            if (!series.isOnLastLife(player)) {
+            if (!series.isOnLastLife(player, true)) {
                 player.sendMessage(Text.of("§cYou cannot re-roll a Hard task."));
             }
             else {
@@ -413,11 +413,11 @@ public class TaskManager {
                 showHeartTitle(player, RED_FAIL);
                 series.removePlayerHealth(player, -RED_FAIL);
             }
-            if (!series.isOnLastLife(player)) {
+            if (!series.isOnLastLife(player, false)) {
                 secretKeeperBeingUsed = false;
             }
         });
-        if (series.isOnLastLife(player)) {
+        if (series.isOnLastLife(player, false)) {
             TaskScheduler.scheduleTask(120, () -> {
                 chooseTasks(List.of(player), TaskType.RED);
             });

@@ -54,18 +54,18 @@ public class LimitedLifeBoogeymanManager extends BoogeymanManager {
     @Override
     public void playerFailBoogeyman(ServerPlayerEntity player) {
         if (!currentSeries.isAlive(player)) return;
-        if (currentSeries.isOnLastLife(player)) return;
+        if (currentSeries.isOnLastLife(player, true)) return;
         String setTo = "";
-        if (currentSeries.isOnSpecificLives(player, 3)) {
+        if (currentSeries.isOnSpecificLives(player, 3, false)) {
             setTo = "16";
             currentSeries.setPlayerLives(player, 57600);
         }
-        else if (currentSeries.isOnSpecificLives(player, 2)) {
+        else if (currentSeries.isOnSpecificLives(player, 2, false)) {
             setTo = "8";
             currentSeries.setPlayerLives(player, 28800);
         }
 
-        if (!currentSeries.isOnLastLife(player)) {
+        if (!currentSeries.isOnLastLife(player, false)) {
             player.sendMessage(Text.of("§7You failed to kill a green or yellow name last session as the Boogeyman. As punishment, you have dropped to "+setTo + " hours left."));
             OtherUtils.broadcastMessage(player.getStyledDisplayName().copy().append(Text.of("§7 failed to kill a player while being the §cBoogeyman§7. Their time has been dropped to "+setTo + " hours left.")));
 

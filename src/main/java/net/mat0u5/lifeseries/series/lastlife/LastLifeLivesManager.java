@@ -69,22 +69,24 @@ public class LastLifeLivesManager {
             //Choose the amount of lives a player will have
 
             int totalSize = lives.size();
-            int chosenNotRandomly = 1;
+            int chosenNotRandomly = LastLife.ROLL_MIN_LIVES;
             for (ServerPlayerEntity player : lives.keySet()) {
                 Integer currentLives = currentSeries.getPlayerLives(player);
                 if (currentLives != null) {
                     lives.put(player, currentLives);
                     continue;
                 }
-                if (chosenNotRandomly < 6 && totalSize > 6) {
-                    chosenNotRandomly++;
+                int diff = LastLife.ROLL_MAX_LIVES-LastLife.ROLL_MIN_LIVES+2;
+                if (chosenNotRandomly <= LastLife.ROLL_MAX_LIVES && totalSize > diff) {
                     lives.put(player, chosenNotRandomly);
+                    chosenNotRandomly++;
                     continue;
                 }
 
                 int minLives = LastLife.ROLL_MIN_LIVES;
                 int maxLives = LastLife.ROLL_MAX_LIVES;
-                int randomLives = rnd.nextInt(maxLives-1)+minLives;// Random number, default 2->6
+                int randomLives = rnd.nextInt(minLives, maxLives+1);
+
                 lives.put(player, randomLives);
             }
 
@@ -119,10 +121,10 @@ public class LastLifeLivesManager {
         }
         int minLives = LastLife.ROLL_MIN_LIVES;
         int maxLives = LastLife.ROLL_MAX_LIVES;
-        int displayLives = rnd.nextInt(maxLives-1)+minLives;// Random number, default 2->6
+        int displayLives = rnd.nextInt(minLives, maxLives+1);
         while (displayLives == lastNum) {
             // Just so that the random cycle can't have two of the same number in a row
-            displayLives = rnd.nextInt(maxLives-1)+minLives;
+            displayLives = rnd.nextInt(minLives, maxLives+1);
         }
         int finalDisplayLives = displayLives;
         PlayerUtils.sendTitleToPlayers(lives.keySet(), currentSeries.getFormattedLives(finalDisplayLives), 0, 25, 0);
