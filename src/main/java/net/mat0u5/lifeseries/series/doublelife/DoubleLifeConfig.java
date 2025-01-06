@@ -60,11 +60,11 @@ public class DoubleLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
-        properties.setProperty("max_player_health", "20");
-        properties.setProperty("default_lives", "3");
-        properties.setProperty("custom_enchanter_algorithm", "true");
-        properties.setProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
-        properties.setProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
-        properties.setProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");
+        getOrCreateProperty("max_player_health", "20");
+        getOrCreateProperty("default_lives", "3");
+        getOrCreateProperty("custom_enchanter_algorithm", "true");
+        getOrCreateProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
+        getOrCreateProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
+        getOrCreateProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");
     }
 }

@@ -14,16 +14,18 @@ public abstract class ConfigManager {
         this.filePath = folderPath + "/" + filePath;
         createFileIfNotExists();
         loadProperties();
+        defaultProperties();
     }
     protected abstract void defaultProperties();
 
     protected void defaultSessionProperties() {
-        setProperty("spawn_egg_drop_chance", "0.05");
-        setProperty("spawn_egg_allow_on_spawner", "false");
-        setProperty("creative_ignore_blacklist", "true");
-        setProperty("auto_set_worldborder", "true");
-        setProperty("auto_keep_inventory", "true");
-        setProperty("players_drop_items_on_last_death", "false");
+        getOrCreateProperty("spawn_egg_drop_chance", "0.05");
+        getOrCreateProperty("spawn_egg_allow_on_spawner", "false");
+        getOrCreateProperty("creative_ignore_blacklist", "true");
+        getOrCreateProperty("auto_set_worldborder", "true");
+        getOrCreateProperty("auto_keep_inventory", "true");
+        getOrCreateProperty("players_drop_items_on_last_death", "false");
+        getOrCreateProperty("show_death_title_on_last_death", "true");
     }
 
     private void createFileIfNotExists() {
@@ -74,6 +76,7 @@ public abstract class ConfigManager {
 
     public String getOrCreateProperty(String key, String defaultValue) {
         if (folderPath == null || filePath == null) return "";
+        if (properties == null) return "";
 
         if (properties.containsKey(key)) {
             return properties.getProperty(key);

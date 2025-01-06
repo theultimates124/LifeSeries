@@ -5,6 +5,8 @@ import net.mat0u5.lifeseries.config.ConfigManager;
 
 import java.util.List;
 
+import static net.mat0u5.lifeseries.Main.seriesConfig;
+
 public class LimitedLifeConfig extends ConfigManager {
     public static final List<String> BLACKLISTED_ITEMS = List.of(
             "lectern",
@@ -58,13 +60,17 @@ public class LimitedLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
-        properties.setProperty("max_player_health", "20");
-        properties.setProperty("time_default", "86400");
-        properties.setProperty("time_yellow", "57600");
-        properties.setProperty("time_red", "28800");
-        properties.setProperty("custom_enchanter_algorithm", "true");
-        properties.setProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
-        properties.setProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
-        properties.setProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");
+        getOrCreateProperty("max_player_health", "20");
+        getOrCreateProperty("time_default", "86400");
+        getOrCreateProperty("time_yellow", "57600");
+        getOrCreateProperty("time_red", "28800");
+        getOrCreateProperty("custom_enchanter_algorithm", "true");
+        getOrCreateProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
+        getOrCreateProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
+        getOrCreateProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");
+        getOrCreateInt("time_death",-3600);
+        getOrCreateInt("time_death_boogeyman",-7200);
+        getOrCreateInt("time_kill",1800);
+        getOrCreateInt("time_kill_boogeyman",3600);
     }
 }

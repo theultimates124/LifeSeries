@@ -52,19 +52,19 @@ public class SecretLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
-        properties.setProperty("task_health_easy_pass", "20");
-        properties.setProperty("task_health_easy_fail", "0");
-        properties.setProperty("task_health_hard_pass", "40");
-        properties.setProperty("task_health_hard_fail", "-20");
-        properties.setProperty("task_health_red_pass", "10");
-        properties.setProperty("task_health_red_fail", "-5");
+        getOrCreateProperty("task_health_easy_pass", "20");
+        getOrCreateProperty("task_health_easy_fail", "0");
+        getOrCreateProperty("task_health_hard_pass", "40");
+        getOrCreateProperty("task_health_hard_fail", "-20");
+        getOrCreateProperty("task_health_red_pass", "10");
+        getOrCreateProperty("task_health_red_fail", "-5");
 
 
-        properties.setProperty("max_player_health", "60");
-        properties.setProperty("default_lives", "3");
-        properties.setProperty("custom_enchanter_algorithm", "false");
-        properties.setProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
-        properties.setProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
-        properties.setProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");
+        getOrCreateProperty("max_player_health", "60");
+        getOrCreateProperty("default_lives", "3");
+        getOrCreateProperty("custom_enchanter_algorithm", "false");
+        getOrCreateProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
+        getOrCreateProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
+        getOrCreateProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");
     }
 }

@@ -8,6 +8,6 @@ public class MainConfig extends ConfigManager {
     }
     @Override
     public void defaultProperties() {
-        properties.setProperty("currentSeries","unassigned");
+        getOrCreateProperty("currentSeries","unassigned");
     }
 }

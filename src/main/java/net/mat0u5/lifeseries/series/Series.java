@@ -219,7 +219,11 @@ public abstract class Series extends Session {
         HashMap<Vec3d, List<Float>> info = new HashMap<>();
         info.put(pos, List.of(player.getYaw(),player.getPitch()));
         respawnPositions.put(player.getUuid(), info);
+        dropItemsOnLastDeath(player);
+        showDeathTitle(player);
+    }
 
+    public void dropItemsOnLastDeath(ServerPlayerEntity player) {
         boolean doDrop = seriesConfig.getOrCreateBoolean("players_drop_items_on_last_death", false);
         boolean keepInventory = player.server.getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
         if (doDrop && keepInventory) {
@@ -230,6 +234,12 @@ public abstract class Series extends Session {
                 /*player.dropStack(player.getServerWorld(), item);*/
             }
         }
+    }
+
+    public void showDeathTitle(ServerPlayerEntity player) {
+        if (!seriesConfig.getOrCreateBoolean("show_death_title_on_last_death",true)) return;
+        PlayerUtils.sendTitleWithSubtitleToPlayers(PlayerUtils.getAllPlayers(), player.getStyledDisplayName(), Text.literal("ran out of lives!"), 20, 80, 20);
+        OtherUtils.broadcastMessage(Text.literal("").append(player.getStyledDisplayName()).append(Text.of(" ran out of lives.")));
     }
 
     public void getRespawnTarget(ServerPlayerEntity player, TeleportTarget.PostDimensionTransition postDimensionTransition, CallbackInfoReturnable<TeleportTarget> cir) {

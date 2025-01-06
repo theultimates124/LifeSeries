@@ -26,6 +26,11 @@ public class LimitedLife extends Series {
     private int DEFAULT_TIME = 86400;
     private int YELLOW_TIME = 57600;
     private int RED_TIME = 28800;
+    private boolean SHOW_DEATH_TITLE = true;
+    private int DEATH_NORMAL = -3600;
+    private int DEATH_BOOGEYMAN = -7200;
+    private int KILL_NORMAL = 1800;
+    private int KILL_BOOGEYMAN = 3600;
 
     public LimitedLifeBoogeymanManager boogeymanManager = new LimitedLifeBoogeymanManager();
 
@@ -152,9 +157,9 @@ public class LimitedLife extends Series {
             }
         }
         onPlayerDiedNaturally(player);
-        addToPlayerLives(player, -3600);
+        addToPlayerLives(player, DEATH_NORMAL);
         if (isAlive(player)) {
-            PlayerUtils.sendTitle(player, Text.literal("-1 hour").formatted(Formatting.RED), 20, 80, 20);
+            PlayerUtils.sendTitle(player, Text.literal(OtherUtils.formatSecondsToReadable(DEATH_NORMAL)).formatted(Formatting.RED), 20, 80, 20);
         }
     }
 
@@ -162,31 +167,35 @@ public class LimitedLife extends Series {
     public void onClaimKill(ServerPlayerEntity killer, ServerPlayerEntity victim) {
         Boogeyman boogeyman  = boogeymanManager.getBoogeyman(killer);
         if (boogeyman == null || boogeyman.cured) {
-            addToPlayerLives(killer, 1800);
-            PlayerUtils.sendTitle(killer, Text.literal("+30 minutes").formatted(Formatting.GREEN), 20, 80, 20);
+            addToPlayerLives(killer, KILL_NORMAL);
+            PlayerUtils.sendTitle(killer, Text.literal(OtherUtils.formatSecondsToReadable(KILL_NORMAL)).formatted(Formatting.GREEN), 20, 80, 20);
             return;
         }
         boogeymanManager.cure(killer);
 
         //Victim was killed by boogeyman - remove 2 hours from victim and add 1 hour to boogey
         boolean wasAlive = false;
+
+        String msgVictim = OtherUtils.formatSecondsToReadable(DEATH_BOOGEYMAN-DEATH_NORMAL);
+        String msgKiller = OtherUtils.formatSecondsToReadable(KILL_BOOGEYMAN);
+
         if (isAlive(victim)) {
-            addToPlayerLives(victim, -3600);
+            addToPlayerLives(victim, DEATH_BOOGEYMAN-DEATH_NORMAL);
             wasAlive = true;
         }
-        addToPlayerLives(killer, 3600);
+        addToPlayerLives(killer, KILL_BOOGEYMAN);
         if (isAlive(victim)) {
-            PlayerUtils.sendTitle(killer, Text.literal("+1 hour").formatted(Formatting.GREEN), 20, 80, 20);
-            PlayerUtils.sendTitle(victim, Text.literal("-1 extra hour").formatted(Formatting.RED), 20, 80, 20);
+            PlayerUtils.sendTitle(killer, Text.literal(msgKiller).formatted(Formatting.GREEN), 20, 80, 20);
+            PlayerUtils.sendTitle(victim, Text.literal(msgVictim).formatted(Formatting.RED), 20, 80, 20);
         }
-        else if (wasAlive) {
+        else if (wasAlive && SHOW_DEATH_TITLE) {
             PlayerUtils.sendTitleWithSubtitle(killer,
-                    Text.literal("+1 hour").formatted(Formatting.GREEN),
+                    Text.literal(msgKiller).formatted(Formatting.GREEN),
                     Text.literal("").append(victim.getStyledDisplayName()).append(Text.literal(" ran out of time!")),
                     20, 80, 20);
         }
         else {
-            PlayerUtils.sendTitle(killer, Text.literal("+1 hour").formatted(Formatting.GREEN), 20, 80, 20);
+            PlayerUtils.sendTitle(killer, Text.literal(msgKiller).formatted(Formatting.GREEN), 20, 80, 20);
         }
     }
 
@@ -195,15 +204,17 @@ public class LimitedLife extends Series {
         Boogeyman boogeyman  = boogeymanManager.getBoogeyman(killer);
         if (boogeyman == null || boogeyman.cured) {
             boolean wasAllowedToAttack = isAllowedToAttack(killer, victim);
-            addToPlayerLives(victim, -3600);
-            addToPlayerLives(killer, 1800);
-            if (isAlive(victim)) {
-                PlayerUtils.sendTitle(victim, Text.literal("-1 hour").formatted(Formatting.RED), 20, 80, 20);
-                PlayerUtils.sendTitle(killer, Text.literal("+30 minutes").formatted(Formatting.GREEN), 20, 80, 20);
+            String msgVictim = OtherUtils.formatSecondsToReadable(DEATH_NORMAL);
+            String msgKiller = OtherUtils.formatSecondsToReadable(KILL_NORMAL);
+            addToPlayerLives(victim, DEATH_NORMAL);
+            addToPlayerLives(killer, KILL_NORMAL);
+            if (isAlive(victim) || !SHOW_DEATH_TITLE) {
+                PlayerUtils.sendTitle(victim, Text.literal(msgVictim).formatted(Formatting.RED), 20, 80, 20);
+                PlayerUtils.sendTitle(killer, Text.literal(msgKiller).formatted(Formatting.GREEN), 20, 80, 20);
             }
             else {
                 PlayerUtils.sendTitleWithSubtitle(killer,
-                        Text.literal("+30 minutes").formatted(Formatting.GREEN),
+                        Text.literal(msgKiller).formatted(Formatting.GREEN),
                         Text.literal("").append(victim.getStyledDisplayName()).append(Text.literal(" ran out of time!")),
                         20, 80, 20);
             }
@@ -216,15 +227,17 @@ public class LimitedLife extends Series {
         boogeymanManager.cure(killer);
 
         //Victim was killed by boogeyman - remove 2 hours from victim and add 1 hour to boogey
-        addToPlayerLives(victim, -7200);
-        addToPlayerLives(killer, 3600);
+        String msgVictim = OtherUtils.formatSecondsToReadable(DEATH_BOOGEYMAN);
+        String msgKiller = OtherUtils.formatSecondsToReadable(KILL_BOOGEYMAN);
+        addToPlayerLives(victim, DEATH_BOOGEYMAN);
+        addToPlayerLives(killer, KILL_BOOGEYMAN);
 
-        if (isAlive(victim)) {
-            PlayerUtils.sendTitle(victim, Text.literal("-2 hours").formatted(Formatting.RED), 20, 80, 20);
-            PlayerUtils.sendTitleWithSubtitle(killer,Text.of("§aYou are cured!"), Text.literal("+1 hour").formatted(Formatting.GREEN), 20, 80, 20);
+        if (isAlive(victim) || !SHOW_DEATH_TITLE) {
+            PlayerUtils.sendTitle(victim, Text.literal(msgVictim).formatted(Formatting.RED), 20, 80, 20);
+            PlayerUtils.sendTitleWithSubtitle(killer,Text.of("§aYou are cured!"), Text.literal(msgKiller).formatted(Formatting.GREEN), 20, 80, 20);
         }
         else {
-            PlayerUtils.sendTitleWithSubtitle(killer,Text.of("§aYou are cured, +1 hour"),
+            PlayerUtils.sendTitleWithSubtitle(killer,Text.of("§aYou are cured, "+msgKiller),
                     Text.literal("").append(victim.getStyledDisplayName()).append(Text.literal(" ran out of time!"))
                     , 20, 80, 20);
         }
@@ -257,6 +270,11 @@ public class LimitedLife extends Series {
         DEFAULT_TIME = seriesConfig.getOrCreateInt("time_default", 86400);
         YELLOW_TIME = seriesConfig.getOrCreateInt("time_yellow", 57600);
         RED_TIME = seriesConfig.getOrCreateInt("time_red", 28800);
+        SHOW_DEATH_TITLE = seriesConfig.getOrCreateBoolean("show_death_title_on_last_death",true);
+        DEATH_NORMAL = seriesConfig.getOrCreateInt("time_death",-3600);
+        DEATH_BOOGEYMAN = seriesConfig.getOrCreateInt("time_death_boogeyman",-7200);
+        KILL_NORMAL = seriesConfig.getOrCreateInt("time_kill",1800);
+        KILL_BOOGEYMAN = seriesConfig.getOrCreateInt("time_kill_boogeyman",3600);
     }
 
     @Override
@@ -283,10 +301,12 @@ public class LimitedLife extends Series {
     public void playerLostAllLives(ServerPlayerEntity player) {
         super.playerLostAllLives(player);
         boogeymanManager.playerLostAllLives(player);
-        List<ServerPlayerEntity> players = new ArrayList<>(PlayerUtils.getAllPlayers());
-        players.remove(player);
-        PlayerUtils.sendTitle(player, Text.literal("You have run out of time!").formatted(Formatting.RED), 20, 160, 20);
-        PlayerUtils.sendTitleWithSubtitleToPlayers(players, player.getStyledDisplayName(), Text.literal("ran out of time!"), 20, 80, 20);
-        OtherUtils.broadcastMessage(Text.literal("").append(player.getStyledDisplayName()).append(Text.of(" ran out of time")));
+    }
+
+    @Override
+    public void showDeathTitle(ServerPlayerEntity player) {
+        if (!SHOW_DEATH_TITLE) return;
+        PlayerUtils.sendTitleWithSubtitleToPlayers(PlayerUtils.getAllPlayers(), player.getStyledDisplayName(), Text.literal("ran out of time!"), 20, 80, 20);
+        OtherUtils.broadcastMessage(Text.literal("").append(player.getStyledDisplayName()).append(Text.of(" ran out of time.")));
     }
 }

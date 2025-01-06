@@ -48,6 +48,26 @@ public class OtherUtils {
         return value;
     }
 
+    public static String formatSecondsToReadable(int seconds) {
+        boolean isNegative = seconds < 0;
+        seconds = Math.abs(seconds);
+
+        int hours = seconds / 3600;
+        int remainingSeconds = seconds % 3600;
+        int minutes = remainingSeconds / 60;
+        int secs = remainingSeconds % 60;
+
+        if (hours > 0 && minutes == 0 && secs == 0) {
+            return (isNegative ? "-" : "+") + hours + (hours == 1 ? " hour" : " hours");
+        } else if (hours == 0 && minutes > 0 && secs == 0) {
+            return (isNegative ? "-" : "+") + minutes + (minutes == 1 ? " minute" : " minutes");
+        } else if (hours == 0 && minutes == 0 && secs > 0) {
+            return (isNegative ? "-" : "+") + secs + (secs == 1 ? " second" : " seconds");
+        } else {
+            return String.format("%s%d:%02d:%02d", isNegative ? "-" : "+", hours, minutes, secs);
+        }
+    }
+
     public static int minutesToTicks(int mins) {
         return mins*60*20;
     }

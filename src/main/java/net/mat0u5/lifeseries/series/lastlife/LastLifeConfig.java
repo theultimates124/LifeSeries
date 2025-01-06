@@ -60,13 +60,13 @@ public class LastLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
-        properties.setProperty("max_player_health", "20");
-        properties.setProperty("random_lives_min", "2");
-        properties.setProperty("random_lives_max", "6");
-        properties.setProperty("givelife_lives_max", "99");
-        properties.setProperty("custom_enchanter_algorithm", "true");
-        properties.setProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
-        properties.setProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
-        properties.setProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");
+        getOrCreateProperty("max_player_health", "20");
+        getOrCreateProperty("random_lives_min", "2");
+        getOrCreateProperty("random_lives_max", "6");
+        getOrCreateProperty("givelife_lives_max", "99");
+        getOrCreateProperty("custom_enchanter_algorithm", "true");
+        getOrCreateProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
+        getOrCreateProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
+        getOrCreateProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");
     }
 }
