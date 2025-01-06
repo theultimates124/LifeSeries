@@ -2,8 +2,6 @@ package net.mat0u5.lifeseries.series.secretlife;
 
 import me.mrnavastar.sqlib.api.DataContainer;
 import me.mrnavastar.sqlib.api.types.JavaTypes;
-import me.mrnavastar.sqlib.api.types.MinecraftTypes;
-import me.mrnavastar.sqlib.api.types.SQLibType;
 import net.mat0u5.lifeseries.config.DatabaseManager;
 import net.minecraft.util.math.BlockPos;
 
@@ -14,10 +12,18 @@ import java.util.Optional;
 public class SecretLifeDatabase extends DatabaseManager {
     public static void loadLocations() {
         for (DataContainer container : secretlife.getContainers()) {
-            TaskManager.successButtonPos = container.get(MinecraftTypes.BLOCKPOS, "successButtonPos").orElse(null);
-            TaskManager.rerollButtonPos = container.get(MinecraftTypes.BLOCKPOS, "rerollButtonPos").orElse(null);
-            TaskManager.failButtonPos = container.get(MinecraftTypes.BLOCKPOS, "failButtonPos").orElse(null);
-            TaskManager.itemSpawnerPos = container.get(MinecraftTypes.BLOCKPOS, "itemSpawnerPos").orElse(null);
+            String name = container.get(JavaTypes.STRING, "name").orElse(null);
+            if (name == null) continue;
+            Integer x = container.get(JavaTypes.INT, "x").orElse(null);
+            Integer y = container.get(JavaTypes.INT, "y").orElse(null);
+            Integer z = container.get(JavaTypes.INT, "z").orElse(null);
+
+            if (x == null || y == null || z == null) continue;
+            BlockPos blockPos = new BlockPos(x, y, z);
+            if (name.equalsIgnoreCase("successButtonPos")) TaskManager.successButtonPos = blockPos;
+            else if (name.equalsIgnoreCase("rerollButtonPos")) TaskManager.rerollButtonPos = blockPos;
+            else if (name.equalsIgnoreCase("failButtonPos")) TaskManager.failButtonPos = blockPos;
+            else if (name.equalsIgnoreCase("itemSpawnerPos")) TaskManager.itemSpawnerPos = blockPos;
             return;
         }
     }
@@ -26,14 +32,34 @@ public class SecretLifeDatabase extends DatabaseManager {
         for (DataContainer container : secretlife.getContainers()) {
             container.delete();
         }
-        DataContainer container = secretlife.createContainer();
         if (TaskManager.successButtonPos != null) {
-            SQLibType<BlockPos> bp = MinecraftTypes.BLOCKPOS;
-            container.put(bp, "successButtonPos", TaskManager.successButtonPos);
+            DataContainer container = secretlife.createContainer();
+            container.put(JavaTypes.STRING, "name", "successButtonPos");
+            container.put(JavaTypes.INT, "x", TaskManager.successButtonPos.getX());
+            container.put(JavaTypes.INT, "y", TaskManager.successButtonPos.getY());
+            container.put(JavaTypes.INT, "z", TaskManager.successButtonPos.getZ());
         }
-        if (TaskManager.rerollButtonPos != null) container.put(MinecraftTypes.BLOCKPOS, "rerollButtonPos", TaskManager.rerollButtonPos);
-        if (TaskManager.failButtonPos != null) container.put(MinecraftTypes.BLOCKPOS, "failButtonPos", TaskManager.failButtonPos);
-        if (TaskManager.itemSpawnerPos != null) container.put(MinecraftTypes.BLOCKPOS, "itemSpawnerPos", TaskManager.itemSpawnerPos);
+        if (TaskManager.rerollButtonPos != null){
+            DataContainer container = secretlife.createContainer();
+            container.put(JavaTypes.STRING, "name", "rerollButtonPos");
+            container.put(JavaTypes.INT, "x", TaskManager.rerollButtonPos.getX());
+            container.put(JavaTypes.INT, "y", TaskManager.rerollButtonPos.getY());
+            container.put(JavaTypes.INT, "z", TaskManager.rerollButtonPos.getZ());
+        }
+        if (TaskManager.failButtonPos != null){
+            DataContainer container = secretlife.createContainer();
+            container.put(JavaTypes.STRING, "name", "failButtonPos");
+            container.put(JavaTypes.INT, "x", TaskManager.failButtonPos.getX());
+            container.put(JavaTypes.INT, "y", TaskManager.failButtonPos.getY());
+            container.put(JavaTypes.INT, "z", TaskManager.failButtonPos.getZ());
+        }
+        if (TaskManager.itemSpawnerPos != null){
+            DataContainer container = secretlife.createContainer();
+            container.put(JavaTypes.STRING, "name", "itemSpawnerPos");
+            container.put(JavaTypes.INT, "x", TaskManager.itemSpawnerPos.getX());
+            container.put(JavaTypes.INT, "y", TaskManager.itemSpawnerPos.getY());
+            container.put(JavaTypes.INT, "z", TaskManager.itemSpawnerPos.getZ());
+        }
     }
 
     public static void deleteLocations() {

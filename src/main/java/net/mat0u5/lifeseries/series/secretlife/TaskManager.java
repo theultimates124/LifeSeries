@@ -517,6 +517,7 @@ public class TaskManager {
             }
         }
         if (!searchingForLocations) return;
+        if (successButtonPos == null || rerollButtonPos == null || failButtonPos == null) return;
         BlockPos placePos = pos.offset(hitResult.getSide());
         TaskScheduler.scheduleTask(1, () -> {
             if (world.getBlockState(placePos).getBlock().getName().getString().equalsIgnoreCase("Bedrock")) {

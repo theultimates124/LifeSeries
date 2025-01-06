@@ -197,6 +197,7 @@ public class SecretLife extends Series {
 
     @Override
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
+        System.out.println("onPlayerDamage_"+amount);
         syncPlayerHealth(player);
     }
 
@@ -215,7 +216,7 @@ public class SecretLife extends Series {
             setPlayerHealth(player, MAX_HEALTH);
             player.setHealth((float) MAX_HEALTH);
         }
-        TaskManager.checkSecretLifePositions();
+        TaskScheduler.scheduleTask(75, TaskManager::checkSecretLifePositions);
         if (TaskManager.tasksChosen && !TaskManager.tasksChosenFor.contains(player.getUuid())) {
             TaskScheduler.scheduleTask(100, () -> {
                 TaskManager.chooseTasks(List.of(player), null);
@@ -301,24 +302,17 @@ public class SecretLife extends Series {
         Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(health);
          //?} else
         /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(health);*/
-
         if (player.getMaxHealth() > player.getHealth() && !player.isDead()) {
             player.setHealth(player.getMaxHealth());
         }
     }
 
     public double getPlayerHealth(ServerPlayerEntity player) {
-        //? if <=1.21 {
-        return player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH);
-         //?} else
-        /*return player.getAttributeBaseValue(EntityAttributes.MAX_HEALTH);*/
+        return player.getMaxHealth();
     }
 
     public double getRoundedHealth(ServerPlayerEntity player) {
-        //? if <=1.21 {
-        return Math.floor(player.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH)*10)/10.0;
-         //?} else
-        /*return Math.floor(player.getAttributeBaseValue(EntityAttributes.MAX_HEALTH)*10)/10.0;*/
+        return Math.floor(player.getMaxHealth()*10)/10.0;
     }
 
     public void syncPlayerHealth(ServerPlayerEntity player) {
