@@ -4,7 +4,7 @@ import net.mat0u5.lifeseries.Main;
 
 public class MainConfig extends ConfigManager {
     public MainConfig() {
-        super("./config", Main.MOD_ID+".properties");
+        super("./config/lifeseries/main", Main.MOD_ID+".properties");
     }
     @Override
     public void defaultProperties() {

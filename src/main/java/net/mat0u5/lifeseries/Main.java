@@ -30,7 +30,7 @@ import java.util.List;
 
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "dev-1.2.1.9";
+	public static final String MOD_VERSION = "dev-1.2.1.10";
 	public static final String MOD_ID = "lifeseries";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ConfigManager config;
@@ -43,6 +43,7 @@ public class Main implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		ConfigManager.moveOldMainFileIfExists();
 		config = new MainConfig();
 
 		String series = config.getOrCreateProperty("currentSeries", "unassigned");

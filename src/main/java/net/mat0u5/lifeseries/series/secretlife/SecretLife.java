@@ -12,6 +12,7 @@ import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -197,7 +198,9 @@ public class SecretLife extends Series {
 
     @Override
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
-        System.out.println("onPlayerDamage_"+amount);
+        if (player.hasStatusEffect(StatusEffects.HEALTH_BOOST)) {
+            player.removeStatusEffect(StatusEffects.HEALTH_BOOST);
+        }
         syncPlayerHealth(player);
     }
 

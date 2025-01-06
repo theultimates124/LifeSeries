@@ -1,6 +1,13 @@
 package net.mat0u5.lifeseries.config;
 
+import net.mat0u5.lifeseries.Main;
+import net.minecraft.entity.ai.pathing.Path;
+
+import javax.swing.text.DefaultEditorKit;
 import java.io.*;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 
 public abstract class ConfigManager {
@@ -26,6 +33,30 @@ public abstract class ConfigManager {
         getOrCreateProperty("auto_keep_inventory", "true");
         getOrCreateProperty("players_drop_items_on_last_death", "false");
         getOrCreateProperty("show_death_title_on_last_death", "true");
+    }
+
+    public static void moveOldMainFileIfExists() {
+        File newFolder = new File("./config/lifeseries/main/");
+        if (!newFolder.exists()) {
+            newFolder.mkdirs();
+        }
+
+        File oldFile = new File("./config/"+ Main.MOD_ID+".properties");
+        if (!oldFile.exists()) return;
+        File newFile = new File("./config/lifeseries/main/"+ Main.MOD_ID+".properties");
+        if (newFile.exists()) {
+            oldFile.delete();
+            Main.LOGGER.info("Deleted old config file.");
+            return;
+        }
+        else {
+            try {
+                Files.move(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Main.LOGGER.info("Moved old config file.");
+            } catch (IOException e) {
+                Main.LOGGER.info("Failed to move old config file.");
+            }
+        }
     }
 
     private void createFileIfNotExists() {
