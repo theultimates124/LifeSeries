@@ -110,8 +110,13 @@ public class Events {
     }
 
     public static ActionResult onBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
-        if (currentSeries instanceof SecretLife) {
-            TaskManager.onBlockUse((ServerPlayerEntity) player, (ServerWorld) world, hitResult);
+        if (currentSeries instanceof SecretLife &&
+            player instanceof ServerPlayerEntity serverPlayer &&
+            world instanceof ServerWorld serverWorld) {
+            TaskManager.onBlockUse(
+                    serverPlayer,
+                    serverWorld,
+                    hitResult);
         }
         if (blacklist == null) return ActionResult.PASS;
         return blacklist.onBlockUse(player,world,hand,hitResult);

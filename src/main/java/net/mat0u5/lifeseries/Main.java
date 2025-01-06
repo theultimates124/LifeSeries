@@ -30,7 +30,7 @@ import java.util.List;
 
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "1.2.1.6";
+	public static final String MOD_VERSION = "1.2.1.7";
 	public static final String MOD_ID = "lifeseries";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ConfigManager config;

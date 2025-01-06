@@ -3,7 +3,9 @@ package net.mat0u5.lifeseries.series.secretlife;
 import me.mrnavastar.sqlib.api.DataContainer;
 import me.mrnavastar.sqlib.api.types.JavaTypes;
 import me.mrnavastar.sqlib.api.types.MinecraftTypes;
+import me.mrnavastar.sqlib.api.types.SQLibType;
 import net.mat0u5.lifeseries.config.DatabaseManager;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,10 @@ public class SecretLifeDatabase extends DatabaseManager {
             container.delete();
         }
         DataContainer container = secretlife.createContainer();
-        if (TaskManager.successButtonPos != null) container.put(MinecraftTypes.BLOCKPOS, "successButtonPos", TaskManager.successButtonPos);
+        if (TaskManager.successButtonPos != null) {
+            SQLibType<BlockPos> bp = MinecraftTypes.BLOCKPOS;
+            container.put(bp, "successButtonPos", TaskManager.successButtonPos);
+        }
         if (TaskManager.rerollButtonPos != null) container.put(MinecraftTypes.BLOCKPOS, "rerollButtonPos", TaskManager.rerollButtonPos);
         if (TaskManager.failButtonPos != null) container.put(MinecraftTypes.BLOCKPOS, "failButtonPos", TaskManager.failButtonPos);
         if (TaskManager.itemSpawnerPos != null) container.put(MinecraftTypes.BLOCKPOS, "itemSpawnerPos", TaskManager.itemSpawnerPos);
