@@ -23,11 +23,19 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class BoogeymanCommand {
 
+    public static boolean isAllowed() {
+        return currentSeries.getSeries() == SeriesList.LAST_LIFE || currentSeries.getSeries() == SeriesList.LIMITED_LIFE;
+    }
+
+    public static boolean checkBanned(ServerCommandSource source) {
+        if (isAllowed()) return false;
+        source.sendError(Text.of("This command is only available when playing Last Life or Limited Life."));
+        return true;
+    }
+
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
-        if (currentSeries.getSeries() != SeriesList.LAST_LIFE &&
-            currentSeries.getSeries() != SeriesList.LIMITED_LIFE) return;
         dispatcher.register(
             literal("boogeyman")
                 .then(literal("clear")
@@ -77,7 +85,7 @@ public class BoogeymanCommand {
     }
 
     public static int cureBoogey(ServerCommandSource source, ServerPlayerEntity target) {
-
+        if (checkBanned(source)) return -1;
         if (target == null) return -1;
 
         BoogeymanManager bm = getBM();
@@ -95,6 +103,7 @@ public class BoogeymanCommand {
     }
 
     public static int addBoogey(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
 
         if (target == null) return -1;
 
@@ -113,6 +122,7 @@ public class BoogeymanCommand {
     }
 
     public static int removeBoogey(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
 
         if (target == null) return -1;
 
@@ -131,6 +141,7 @@ public class BoogeymanCommand {
     }
 
     public static int boogeyList(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         BoogeymanManager bm = getBM();
         if (bm == null) return -1;
 
@@ -144,6 +155,7 @@ public class BoogeymanCommand {
     }
 
     public static int boogeyClear(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         BoogeymanManager bm = getBM();
         if (bm == null) return -1;
 
@@ -154,6 +166,7 @@ public class BoogeymanCommand {
     }
 
     public static int boogeyChooseRandom(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         BoogeymanManager bm = getBM();
         if (bm == null) return -1;
 

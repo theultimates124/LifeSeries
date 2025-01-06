@@ -42,7 +42,7 @@ On series where bookshelves are banned, the enchantment table has been modified 
 - The config files are all located in the `config/lifeseries/*` folder. There are files for every series, where you can modify the gameplay for each one of them.<br>
 - Reload the config using `/lifeseries reload` or simply the vanilla `/reload`
 - Currently, you can modify these (check the config files themselves for more info):
-  - Default number of lives, the blacklists, Clamped enchants, spawn egg drop rates & much, much more.
+  - Default number of lives, the blacklists, Clamped enchants, spawn egg drop rates, if players drop items when they lose their last life ** and much, much more**.
   - Tasks in Secret Life (`config/lifeseries/secretlife/` folder) - there are three files, where you can modify / add / remove the easy, hard and red tasks.
 
 ## Commands & Subcommands
@@ -79,7 +79,6 @@ This command **always** available
 <summary>/lives</summary>
 
 *This command is only available when you have selected a Series.*
-*When the selected series is Limited Life, all `amount` arguments are replaced with `time` arguments.*
 - `/lives` - Shows you the amount of lives you have. *No permissions required.*
 - `/lives reload` - Reloads the teams of all players. This should never be necessary to run.
 - `/lives add <player> [amount]` - Adds `[amount]` lives to `<player>`. If `[amount]` is not specified, it defaults to 1.
@@ -129,7 +128,8 @@ This command **always** available
 <summary>Other series specific commands</summary>
 
 - `/givelife <player>` - Gives one of your lives to `<player>`. *This command is only available when playing Last Life.* *No permissions required.*
-- `/lives rollLives [<player>]` - Rolls 2-6 lives for everyone or for the `[<player>]`, if specified. *This command is only available when playing Last Life.*
+- `/lastlife rollLives [<player>]` - Rolls 2-6 lives for everyone or for the `[<player>]`, if specified. *This command is only available when playing Last Life.*
+- `/limitedlife time` - Same syntax as normal `/lives`, but with the <time> argument instead of numbers i am not writing it all down :). *This command is only available when playing Limited Life.*
 
 - `/gift <player>` - Gives one free heart to `<player>`. *This command is only available when playing Secret Life.* *No permissions required.*
 

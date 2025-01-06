@@ -25,10 +25,20 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class LastLifeCommands {
 
+
+    public static boolean isAllowed() {
+        return currentSeries.getSeries() == SeriesList.LAST_LIFE;
+    }
+
+    public static boolean checkBanned(ServerCommandSource source) {
+        if (isAllowed()) return false;
+        source.sendError(Text.of("This command is only available when playing Last Life."));
+        return true;
+    }
+
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
-        if (currentSeries.getSeries() != SeriesList.LAST_LIFE) return;
         dispatcher.register(
             literal("lastlife")
                 .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
@@ -52,7 +62,7 @@ public class LastLifeCommands {
     }
 
     public static int assignRandomLives(ServerCommandSource source, Collection<ServerPlayerEntity> players) {
-        if (!isValidCommand(source)) return -1;
+        if (checkBanned(source)) return -1;
 
         MinecraftServer server = source.getServer();
         ((LastLife) currentSeries).livesManager.assignRandomLives(players);
@@ -60,7 +70,7 @@ public class LastLifeCommands {
     }
 
     public static int giftLife(ServerCommandSource source, ServerPlayerEntity target) {
-        if (!isValidCommand(source)) return -1;
+        if (checkBanned(source)) return -1;
 
         MinecraftServer server = source.getServer();
         final ServerPlayerEntity self = source.getPlayer();
@@ -98,13 +108,5 @@ public class LastLifeCommands {
         });
 
         return 1;
-    }
-
-    public static boolean isValidCommand(ServerCommandSource source) {
-        boolean isValid = currentSeries.getSeries() == SeriesList.LAST_LIFE;
-        if (!isValid) {
-            source.sendError(Text.of("This command is only available when playing Last Life."));
-        }
-        return isValid;
     }
 }

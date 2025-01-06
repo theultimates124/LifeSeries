@@ -50,6 +50,7 @@ public class Events {
         });
         UseBlockCallback.EVENT.register(Events::onBlockUse);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> onPlayerJoin(server, handler.getPlayer()));
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> onPlayerDisconnect(server, handler.getPlayer()));
         ServerTickEvents.END_SERVER_TICK.register(Events::onServerTickEnd);
 
         ServerLivingEntityEvents.AFTER_DEATH.register(Events::onEntityDeath);
@@ -61,8 +62,10 @@ public class Events {
 
     private static void onPlayerJoin(MinecraftServer server, ServerPlayerEntity player) {
         currentSeries.onPlayerJoin(player);
-        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-        PlayerUtils.applyResorucepack(serverPlayer);
+    }
+    private static void onPlayerDisconnect(MinecraftServer server, ServerPlayerEntity player) {
+        PlayerUtils.currentResourcepacks.remove(player.getUuid());
+        currentSeries.onPlayerDisconnect(player);
     }
 
     private static void onServerStopping(MinecraftServer server) {

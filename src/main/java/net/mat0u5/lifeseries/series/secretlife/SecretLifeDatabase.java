@@ -24,7 +24,6 @@ public class SecretLifeDatabase extends DatabaseManager {
             else if (name.equalsIgnoreCase("rerollButtonPos")) TaskManager.rerollButtonPos = blockPos;
             else if (name.equalsIgnoreCase("failButtonPos")) TaskManager.failButtonPos = blockPos;
             else if (name.equalsIgnoreCase("itemSpawnerPos")) TaskManager.itemSpawnerPos = blockPos;
-            return;
         }
     }
 

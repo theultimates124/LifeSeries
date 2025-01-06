@@ -29,10 +29,19 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class SecretLifeCommands {
 
+    public static boolean isAllowed() {
+        return currentSeries.getSeries() == SeriesList.SECRET_LIFE;
+    }
+
+    public static boolean checkBanned(ServerCommandSource source) {
+        if (isAllowed()) return false;
+        source.sendError(Text.of("This command is only available when playing Secret Life."));
+        return true;
+    }
+
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
-        if (currentSeries.getSeries() != SeriesList.SECRET_LIFE) return;
 
         dispatcher.register(
             literal("health")
@@ -161,12 +170,14 @@ public class SecretLifeCommands {
     }
 
     public static int changeLocations(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         SecretLifeDatabase.deleteLocations();
         TaskManager.checkSecretLifePositions();
         return 1;
     }
 
     public static int clearTask(ServerCommandSource source, Collection<ServerPlayerEntity> targets) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         int removedFrom = 0;
         for (ServerPlayerEntity player : targets) {
@@ -177,12 +188,14 @@ public class SecretLifeCommands {
     }
 
     public static int assignTask(ServerCommandSource source, Collection<ServerPlayerEntity> targets) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         TaskManager.chooseTasks(targets.stream().toList(), null);
         return 1;
     }
 
     public static int succeedTask(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
         TaskManager.succeedTask(target);
@@ -190,6 +203,7 @@ public class SecretLifeCommands {
     }
 
     public static int failTask(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
         TaskManager.failTask(target);
@@ -197,6 +211,7 @@ public class SecretLifeCommands {
     }
 
     public static int rerollTask(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
         TaskManager.rerollTask(target);
@@ -205,6 +220,7 @@ public class SecretLifeCommands {
 
     public static List<UUID> playersGiven = new ArrayList<>();
     public static int gift(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         final ServerPlayerEntity self = source.getPlayer();
         if (self == null) return -1;
@@ -243,6 +259,7 @@ public class SecretLifeCommands {
     }
 
     public static int showHealth(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
 
         MinecraftServer server = source.getServer();
         final ServerPlayerEntity self = source.getPlayer();
@@ -263,6 +280,7 @@ public class SecretLifeCommands {
     }
 
     public static int getHealthFor(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
         if (target == null) return -1;
 
         SecretLife secretLife = (SecretLife) currentSeries;
@@ -279,6 +297,7 @@ public class SecretLifeCommands {
     }
 
     public static int syncHealth(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         SecretLife secretLife = (SecretLife) currentSeries;
         secretLife.syncAllPlayerHealth();
@@ -286,6 +305,7 @@ public class SecretLifeCommands {
     }
 
     public static int healthManager(ServerCommandSource source, ServerPlayerEntity target, double amount, boolean setNotGive) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
 
@@ -305,6 +325,7 @@ public class SecretLifeCommands {
     }
 
     public static int resetHealth(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
 
@@ -316,6 +337,7 @@ public class SecretLifeCommands {
     }
 
     public static int resetAllHealth(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
 
         SecretLife secretLife = (SecretLife) currentSeries;

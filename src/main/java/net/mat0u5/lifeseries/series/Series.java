@@ -387,5 +387,9 @@ public abstract class Series extends Session {
             /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(health);*/
         }
         reloadPlayerTeam(player);
+        PlayerUtils.applyResorucepack(player);
+    }
+
+    public void onPlayerDisconnect(ServerPlayerEntity player) {
     }
 }

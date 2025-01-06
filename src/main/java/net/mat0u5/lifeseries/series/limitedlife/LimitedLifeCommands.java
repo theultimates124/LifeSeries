@@ -23,81 +23,93 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class LimitedLifeCommands {
 
+    public static boolean isAllowed() {
+        return currentSeries.getSeries() == SeriesList.LIMITED_LIFE;
+    }
+
+    public static boolean checkBanned(ServerCommandSource source) {
+        if (isAllowed()) return false;
+        source.sendError(Text.of("This command is only available when playing Limited Life."));
+        return true;
+    }
+
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
-        if (currentSeries.getSeries() != SeriesList.LIMITED_LIFE) return;
         dispatcher.register(
-            literal("lives")
-            .executes(context -> showLives(context.getSource()))
-            .then(literal("reload")
-                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                    .executes(context -> reloadLives(
-                            context.getSource())
-                    )
-            )
-            .then(literal("add")
-                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                    .then(argument("player", EntityArgumentType.player())
-                            .then(argument("time", StringArgumentType.string())
-                                    .suggests((context, builder) -> CommandSource.suggestMatching(List.of("30m", "1h"), builder))
-                                    .executes(context -> lifeManager(
-                                            context.getSource(), EntityArgumentType.getPlayer(context, "player"),
-                                            StringArgumentType.getString(context, "time"), false, false)
-                                    )
-                            )
-                    )
-            )
-            .then(literal("remove")
-                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                    .then(argument("player", EntityArgumentType.player())
-                            .then(argument("time", StringArgumentType.string())
-                                    .suggests((context, builder) -> CommandSource.suggestMatching(List.of("30m", "1h"), builder))
-                                    .executes(context -> lifeManager(
-                                            context.getSource(), EntityArgumentType.getPlayer(context, "player"),
-                                            StringArgumentType.getString(context, "time"), false, true)
-                                    )
-                            )
-                    )
-            )
-            .then(literal("set")
-                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                    .then(argument("player", EntityArgumentType.player())
-                            .then(argument("time", StringArgumentType.string())
-                                    .suggests((context, builder) -> CommandSource.suggestMatching(List.of("8h", "16h", "24h"), builder))
-                                    .executes(context -> lifeManager(
-                                            context.getSource(), EntityArgumentType.getPlayer(context, "player"),
-                                            StringArgumentType.getString(context, "time"), true, false)
-                                    )
-                            )
-                    )
-            )
-            .then(literal("get")
-                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                    .then(argument("player", EntityArgumentType.player())
-                            .executes(context -> getLivesFor(
-                                    context.getSource(), EntityArgumentType.getPlayer(context, "player"))
-                            )
-                    )
-            )
-            .then(literal("reset")
-                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                    .then(argument("player", EntityArgumentType.player())
-                            .executes(context -> resetLives(
-                                    context.getSource(), EntityArgumentType.getPlayer(context, "player"))
-                            )
-                    )
-            )
-            .then(literal("resetAll")
-                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
-                    .executes(context -> resetAllLives(
-                            context.getSource())
-                    )
+            literal("limitedlife")
+            .then(literal("time")
+                .executes(context -> showLives(context.getSource()))
+                .then(literal("reload")
+                        .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                        .executes(context -> reloadLives(
+                                context.getSource())
+                        )
+                )
+                .then(literal("add")
+                        .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                        .then(argument("player", EntityArgumentType.player())
+                                .then(argument("time", StringArgumentType.string())
+                                        .suggests((context, builder) -> CommandSource.suggestMatching(List.of("30m", "1h"), builder))
+                                        .executes(context -> lifeManager(
+                                                context.getSource(), EntityArgumentType.getPlayer(context, "player"),
+                                                StringArgumentType.getString(context, "time"), false, false)
+                                        )
+                                )
+                        )
+                )
+                .then(literal("remove")
+                        .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                        .then(argument("player", EntityArgumentType.player())
+                                .then(argument("time", StringArgumentType.string())
+                                        .suggests((context, builder) -> CommandSource.suggestMatching(List.of("30m", "1h"), builder))
+                                        .executes(context -> lifeManager(
+                                                context.getSource(), EntityArgumentType.getPlayer(context, "player"),
+                                                StringArgumentType.getString(context, "time"), false, true)
+                                        )
+                                )
+                        )
+                )
+                .then(literal("set")
+                        .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                        .then(argument("player", EntityArgumentType.player())
+                                .then(argument("time", StringArgumentType.string())
+                                        .suggests((context, builder) -> CommandSource.suggestMatching(List.of("8h", "16h", "24h"), builder))
+                                        .executes(context -> lifeManager(
+                                                context.getSource(), EntityArgumentType.getPlayer(context, "player"),
+                                                StringArgumentType.getString(context, "time"), true, false)
+                                        )
+                                )
+                        )
+                )
+                .then(literal("get")
+                        .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                        .then(argument("player", EntityArgumentType.player())
+                                .executes(context -> getLivesFor(
+                                        context.getSource(), EntityArgumentType.getPlayer(context, "player"))
+                                )
+                        )
+                )
+                .then(literal("reset")
+                        .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                        .then(argument("player", EntityArgumentType.player())
+                                .executes(context -> resetLives(
+                                        context.getSource(), EntityArgumentType.getPlayer(context, "player"))
+                                )
+                        )
+                )
+                .then(literal("resetAll")
+                        .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                        .executes(context -> resetAllLives(
+                                context.getSource())
+                        )
+                )
             )
         );
     }
 
     public static int showLives(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
 
         MinecraftServer server = source.getServer();
         final ServerPlayerEntity self = source.getPlayer();
@@ -118,6 +130,7 @@ public class LimitedLifeCommands {
     }
 
     public static int getLivesFor(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
         if (target == null) return -1;
 
         MinecraftServer server = source.getServer();
@@ -134,12 +147,14 @@ public class LimitedLifeCommands {
     }
 
     public static int reloadLives(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         currentSeries.reloadAllPlayerTeams();
         return 1;
     }
 
     public static int lifeManager(ServerCommandSource source, ServerPlayerEntity target, String timeArgument, boolean setNotGive, boolean reverse) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
 
@@ -161,6 +176,7 @@ public class LimitedLifeCommands {
     }
 
     public static int resetLives(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
 
@@ -171,6 +187,7 @@ public class LimitedLifeCommands {
     }
 
     public static int resetAllLives(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
 
         currentSeries.resetAllPlayerLives();

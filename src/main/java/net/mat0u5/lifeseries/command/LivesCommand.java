@@ -18,11 +18,19 @@ import static net.minecraft.server.command.CommandManager.*;
 
 public class LivesCommand {
 
+    public static boolean isAllowed() {
+        return currentSeries.getSeries() != SeriesList.LIMITED_LIFE && currentSeries.getSeries() != SeriesList.UNASSIGNED;
+    }
+
+    public static boolean checkBanned(ServerCommandSource source) {
+        if (isAllowed()) return false;
+        source.sendError(Text.of("This command is not available during Limited Life."));
+        return true;
+    }
+
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
-        if (currentSeries.getSeries() == SeriesList.UNASSIGNED) return;
-        if (currentSeries.getSeries() == SeriesList.LIMITED_LIFE) return;
 
         dispatcher.register(
             literal("lives")
@@ -95,6 +103,7 @@ public class LivesCommand {
     }
 
     public static int showLives(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
 
         MinecraftServer server = source.getServer();
         final ServerPlayerEntity self = source.getPlayer();
@@ -115,6 +124,7 @@ public class LivesCommand {
     }
 
     public static int getLivesFor(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
         if (target == null) return -1;
 
         MinecraftServer server = source.getServer();
@@ -131,12 +141,14 @@ public class LivesCommand {
     }
 
     public static int reloadLives(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         currentSeries.reloadAllPlayerTeams();
         return 1;
     }
 
     public static int lifeManager(ServerCommandSource source, ServerPlayerEntity target, int amount, boolean setNotGive) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
 
@@ -156,6 +168,7 @@ public class LivesCommand {
     }
 
     public static int resetLives(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         if (target == null) return -1;
 
@@ -166,6 +179,7 @@ public class LivesCommand {
     }
 
     public static int resetAllLives(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
 
         currentSeries.resetAllPlayerLives();

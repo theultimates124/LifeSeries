@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.utils;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.common.ResourcePackRemoveS2CPacket;
 import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
@@ -71,12 +72,27 @@ public class PlayerUtils {
         return server.getPlayerManager().getPlayerList();
     }
 
+    public static HashMap<UUID, UUID> currentResourcepacks = new HashMap<>();
     public static void applyResorucepack(ServerPlayerEntity player) {
         String RESOURCEPACK_LINK = currentSeries.getResourcepackURL();
         String RESOURCEPACK_SHA1 = currentSeries.getResourcepackSHA1();
         UUID id = UUID.nameUUIDFromBytes(RESOURCEPACK_LINK.getBytes(StandardCharsets.UTF_8));
 
+        UUID oldPackId = null;
+        if (currentResourcepacks.containsKey(player.getUuid())) {
+            oldPackId = currentResourcepacks.get(player.getUuid());
+        }
+
         if (player.getServer().isDedicated()) {
+            if (Objects.equals(oldPackId, id)) {
+                return;
+            }
+            if (oldPackId != null) {
+                ResourcePackRemoveS2CPacket removePackPacket = new ResourcePackRemoveS2CPacket(Optional.of(oldPackId));
+                player.networkHandler.sendPacket(removePackPacket);
+            }
+            currentResourcepacks.put(player.getUuid(), id);
+
             ResourcePackSendS2CPacket resourcepackPacket = new ResourcePackSendS2CPacket(
                     id,
                     RESOURCEPACK_LINK,

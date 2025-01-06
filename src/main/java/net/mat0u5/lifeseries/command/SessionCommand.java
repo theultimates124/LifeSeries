@@ -24,11 +24,19 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class SessionCommand {
 
+    public static boolean isAllowed() {
+        return currentSeries.getSeries() != SeriesList.UNASSIGNED;
+    }
+
+    public static boolean checkBanned(ServerCommandSource source) {
+        if (isAllowed()) return false;
+        source.sendError(Text.of("This command is only available when you have selected a Series."));
+        return true;
+    }
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
-        if (currentSeries.getSeries() == SeriesList.UNASSIGNED) return;
         dispatcher.register(
             literal("session")
                 .then(literal("start")
@@ -102,6 +110,7 @@ public class SessionCommand {
     }
 
     public static int getTime(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         final ServerPlayerEntity self = source.getPlayer();
 
@@ -115,6 +124,7 @@ public class SessionCommand {
     }
 
     public static int displayTimer(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
         final ServerPlayerEntity self = source.getPlayer();
 
@@ -127,6 +137,7 @@ public class SessionCommand {
     }
 
     public static int startSession(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
 
         if (!currentSession.validTime()) {
@@ -150,6 +161,7 @@ public class SessionCommand {
     }
 
     public static int stopSession(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
 
         if (currentSession.status == SessionStatus.NOT_STARTED || currentSession.status == SessionStatus.FINISHED) {
@@ -163,6 +175,7 @@ public class SessionCommand {
     }
 
     public static int pauseSession(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
 
         if (currentSession.status == SessionStatus.NOT_STARTED || currentSession.status == SessionStatus.FINISHED) {
@@ -176,6 +189,7 @@ public class SessionCommand {
     }
 
     public static int skipTime(ServerCommandSource source, String timeArgument) {
+        if (checkBanned(source)) return -1;
 
         int totalTicks = OtherUtils.parseTimeFromArgument(timeArgument);
         if (totalTicks == -1) {
@@ -188,6 +202,7 @@ public class SessionCommand {
     }
 
     public static int setTime(ServerCommandSource source, String timeArgument) {
+        if (checkBanned(source)) return -1;
 
         int totalTicks = OtherUtils.parseTimeFromArgument(timeArgument);
         if (totalTicks == -1) {
@@ -201,6 +216,7 @@ public class SessionCommand {
     }
 
     public static int addTime(ServerCommandSource source, String timeArgument) {
+        if (checkBanned(source)) return -1;
 
         int totalTicks = OtherUtils.parseTimeFromArgument(timeArgument);
         if (totalTicks == -1) {
@@ -214,6 +230,7 @@ public class SessionCommand {
     }
 
     public static int removeTime(ServerCommandSource source, String timeArgument) {
+        if (checkBanned(source)) return -1;
 
         int totalTicks = OtherUtils.parseTimeFromArgument(timeArgument);
         if (totalTicks == -1) {

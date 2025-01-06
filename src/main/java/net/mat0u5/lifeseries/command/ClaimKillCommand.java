@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
@@ -24,6 +25,17 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class ClaimKillCommand {
+
+    public static boolean isAllowed() {
+        return currentSeries.getSeries() != SeriesList.UNASSIGNED;
+    }
+
+    public static boolean checkBanned(ServerCommandSource source) {
+        if (isAllowed()) return false;
+        source.sendError(Text.of("This command is only available when you have selected a Series."));
+        return true;
+    }
+
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
@@ -62,6 +74,7 @@ public class ClaimKillCommand {
     }
 
     public static int claimCredit(ServerCommandSource source, ServerPlayerEntity victim) {
+        if (checkBanned(source)) return -1;
         if (victim == null) return -1;
         PlayerEntity player = source.getPlayer();
         if (player == null) return -1;
@@ -93,6 +106,7 @@ public class ClaimKillCommand {
     }
 
     public static int claimCreditAccept(ServerCommandSource source, ServerPlayerEntity killer, ServerPlayerEntity victim) {
+        if (checkBanned(source)) return -1;
         if (killer == null) return -1;
         if (victim == null) return -1;
 

@@ -86,17 +86,8 @@ public class LifeSeriesCommand {
     }
 
     public static void setSeriesFinal(ServerCommandSource source, String setTo) {
-        currentSeries.resetAllPlayerLives();
-        config.setProperty("currentSeries", setTo);
         source.sendMessage(Text.literal("Successfully changed the series to " + setTo + ".").formatted(Formatting.GREEN));
-        source.sendMessage(Text.of("---------------"));
-        if (source.getServer().isDedicated()) {
-            source.sendMessage(Text.literal("--- You must restart the server to fully finish setting up ---").formatted(Formatting.GREEN));
-        }
-        else {
-            source.sendMessage(Text.literal("--- You must restart the client to fully finish setting up ---").formatted(Formatting.GREEN));
-        }
-        source.sendMessage(Text.of("---------------"));
+        Main.changeSeriesTo(setTo);
     }
 
     public static int getWorlds(ServerCommandSource source) {

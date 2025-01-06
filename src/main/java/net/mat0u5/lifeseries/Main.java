@@ -21,7 +21,9 @@ import net.mat0u5.lifeseries.series.lastlife.LastLife;
 import net.mat0u5.lifeseries.series.limitedlife.LimitedLife;
 import net.mat0u5.lifeseries.series.thirdlife.ThirdLife;
 import net.mat0u5.lifeseries.utils.ModRegistries;
+import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +32,7 @@ import java.util.List;
 
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "dev-1.2.1.10";
+	public static final String MOD_VERSION = "dev-1.2.1.11";
 	public static final String MOD_ID = "lifeseries";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ConfigManager config;
@@ -90,8 +92,23 @@ public class Main implements ModInitializer {
 		if (currentSeries.getSeries() == SeriesList.SECRET_LIFE) {
 			TaskManager.initialize();
 		}
+		if (currentSeries.getSeries() == SeriesList.DOUBLE_LIFE) {
+			((DoubleLife) currentSeries).loadSoulmates();
+		}
 		seriesConfig.loadProperties();
 		blacklist.reloadBlacklist();
 		currentSeries.reload();
+	}
+
+	public static void changeSeriesTo(String changeTo) {
+		config.setProperty("currentSeries", changeTo);
+		currentSeries.resetAllPlayerLives();
+		Main.parseSeries(changeTo);
+		currentSeries.initialize();
+		reload();
+
+		for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+			currentSeries.onPlayerJoin(player);
+		}
 	}
 }
