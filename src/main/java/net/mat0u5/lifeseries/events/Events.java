@@ -57,15 +57,21 @@ public class Events {
     }
 
     private static void onReload(MinecraftServer server, LifecycledResourceManager resourceManager) {
-        Main.reload();
+        try {
+            Main.reload();
+        } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
 
     private static void onPlayerJoin(MinecraftServer server, ServerPlayerEntity player) {
-        currentSeries.onPlayerJoin(player);
+        try {
+            currentSeries.onPlayerJoin(player);
+        } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
     private static void onPlayerDisconnect(MinecraftServer server, ServerPlayerEntity player) {
-        PlayerUtils.currentResourcepacks.remove(player.getUuid());
-        currentSeries.onPlayerDisconnect(player);
+        try {
+            PlayerUtils.currentResourcepacks.remove(player.getUuid());
+            currentSeries.onPlayerDisconnect(player);
+        } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
 
     private static void onServerStopping(MinecraftServer server) {
@@ -76,14 +82,16 @@ public class Events {
     }
 
     private static void onServerStart(MinecraftServer server) {
-        Main.server = server;
-        DatabaseManager.initialize();
-        currentSeries.initialize();
-        blacklist.reloadBlacklist();
-        if (currentSeries.getSeries() == SeriesList.DOUBLE_LIFE) {
-            ((DoubleLife) currentSeries).loadSoulmates();
-        }
-        new DatapackManager().onServerStarted(server);
+        try {
+            Main.server = server;
+            DatabaseManager.initialize();
+            currentSeries.initialize();
+            blacklist.reloadBlacklist();
+            if (currentSeries.getSeries() == SeriesList.DOUBLE_LIFE) {
+                ((DoubleLife) currentSeries).loadSoulmates();
+            }
+            new DatapackManager().onServerStarted(server);
+        } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
 
     private static void onServerTickEnd(MinecraftServer server) {
@@ -97,37 +105,52 @@ public class Events {
     }
 
     public static void onEntityDeath(LivingEntity entity, DamageSource source) {
-        if (entity instanceof ServerPlayerEntity) {
-            Events.onPlayerDeath((ServerPlayerEntity) entity, source);
-            return;
-        }
-        onMobDeath(entity, source);
+        try {
+            if (entity instanceof ServerPlayerEntity) {
+                Events.onPlayerDeath((ServerPlayerEntity) entity, source);
+                return;
+            }
+            onMobDeath(entity, source);
+        } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
 
     public static void onMobDeath(LivingEntity entity, DamageSource source) {
-        currentSeries.onMobDeath(entity, source);
+        try {
+            currentSeries.onMobDeath(entity, source);
+        } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
 
     public static void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
-        currentSeries.onPlayerDeath(player, source);
+        try {
+            currentSeries.onPlayerDeath(player, source);
+        } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
 
     public static ActionResult onBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
-        if (currentSeries instanceof SecretLife &&
-            player instanceof ServerPlayerEntity serverPlayer &&
-            world instanceof ServerWorld serverWorld) {
-            TaskManager.onBlockUse(
-                    serverPlayer,
-                    serverWorld,
-                    hitResult);
+        try {
+            if (currentSeries instanceof SecretLife &&
+                    player instanceof ServerPlayerEntity serverPlayer &&
+                    world instanceof ServerWorld serverWorld) {
+                TaskManager.onBlockUse(
+                        serverPlayer,
+                        serverWorld,
+                        hitResult);
+            }
+            if (blacklist == null) return ActionResult.PASS;
+            return blacklist.onBlockUse(player,world,hand,hitResult);
+        } catch(Exception e) {
+            Main.LOGGER.error(e.getMessage());
+            return ActionResult.PASS;
         }
-        if (blacklist == null) return ActionResult.PASS;
-        return blacklist.onBlockUse(player,world,hand,hitResult);
     }
 
     public static ActionResult onBlockAttack(ServerPlayerEntity player, World world, BlockPos pos) {
-        if (blacklist == null) return ActionResult.PASS;
-        if (world.isClient()) return ActionResult.PASS;
-        return blacklist.onBlockAttack(player,world,pos);
+        try {
+            if (blacklist == null) return ActionResult.PASS;
+            if (world.isClient()) return ActionResult.PASS;
+            return blacklist.onBlockAttack(player,world,pos);
+        } catch(Exception e) {
+            Main.LOGGER.error(e.getMessage());
+            return ActionResult.PASS;}
     }
 }

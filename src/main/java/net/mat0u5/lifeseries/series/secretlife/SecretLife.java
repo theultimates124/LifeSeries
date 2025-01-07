@@ -188,12 +188,12 @@ public class SecretLife extends Series {
 
     @Override
     public String getResourcepackURL() {
-        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-secretlife-88c7bc3cf13c71a3325103851754755e11ef3280/RP.zip";
+        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-secretlife-f10f653082b8ac980648fa5a89ea3372d4f1bd35/RP.zip";
     }
 
     @Override
     public String getResourcepackSHA1() {
-        return "10cafd881ae1c8cdbc76b2627e175657cf3c7b52";
+        return "674ea81fd14089bb2657d690f1b050b43ff38169";
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.series;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
+import net.mat0u5.lifeseries.series.secretlife.TaskManager;
 import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -38,11 +39,11 @@ public abstract class Series extends Session {
     public abstract ConfigManager getConfig();
 
     public String getResourcepackURL() {
-        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-main-0c89c6fd068f52aeb882e1c0bda935eb46f24331/RP.zip";
+        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-main-2f7d9b9783e5bb1f9f096e5e4e82a036a6a43ca8/RP.zip";
     }
 
     public String getResourcepackSHA1() {
-        return "7f4eba01453f6cf58bf08131fc5576f5ed873679";
+        return "1a8efd8593c0dbec2558d4286e8250e09a5ef99a";
     }
 
     public Blacklist createBlacklist() {
@@ -388,6 +389,11 @@ public abstract class Series extends Session {
         }
         reloadPlayerTeam(player);
         PlayerUtils.applyResorucepack(player);
+
+        TaskScheduler.scheduleTask(100, () -> {
+            OtherUtils.broadcastMessageToAdmins(Text.of("Use §b'/session timer set <time>'§f to set the desired session time."));
+            OtherUtils.broadcastMessageToAdmins(Text.of("After that, use §b'/session start'§f to start the session."));
+        });
     }
 
     public void onPlayerDisconnect(ServerPlayerEntity player) {
