@@ -30,6 +30,8 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.seriesConfig;
 
 public class SecretLife extends Series {
+    public static final String RESOURCEPACK_SECRETLIFE_URL = "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-secretlife-bf78b374a583c05fdb1919a0889c55f377b1a41c/RP.zip";
+    public static final String RESOURCEPACK_SECRETLIFE_SHA ="bc8e497f88e1c8fe160858dbb2b61908deb30b88";
     public static double MAX_HEALTH = 60.0d;
     public ItemSpawner itemSpawner;
     SessionAction taskWarningAction = new SessionAction(OtherUtils.minutesToTicks(-5)+1) {
@@ -184,16 +186,6 @@ public class SecretLife extends Series {
                 List.of(Text.of("§5§oEating this might help you. Or maybe not..."))
         );
         itemSpawner.addItem(patat, 1);
-    }
-
-    @Override
-    public String getResourcepackURL() {
-        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-secretlife-f10f653082b8ac980648fa5a89ea3372d4f1bd35/RP.zip";
-    }
-
-    @Override
-    public String getResourcepackSHA1() {
-        return "674ea81fd14089bb2657d690f1b050b43ff38169";
     }
 
     @Override

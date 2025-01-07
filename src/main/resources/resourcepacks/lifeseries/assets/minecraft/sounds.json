@@ -1,0 +1,37 @@
+{
+    "lastlife_boogeyman_wait": {
+        "sounds": [
+            "lastlife/boogeyman_wait"
+        ]
+    },
+    "lastlife_boogeyman_yes": {
+        "sounds": [
+            "lastlife/boogeyman_yes"
+        ]
+    },
+    "lastlife_boogeyman_no": {
+        "sounds": [
+            "lastlife/boogeyman_no"
+        ]
+    },
+    "doublelife_soulmate_wait": {
+        "sounds": [
+            "doublelife/soulmate_wait"
+        ]
+    },
+    "doublelife_soulmate_chosen": {
+        "sounds": [
+            "doublelife/soulmate_chosen"
+        ]
+    },
+    "secretlife_task": {
+        "sounds": [
+            "secretlife/task"
+        ]
+    },
+    "secretlife_life": {
+        "sounds": [
+            "secretlife/life"
+        ]
+    }
+}

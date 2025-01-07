@@ -1,5 +1,11 @@
 package net.mat0u5.lifeseries.utils;
 
+import net.mat0u5.lifeseries.series.Series;
+import net.mat0u5.lifeseries.series.secretlife.SecretLife;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.common.ResourcePackRemoveS2CPacket;
@@ -72,36 +78,39 @@ public class PlayerUtils {
         return server.getPlayerManager().getPlayerList();
     }
 
-    public static HashMap<UUID, UUID> currentResourcepacks = new HashMap<>();
     public static void applyResorucepack(ServerPlayerEntity player) {
-        String RESOURCEPACK_LINK = currentSeries.getResourcepackURL();
-        String RESOURCEPACK_SHA1 = currentSeries.getResourcepackSHA1();
-        UUID id = UUID.nameUUIDFromBytes(RESOURCEPACK_LINK.getBytes(StandardCharsets.UTF_8));
-
-        UUID oldPackId = null;
-        if (currentResourcepacks.containsKey(player.getUuid())) {
-            oldPackId = currentResourcepacks.get(player.getUuid());
-        }
-
-        if (player.getServer().isDedicated()) {
-            if (Objects.equals(oldPackId, id)) {
-                return;
+        if (MinecraftClient.getInstance() != null) {
+            if (MinecraftClient.getInstance().player != null) {
+                if (MinecraftClient.getInstance().player.getUuid().equals(player.getUuid())) {
+                    return;
+                }
             }
-            if (oldPackId != null) {
-                ResourcePackRemoveS2CPacket removePackPacket = new ResourcePackRemoveS2CPacket(Optional.of(oldPackId));
-                player.networkHandler.sendPacket(removePackPacket);
-            }
-            currentResourcepacks.put(player.getUuid(), id);
-
-            ResourcePackSendS2CPacket resourcepackPacket = new ResourcePackSendS2CPacket(
-                    id,
-                    RESOURCEPACK_LINK,
-                    RESOURCEPACK_SHA1,
-                    false,
-                    Optional.of(Text.translatable("Life Series resourcepack."))
-            );
-            player.networkHandler.sendPacket(resourcepackPacket);
         }
+        applySingleResourcepack(player, Series.RESOURCEPACK_MAIN_URL, Series.RESOURCEPACK_MAIN_SHA, "Life Series Main Resourcepack.");
+        if (currentSeries instanceof SecretLife) {
+            applySingleResourcepack(player, SecretLife.RESOURCEPACK_SECRETLIFE_URL, SecretLife.RESOURCEPACK_SECRETLIFE_SHA, "Secret Life Resourcepack.");
+        }
+        else {
+            removeSingleResourcepack(player, SecretLife.RESOURCEPACK_SECRETLIFE_URL);
+        }
+    }
+
+    private static void applySingleResourcepack(ServerPlayerEntity player, String link, String sha1, String message) {
+        UUID id = UUID.nameUUIDFromBytes(link.getBytes(StandardCharsets.UTF_8));
+        ResourcePackSendS2CPacket resourcepackPacket = new ResourcePackSendS2CPacket(
+                id,
+                link,
+                sha1,
+                false,
+                Optional.of(Text.translatable(message))
+        );
+        player.networkHandler.sendPacket(resourcepackPacket);
+    }
+
+    private static void removeSingleResourcepack(ServerPlayerEntity player, String link) {
+        UUID id = UUID.nameUUIDFromBytes(link.getBytes(StandardCharsets.UTF_8));
+        ResourcePackRemoveS2CPacket removePackPacket = new ResourcePackRemoveS2CPacket(Optional.of(id));
+        player.networkHandler.sendPacket(removePackPacket);
     }
 
     public static List<ItemStack> getPlayerInventory(ServerPlayerEntity player) {

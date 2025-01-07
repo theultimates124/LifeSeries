@@ -35,18 +35,19 @@ public class UnassignedSeries extends Series {
     }
 
     public void broadcastNotice() {
-        OtherUtils.broadcastMessage(Text.literal("[LifeSeries] You must select a series with ").formatted(Formatting.RED)
-                .append(Text.literal("'/lifeseries setSeries <series>'").formatted(Formatting.GRAY)));
-        OtherUtils.broadcastMessage(Text.literal("You must be an admin to use this command.").formatted(Formatting.RED));
-        Text text = Text.literal("§7Click ").append(
-                Text.literal("here")
-                        .styled(style -> style
-                                .withColor(Formatting.WHITE)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/QWJxfb4zQZ"))
-                                .withUnderline(true)
-                        )).append(Text.of("§7 to join the mod development discord if you have any questions, issues, requests, or if you just want to hang out :)"));
-        OtherUtils.broadcastMessage(text);
-        /*
-        */
+        if (!showedBroadcastThisTick) {
+            OtherUtils.broadcastMessage(Text.literal("[LifeSeries] You must select a series with ").formatted(Formatting.RED)
+                    .append(Text.literal("'/lifeseries setSeries <series>'").formatted(Formatting.GRAY)));
+            OtherUtils.broadcastMessage(Text.literal("You must be an admin to use this command.").formatted(Formatting.RED));
+            Text text = Text.literal("§7Click ").append(
+                    Text.literal("here")
+                            .styled(style -> style
+                                    .withColor(Formatting.WHITE)
+                                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/QWJxfb4zQZ"))
+                                    .withUnderline(true)
+                            )).append(Text.of("§7 to join the mod development discord if you have any questions, issues, requests, or if you just want to hang out :)"));
+            OtherUtils.broadcastMessage(text);
+        }
+        showedBroadcastThisTick = true;
     }
 }

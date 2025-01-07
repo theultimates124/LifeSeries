@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.config.DatabaseManager;
 import net.mat0u5.lifeseries.config.DatapackManager;
+import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.mat0u5.lifeseries.series.secretlife.SecretLife;
@@ -69,7 +70,6 @@ public class Events {
     }
     private static void onPlayerDisconnect(MinecraftServer server, ServerPlayerEntity player) {
         try {
-            PlayerUtils.currentResourcepacks.remove(player.getUuid());
             currentSeries.onPlayerDisconnect(player);
         } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
@@ -96,6 +96,9 @@ public class Events {
 
     private static void onServerTickEnd(MinecraftServer server) {
         try {
+            if (Series.showedBroadcastThisTick) {
+                Series.showedBroadcastThisTick = false;
+            }
             if (Main.currentSession != null) {
                 Main.currentSession.tick(server);
             }

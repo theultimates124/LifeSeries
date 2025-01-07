@@ -33,18 +33,13 @@ import java.util.*;
 import static net.mat0u5.lifeseries.Main.*;
 
 public abstract class Series extends Session {
+    public static final String RESOURCEPACK_MAIN_URL = "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-main-d0371a5550078676058b12888489b6b9209f6e31/RP.zip";
+    public static final String RESOURCEPACK_MAIN_SHA ="5be356bbaddf78e57487e6e8a1aec7a15b368b93";
+    public static boolean showedBroadcastThisTick = false;
     public boolean NO_HEALING = false;
 
     public abstract SeriesList getSeries();
     public abstract ConfigManager getConfig();
-
-    public String getResourcepackURL() {
-        return "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-main-2f7d9b9783e5bb1f9f096e5e4e82a036a6a43ca8/RP.zip";
-    }
-
-    public String getResourcepackSHA1() {
-        return "1a8efd8593c0dbec2558d4286e8250e09a5ef99a";
-    }
 
     public Blacklist createBlacklist() {
         return new Blacklist();
@@ -388,12 +383,17 @@ public abstract class Series extends Session {
             /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(health);*/
         }
         reloadPlayerTeam(player);
-        PlayerUtils.applyResorucepack(player);
-
-        TaskScheduler.scheduleTask(100, () -> {
-            OtherUtils.broadcastMessageToAdmins(Text.of("Use §b'/session timer set <time>'§f to set the desired session time."));
-            OtherUtils.broadcastMessageToAdmins(Text.of("After that, use §b'/session start'§f to start the session."));
+        TaskScheduler.scheduleTask(1, () -> {
+            PlayerUtils.applyResorucepack(player);
         });
+
+        if (!showedBroadcastThisTick) {
+            TaskScheduler.scheduleTask(100, () -> {
+                OtherUtils.broadcastMessageToAdmins(Text.of("Use §b'/session timer set <time>'§f to set the desired session time."));
+                OtherUtils.broadcastMessageToAdmins(Text.of("After that, use §b'/session start'§f to start the session."));
+            });
+        }
+        showedBroadcastThisTick = true;
     }
 
     public void onPlayerDisconnect(ServerPlayerEntity player) {
