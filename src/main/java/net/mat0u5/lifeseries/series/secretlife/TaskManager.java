@@ -240,6 +240,7 @@ public class TaskManager {
     }
 
     public static void addHealthThenItems(ServerPlayerEntity player, int addHealth) {
+        if (server == null) return;
         if (addHealth == 0) {
             secretKeeperBeingUsed = false;
             return;
@@ -297,6 +298,7 @@ public class TaskManager {
     }
 
     public static void succeedTask(ServerPlayerEntity player) {
+        if (server == null) return;
         if (!hasSessionStarted(player)) return;
         if (isBeingUsed(player)) return;
         SecretLife series = (SecretLife) currentSeries;
@@ -386,6 +388,7 @@ public class TaskManager {
     }
 
     public static void failTask(ServerPlayerEntity player) {
+        if (server == null) return;
         if (!hasSessionStarted(player)) return;
         if (isBeingUsed(player)) return;
         SecretLife series = (SecretLife) currentSeries;

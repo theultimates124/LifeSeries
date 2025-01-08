@@ -143,12 +143,14 @@ public class DoubleLife extends Series {
     }
 
     public boolean isSoulmateOnline(ServerPlayerEntity player) {
+        if (server == null) return false;
         if (!hasSoulmate(player)) return false;
         UUID soulmateUUID = soulmates.get(player.getUuid());
         return server.getPlayerManager().getPlayer(soulmateUUID) != null;
     }
 
     public ServerPlayerEntity getSoulmate(ServerPlayerEntity player) {
+        if (server == null) return null;
         if (!isSoulmateOnline(player)) return null;
         UUID soulmateUUID = soulmates.get(player.getUuid());
         return server.getPlayerManager().getPlayer(soulmateUUID);

@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series;
 
+import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.utils.ItemStackUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.block.Block;
@@ -124,6 +125,7 @@ public class Blacklist {
     }
 
     public List<RegistryKey<Enchantment>> getClampedEnchants() {
+        if (server == null) return new ArrayList<>();
 
         if (loadedListEnchants != null) return loadedListEnchants;
         List<RegistryKey<Enchantment>> newList = new ArrayList<>();
@@ -158,6 +160,7 @@ public class Blacklist {
     }
 
     public void reloadBlacklist() {
+        if (Main.server == null) return;
         loadedListItem = null;
         loadedListBlock = null;
         loadedListEnchants = null;
@@ -197,6 +200,7 @@ public class Blacklist {
     }
 
     public void onInventoryUpdated(PlayerEntity player, PlayerInventory inventory, CallbackInfo ci) {
+        if (Main.server == null) return;
         if (player.isCreative() && seriesConfig.getOrCreateBoolean("creative_ignore_blacklist", true)) return;
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack stack = inventory.getStack(i);

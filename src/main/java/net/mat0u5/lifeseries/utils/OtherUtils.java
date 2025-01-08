@@ -108,6 +108,7 @@ public class OtherUtils {
     }
 
     public static void executeCommand(String command) {
+        if (server == null) return;
         CommandManager manager = server.getCommandManager();
         ServerCommandSource commandSource = server.getCommandSource().withSilent();
         manager.executeWithPrefix(commandSource, command);

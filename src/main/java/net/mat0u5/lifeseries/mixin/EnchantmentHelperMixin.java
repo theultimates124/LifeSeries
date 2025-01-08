@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.mixin;
 
 import com.google.common.collect.Lists;
+import net.mat0u5.lifeseries.Main;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
@@ -24,6 +25,7 @@ import static net.mat0u5.lifeseries.Main.*;
 public class EnchantmentHelperMixin {
     @Inject(method = "getPossibleEntries", at = @At("HEAD"), cancellable = true)
     private static void getPossibleEntries(int level, ItemStack stack, Stream<RegistryEntry<Enchantment>> possibleEnchantments, CallbackInfoReturnable<List<EnchantmentLevelEntry>> cir) {
+        if (Main.server == null) return;
         if (seriesConfig.getOrCreateBoolean("custom_enchanter_algorithm", false)) {
             customEnchantmentTableAlgorithm(level, stack, possibleEnchantments, cir);
         }

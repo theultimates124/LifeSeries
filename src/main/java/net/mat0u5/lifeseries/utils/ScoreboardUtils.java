@@ -7,33 +7,35 @@ import static net.mat0u5.lifeseries.Main.server;
 
 public class ScoreboardUtils {
 
-    public static ScoreboardObjective createObjective(String name) {
-        return createObjective(name, name, ScoreboardCriterion.DUMMY);
+    public static void createObjective(String name) {
+        createObjective(name, name, ScoreboardCriterion.DUMMY);
     }
 
     public static ScoreboardObjective createObjective(String name, String displayName, ScoreboardCriterion criterion) {
+        if (server == null) return null;
         Scoreboard scoreboard = server.getScoreboard();
         if (scoreboard.getNullableObjective(name) != null) return null;
         return scoreboard.addObjective(name, criterion, Text.literal(displayName), criterion.getDefaultRenderType(), false, null);
     }
 
-    public static boolean removeObjective(String name) {
+    public static void removeObjective(String name) {
+        if (server == null) return;
         Scoreboard scoreboard = server.getScoreboard();
         ScoreboardObjective objective = scoreboard.getNullableObjective(name);
-        if (objective == null) return false;
+        if (objective == null) return;
         scoreboard.removeObjective(objective);
-        return true;
     }
 
-    public static boolean setScore(ScoreHolder holder, String objectiveName, int score) {
+    public static void setScore(ScoreHolder holder, String objectiveName, int score) {
+        if (server == null) return;
         Scoreboard scoreboard = server.getScoreboard();
         ScoreboardObjective objective = scoreboard.getNullableObjective(objectiveName);
-        if (objective == null) return false;
+        if (objective == null) return;
         scoreboard.getOrCreateScore(holder, objective).setScore(score);
-        return true;
     }
 
     public static Integer getScore(ScoreHolder holder, String objectiveName) {
+        if (server == null) return null;
         Scoreboard scoreboard = server.getScoreboard();
         ScoreboardObjective objective = scoreboard.getNullableObjective(objectiveName);
         if (objective == null) return -1;
@@ -42,11 +44,11 @@ public class ScoreboardUtils {
         return score.getScore();
     }
 
-    public static boolean resetScore(ScoreHolder holder, String objectiveName) {
+    public static void resetScore(ScoreHolder holder, String objectiveName) {
+        if (server == null) return;
         Scoreboard scoreboard = server.getScoreboard();
         ScoreboardObjective objective = scoreboard.getNullableObjective(objectiveName);
-        if (objective == null) return false;
+        if (objective == null) return;
         scoreboard.removeScore(holder, objective);
-        return true;
     }
 }

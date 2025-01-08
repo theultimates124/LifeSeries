@@ -19,6 +19,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potions;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -211,7 +212,9 @@ public class SecretLife extends Series {
             setPlayerHealth(player, MAX_HEALTH);
             player.setHealth((float) MAX_HEALTH);
         }
+
         TaskScheduler.scheduleTask(75, TaskManager::checkSecretLifePositions);
+
         if (TaskManager.tasksChosen && !TaskManager.tasksChosenFor.contains(player.getUuid())) {
             TaskScheduler.scheduleTask(100, () -> {
                 TaskManager.chooseTasks(List.of(player), null);

@@ -90,6 +90,7 @@ public class BoogeymanManager {
     }
 
     public void resetBoogeymen() {
+        if (server == null) return;
         for (Boogeyman boogeyman : boogeymen) {
             ServerPlayerEntity player = server.getPlayerManager().getPlayer(boogeyman.uuid);
             if (player == null) continue;
@@ -175,6 +176,7 @@ public class BoogeymanManager {
     }
 
     public void sessionEnd() {
+        if (server == null) return;
         for (Boogeyman boogeyman : boogeymen) {
             if (boogeyman.died) continue;
 

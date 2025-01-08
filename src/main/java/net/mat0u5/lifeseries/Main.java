@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.config.MainConfig;
+import net.mat0u5.lifeseries.config.UpdateChecker;
 import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
@@ -24,6 +25,7 @@ import net.mat0u5.lifeseries.utils.ModRegistries;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +34,14 @@ import java.util.List;
 
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "dev-1.2.1.13";
+	public static final String MOD_VERSION = "1.2.2";
 	public static final String MOD_ID = "lifeseries";
+	public static final String GITHUB_API_URL = "https://api.github.com/repos/Mat0u5/LifeSeries/releases/latest";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ConfigManager config;
+	public static boolean isClient = false;
+
+	@Nullable
 	public static MinecraftServer server;
 	public static Series currentSeries;
 	public static Session currentSession;
@@ -53,6 +59,7 @@ public class Main implements ModInitializer {
 		createConfigs();
 
 		ModRegistries.registerModStuff();
+		UpdateChecker.checkForUpdates();
 		LOGGER.info("Initializing Life Series...");
 	}
 

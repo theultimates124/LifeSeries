@@ -53,6 +53,7 @@ public abstract class Series extends Session {
     }
 
     public void updateStuff() {
+        if (server == null) return;
         if (server.getOverworld().getWorldBorder().getSize() > 1000000 && seriesConfig.getOrCreateBoolean("auto_set_worldborder", true)) {
             OtherUtils.executeCommand("worldborder set 500");
         }
@@ -322,9 +323,8 @@ public abstract class Series extends Session {
     }
 
     public void onPlayerDiedNaturally(ServerPlayerEntity player) {
-        if (playerNaturalDeathLog.containsKey(player.getUuid())) {
-            playerNaturalDeathLog.remove(player.getUuid());
-        }
+        if (server == null) return;
+        playerNaturalDeathLog.remove(player.getUuid());
         playerNaturalDeathLog.put(player.getUuid(), server.getTicks());
     }
 

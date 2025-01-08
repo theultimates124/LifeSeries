@@ -63,6 +63,7 @@ public class ClaimKillCommand {
     }
 
     public static List<String> getSuggestions() {
+        if (server == null) return new ArrayList<>();
         List<String> suggestions = new ArrayList<>();
         Set<UUID> recentDeaths = currentSession.playerNaturalDeathLog.keySet();
         for (UUID uuid : recentDeaths) {

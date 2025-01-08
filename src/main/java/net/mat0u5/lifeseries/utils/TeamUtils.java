@@ -11,32 +11,33 @@ import static net.mat0u5.lifeseries.Main.server;
 
 public class TeamUtils {
 
-    public static Team createTeam(String teamName, Formatting color) {
+    public static void createTeam(String teamName, Formatting color) {
+        if (server == null) return;
         Scoreboard scoreboard = server.getScoreboard();
         if (scoreboard.getTeam(teamName) != null) {
             // A team with this name already exists
-            return null;
+            return;
         }
         Team team = scoreboard.addTeam(teamName);
         team.setDisplayName(Text.literal(teamName).formatted(color));
         team.setColor(color);
-        return team;
     }
 
-    public static boolean addPlayerToTeam(String teamName, ServerPlayerEntity player) {
+    public static void addPlayerToTeam(String teamName, ServerPlayerEntity player) {
+        if (server == null) return;
         Scoreboard scoreboard = server.getScoreboard();
         Team team = scoreboard.getTeam(teamName);
 
         if (team == null) {
             // A team with this name does not exist
-            return false;
+            return;
         }
 
         scoreboard.addScoreHolderToTeam(player.getNameForScoreboard(), team);
-        return true;
     }
 
     public static boolean removePlayerFromTeam(ServerPlayerEntity player) {
+        if (server == null) return false;
         Scoreboard scoreboard = server.getScoreboard();
         String playerName = player.getNameForScoreboard();
 
@@ -51,6 +52,7 @@ public class TeamUtils {
     }
 
     public static boolean deleteTeam(String teamName) {
+        if (server == null) return false;
         Scoreboard scoreboard = server.getScoreboard();
         Team team = scoreboard.getTeam(teamName);
 
@@ -64,6 +66,7 @@ public class TeamUtils {
     }
 
     public static Team getPlayerTeam(ServerPlayerEntity player) {
+        if (server == null) return null;
         Scoreboard scoreboard = server.getScoreboard();
         return scoreboard.getScoreHolderTeam(player.getNameForScoreboard());
     }

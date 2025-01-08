@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.config.DatabaseManager;
 import net.mat0u5.lifeseries.config.DatapackManager;
+import net.mat0u5.lifeseries.config.UpdateChecker;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
@@ -65,6 +66,7 @@ public class Events {
 
     private static void onPlayerJoin(MinecraftServer server, ServerPlayerEntity player) {
         try {
+            UpdateChecker.onPlayerJoin(player);
             currentSeries.onPlayerJoin(player);
         } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
@@ -75,6 +77,9 @@ public class Events {
     }
 
     private static void onServerStopping(MinecraftServer server) {
+        try {
+            UpdateChecker.shutdownExecutor();
+        }catch (Exception e) {}
     }
 
     private static void onServerStarting(MinecraftServer server) {

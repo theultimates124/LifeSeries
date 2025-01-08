@@ -40,6 +40,7 @@ public class ItemStackUtils {
 
     public static List<Text> getLore(ItemStack itemStack) {
         LoreComponent lore = itemStack.get(DataComponentTypes.LORE);
+        if (lore == null) return new ArrayList<>();
         List<Text> lines = lore.lines();
         if (lines == null) return new ArrayList<>();
         if (lines.isEmpty()) return new ArrayList<>();
@@ -51,8 +52,7 @@ public class ItemStackUtils {
         if (mainHandItem != null) {
             if (!mainHandItem.isEmpty()) return mainHandItem;
         }
-        ItemStack offHandItem = player.getOffHandStack();
-        return offHandItem;
+        return player.getOffHandStack();
     }
 
     public static void setCustomComponentInt(ItemStack itemStack, String componentKey, int value) {
@@ -146,6 +146,7 @@ public class ItemStackUtils {
     }
 
     public static ItemStack createEnchantedBook(RegistryKey<Enchantment> enchantment, int level) {
+        if (server == null) return null;
         //? if <=1.21 {
         RegistryEntry<Enchantment> entry = server.getRegistryManager()
                 .getWrapperOrThrow(RegistryKeys.ENCHANTMENT)
