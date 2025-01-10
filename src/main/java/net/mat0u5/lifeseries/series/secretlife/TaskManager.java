@@ -454,22 +454,45 @@ public class TaskManager {
         PlayerUtils.sendTitle(player, Text.literal(finalStr+" Hearts").formatted(formatting), 20, 40, 20);
     }
 
-    public static void positionFound(BlockPos pos) {
-        if (successButtonPos == null) {
+    public static boolean alreadyHasPos(BlockPos pos) {
+        if (successButtonPos != null) {
+            if (successButtonPos.equals(pos)) return true;
+        }
+        if (rerollButtonPos != null) {
+            if (rerollButtonPos.equals(pos)) return true;
+        }
+        if (failButtonPos != null) {
+            if (failButtonPos.equals(pos)) return true;
+        }
+        if (itemSpawnerPos != null) {
+            if (itemSpawnerPos.equals(pos)) return true;
+        }
+        return false;
+    }
+
+    public static void positionFound(BlockPos pos, boolean fromButton) {
+        if (pos == null) return;
+        if (alreadyHasPos(pos)) {
+            OtherUtils.broadcastMessage(Text.literal("§c[SecretLife setup] This location is already being used."));
+            return;
+        }
+        if (successButtonPos == null && fromButton) {
             successButtonPos = pos;
             OtherUtils.broadcastMessage(Text.literal("§a[SecretLife setup 1/4] Location set."));
         }
-        else if (rerollButtonPos == null) {
+        else if (rerollButtonPos == null && fromButton) {
             rerollButtonPos = pos;
             OtherUtils.broadcastMessage(Text.literal("§a[SecretLife setup 2/4] Location set."));
         }
-        else if (failButtonPos == null) {
+        else if (failButtonPos == null && fromButton) {
             failButtonPos = pos;
             OtherUtils.broadcastMessage(Text.literal("§a[SecretLife setup 3/4] Location set."));
         }
-        else if (itemSpawnerPos == null) {
-            itemSpawnerPos = pos;
-            OtherUtils.broadcastMessage(Text.literal("§a[SecretLife] All locations have been set. If you wish to change them in the future, use §2'/secretlife changeLocations'"));
+        if (itemSpawnerPos == null && !fromButton) {
+            if (successButtonPos != null && rerollButtonPos != null && failButtonPos != null) {
+                itemSpawnerPos = pos;
+                OtherUtils.broadcastMessage(Text.literal("§a[SecretLife] All locations have been set. If you wish to change them in the future, use §2'/secretlife changeLocations'"));
+            }
         }
         SecretLifeDatabase.saveLocations();
         checkSecretLifePositions();
@@ -505,7 +528,7 @@ public class TaskManager {
         BlockPos pos = hitResult.getBlockPos();
         if (world.getBlockState(pos).getBlock().getName().getString().contains("Button")) {
             if (searchingForLocations) {
-                positionFound(pos);
+                positionFound(pos, true);
             }
             else {
                 if (pos.equals(successButtonPos)) {
@@ -524,7 +547,7 @@ public class TaskManager {
         BlockPos placePos = pos.offset(hitResult.getSide());
         TaskScheduler.scheduleTask(1, () -> {
             if (world.getBlockState(placePos).getBlock().getName().getString().equalsIgnoreCase("Bedrock")) {
-                positionFound(placePos);
+                positionFound(placePos, false);
                 world.breakBlock(placePos, false);
             }
         });

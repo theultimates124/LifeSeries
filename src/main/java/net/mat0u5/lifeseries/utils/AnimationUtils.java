@@ -2,7 +2,9 @@ package net.mat0u5.lifeseries.utils;
 
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.command.ParticleCommand;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -58,8 +60,8 @@ public class AnimationUtils {
         double offsetX = radius * Math.cos((float) angle);
         double offsetZ = radius * Math.sin((float) angle);
 
-        world.spawnParticles(
-                ParticleTypes.HAPPY_VILLAGER,
+        spawnParticles(
+                "happy_villager",
                 x + offsetX, y, z + offsetZ,
                 1, 0, 0, 0, 0
         );
@@ -106,8 +108,8 @@ public class AnimationUtils {
             double vz = dz * velocityScale;
 
             // Spawn the particle with velocity
-            world.spawnParticles(
-                    ParticleTypes.ENCHANT, // Glyph particle
+            spawnParticles(
+                    "enchant",
                     startX, startY, startZ, // Starting position
                     0, // Number of particles to display as a burst (keep 0 for velocity to work)
                     vx, vy, vz, // Velocity components
@@ -134,16 +136,9 @@ public class AnimationUtils {
                     double x = r * Math.sin(phi) * Math.cos(theta);
                     double y = r * Math.sin(phi) * Math.sin(theta);
                     double z = r * Math.cos(phi);
-
-                    // Create the particle effect with the generated color and size
-                    //? if <=1.21 {
-                    DustParticleEffect particleEffect = new DustParticleEffect(color, 1.0f);
-                     //?} else
-                    /*DustParticleEffect particleEffect = new DustParticleEffect(new Color(color.x, color.y, color.z).getRGB(), 1.0f);*/
-
                     // Spawn particle with random offset
-                    world.spawnParticles(
-                            particleEffect, // Colored particle effect
+                    spawnParticles(
+                            "dust{color:["+color.x+","+color.y+","+color.z+"],scale:1}",
                             position.getX() + x,
                             position.getY() + y,
                             position.getZ() + z,
@@ -154,6 +149,12 @@ public class AnimationUtils {
                 }
             });
         }
+    }
+
+    public static <T extends ParticleEffect> void spawnParticles(String particleName,  double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double speed) {
+        // Ugh i don't like this at all but it's necessary to group 1.21.2-3 with 1.21.4 :(
+        // Might change this later, we'll see.
+        OtherUtils.executeCommand("particle "+particleName +" "+x+" "+y+" "+z+" "+offsetX+" "+offsetY+" "+offsetZ+" "+speed+" "+count);
     }
 
 }

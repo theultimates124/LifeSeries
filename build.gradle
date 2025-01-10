@@ -35,7 +35,6 @@ loom {
 }
 
 processResources {
- inputs.property "version", stonecutter.current.version
  filesMatching("fabric.mod.json") {
   expand "version": version,
           "targetVersion": project.property('target_version'),
