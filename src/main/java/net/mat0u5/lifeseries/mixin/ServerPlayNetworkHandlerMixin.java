@@ -31,7 +31,7 @@ public class ServerPlayNetworkHandlerMixin {
             Text formattedContentText = Text.literal(formattedContent).setStyle(originalText.getStyle());
             Text finalMessage = Text.empty().append("<").append(playerNameWithFormatting).append(">").append(formattedContentText);
 
-            OtherUtils.broadcastMessage(Objects.requireNonNull(player.getServer()), finalMessage);
+            OtherUtils.broadcastMessage(finalMessage);
             ci.cancel();
         }
     }

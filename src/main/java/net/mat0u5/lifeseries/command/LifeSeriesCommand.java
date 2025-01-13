@@ -111,7 +111,7 @@ public class LifeSeriesCommand {
         Text text = Text.literal("§7Click ").append(
                 Text.literal("here")
                         .styled(style -> style
-                                .withColor(Formatting.WHITE)
+                                .withColor(Formatting.BLUE)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/QWJxfb4zQZ"))
                                 .withUnderline(true)
                         )).append(Text.of("§7 to join the mod development discord if you have any questions, issues, requests, or if you just want to hang out :)"));

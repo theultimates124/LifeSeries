@@ -2,10 +2,7 @@ package net.mat0u5.lifeseries.series.limitedlife;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.*;
-import net.mat0u5.lifeseries.utils.OtherUtils;
-import net.mat0u5.lifeseries.utils.PlayerUtils;
-import net.mat0u5.lifeseries.utils.ScoreboardUtils;
-import net.mat0u5.lifeseries.utils.TeamUtils;
+import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.server.MinecraftServer;
@@ -263,6 +260,14 @@ public class LimitedLife extends Series {
         if (!hasAssignedLives(player)) {
             setPlayerLives(player, DEFAULT_TIME);
         }
+        TaskScheduler.scheduleTask(99, () -> {
+            if (PermissionManager.isAdmin(player)) {
+                player.sendMessage(Text.of("§7Limited Life commands: §r/lifeseries, /session, /claimkill, /lives, /boogeyman"));
+            }
+            else {
+                player.sendMessage(Text.of("§7Limited Life non-admin commands: §r/claimkill, /lives"));
+            }
+        });
     }
 
     @Override

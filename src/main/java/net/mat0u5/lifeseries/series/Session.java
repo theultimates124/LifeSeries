@@ -38,7 +38,7 @@ public class Session {
             OtherUtils.broadcastMessage(Text.literal("Session ends in 30 minutes!").formatted(Formatting.GOLD));
         }
     };
-    SessionAction actionInfoAction = new SessionAction(OtherUtils.secondsToTicks(5)) {
+    SessionAction actionInfoAction = new SessionAction(OtherUtils.secondsToTicks(7)) {
         @Override
         public void trigger() {
             showActionInfo();

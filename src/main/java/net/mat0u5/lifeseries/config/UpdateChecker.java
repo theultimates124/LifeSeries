@@ -3,6 +3,10 @@ package net.mat0u5.lifeseries.config;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.mat0u5.lifeseries.Main;
+import net.mat0u5.lifeseries.series.SessionStatus;
+import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.utils.PermissionManager;
+import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
@@ -60,17 +64,30 @@ public class UpdateChecker {
         if (!updateAvailable || versionName == null) {
             return;
         }
-        Text updateText =
-                Text.literal("A new version of the mod is available ("+versionName+"). \n")
-                .append(
-                    Text.literal("Click to download on Modrinth")
+        TaskScheduler.scheduleTask(98, () -> {
+            Text discordText = Text.literal("§7Click ").append(
+                Text.literal("here")
                         .styled(style -> style
-                            .withColor(Formatting.BLUE)
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://modrinth.com/mod/life-series"))
-                            .withUnderline(true)
-                        )
-                );
-        player.sendMessage(updateText);
+                                .withColor(Formatting.BLUE)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/QWJxfb4zQZ"))
+                                .withUnderline(true)
+                        )).append(Text.of("§7 to join the mod development discord if you have any questions, issues, requests, or if you just want to hang out :)\n"));
+
+            Text updateText =
+                    Text.literal("A new version of the Life Series Mod is available ("+versionName+"). \n")
+                            .append(
+                                    Text.literal("Click to download on Modrinth\n")
+                                            .styled(style -> style
+                                                    .withColor(Formatting.BLUE)
+                                                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://modrinth.com/mod/life-series"))
+                                                    .withUnderline(true)
+                                            )
+                            );
+            if (PermissionManager.isAdmin(player)) {
+                player.sendMessage(updateText);
+                player.sendMessage(discordText);
+            }
+        });
     }
     public static void shutdownExecutor() {
         executor.shutdown();

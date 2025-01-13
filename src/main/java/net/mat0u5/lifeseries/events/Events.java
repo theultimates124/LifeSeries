@@ -17,6 +17,7 @@ import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.mat0u5.lifeseries.series.secretlife.SecretLife;
 import net.mat0u5.lifeseries.series.secretlife.TaskManager;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -25,6 +26,7 @@ import net.minecraft.resource.LifecycledResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -101,12 +103,10 @@ public class Events {
 
     private static void onServerTickEnd(MinecraftServer server) {
         try {
-            if (Series.showedBroadcastThisTick) {
-                Series.showedBroadcastThisTick = false;
-            }
             if (Main.currentSession != null) {
                 Main.currentSession.tick(server);
             }
+            OtherUtils.onTick();
         }catch(Exception e) {
             e.printStackTrace();
         }

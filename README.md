@@ -15,7 +15,7 @@ This includes automated lives tracking, automated team colors, automated session
 Join the [Discord](https://discord.gg/QWJxfb4zQZ) or make an issue if you want to submit any bugs / give suggestions.
 ## Features
 
-Currently, the first four seasons of the Life Series are implemented, the last two are much more complicated, but they are planned to be released.
+Currently, the first five seasons of the Life Series are implemented. The latest season, Wild Life, is much more complicated, but it is planned to be released.
 
 | Third Life | Last Life | Double Life | Limited Life | Secret Life | | Wild Life  |
 |------------|-----------|-------------|--------------|-------------|-|------------|

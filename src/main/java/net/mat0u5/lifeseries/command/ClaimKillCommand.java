@@ -101,7 +101,7 @@ public class ClaimKillCommand {
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/claimkill validate " + player.getNameForScoreboard() + " "+victim.getNameForScoreboard()))
                                 .withUnderline(true)
                         )).append(Text.of("§7 to accept the claim if you think it's valid."));
-        OtherUtils.broadcastMessageToAdmins(adminText);
+        OtherUtils.broadcastMessageToAdmins(adminText, 120);
 
         return 1;
     }

@@ -5,10 +5,7 @@ import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.SessionAction;
-import net.mat0u5.lifeseries.utils.OtherUtils;
-import net.mat0u5.lifeseries.utils.PlayerUtils;
-import net.mat0u5.lifeseries.utils.TaskScheduler;
-import net.mat0u5.lifeseries.utils.WorldUitls;
+import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -76,6 +73,15 @@ public class DoubleLife extends Series {
 
         ServerPlayerEntity soulmate = getSoulmate(player);
         syncPlayers(player, soulmate);
+
+        TaskScheduler.scheduleTask(99, () -> {
+            if (PermissionManager.isAdmin(player)) {
+                player.sendMessage(Text.of("§7Double Life commands: §r/lifeseries, /session, /claimkill, /lives, /soulmate"));
+            }
+            else {
+                player.sendMessage(Text.of("§7Double Life non-admin commands: §r/claimkill, /lives"));
+            }
+        });
     }
 
     @Override

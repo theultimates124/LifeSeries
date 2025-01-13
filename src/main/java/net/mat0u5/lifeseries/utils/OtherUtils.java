@@ -1,37 +1,61 @@
 package net.mat0u5.lifeseries.utils;
 
 import net.mat0u5.lifeseries.Main;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static net.mat0u5.lifeseries.Main.server;
 
 public class OtherUtils {
-
-    public static void broadcastMessage(MinecraftServer server, Text message) {
-        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
-            player.sendMessage(message, false);
-        }
-    }
+    private static HashMap<Text, Integer> cooldown = new HashMap<>();
 
     public static void broadcastMessage(Text message) {
-        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
-            player.sendMessage(message, false);
-        }
+        broadcastMessage(message, 1);
     }
 
     public static void broadcastMessageToAdmins(Text message) {
+        broadcastMessageToAdmins(message, 1);
+    }
+
+    public static void broadcastMessage(Text message, int cooldownTicks) {
+        if (cooldown.containsKey(message)) return;
+        cooldown.put(message, cooldownTicks);
+
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            player.sendMessage(message, false);
+        }
+    }
+
+    public static void broadcastMessageToAdmins(Text message, int cooldownTicks) {
+        if (cooldown.containsKey(message)) return;
+        cooldown.put(message, cooldownTicks);
+
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             if (!PermissionManager.isAdmin(player)) continue;
             player.sendMessage(message, false);
         }
         Main.LOGGER.info(message.getString());
+    }
+
+    public static void onTick() {
+        if (cooldown.isEmpty()) return;
+        HashMap<Text, Integer> newCooldowns = new HashMap<>();
+        for (Map.Entry<Text, Integer> entry : cooldown.entrySet()) {
+            Text key = entry.getKey();
+            Integer value = entry.getValue();
+            value--;
+            if (value > 0) {
+                newCooldowns.put(key, value);
+            }
+        }
+        cooldown = newCooldowns;
     }
 
     public static String formatTime(int totalTicks) {

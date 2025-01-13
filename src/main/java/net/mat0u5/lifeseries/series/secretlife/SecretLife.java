@@ -2,10 +2,7 @@ package net.mat0u5.lifeseries.series.secretlife;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.*;
-import net.mat0u5.lifeseries.utils.ItemStackUtils;
-import net.mat0u5.lifeseries.utils.OtherUtils;
-import net.mat0u5.lifeseries.utils.PlayerUtils;
-import net.mat0u5.lifeseries.utils.TaskScheduler;
+import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.component.type.PotionContentsComponent;
@@ -220,6 +217,14 @@ public class SecretLife extends Series {
                 TaskManager.chooseTasks(List.of(player), null);
             });
         }
+        TaskScheduler.scheduleTask(99, () -> {
+            if (PermissionManager.isAdmin(player)) {
+                player.sendMessage(Text.of("§7Secret Life commands: §r/lifeseries, /session, /claimkill, /lives, /gift, /task, /health, /secretlife"));
+            }
+            else {
+                player.sendMessage(Text.of("§7Secret Life non-admin commands: §r/claimkill, /lives, /gift"));
+            }
+        });
     }
 
     @Override

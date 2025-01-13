@@ -3,7 +3,9 @@ package net.mat0u5.lifeseries.series.lastlife;
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.*;
 import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.utils.PermissionManager;
 import net.mat0u5.lifeseries.utils.ScoreboardUtils;
+import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -92,6 +94,14 @@ public class LastLife extends Series {
     public void onPlayerJoin(ServerPlayerEntity player) {
         super.onPlayerJoin(player);
         boogeymanManager.onPlayerJoin(player);
+        TaskScheduler.scheduleTask(99, () -> {
+            if (PermissionManager.isAdmin(player)) {
+                player.sendMessage(Text.of("§7Last Life commands: §r/lifeseries, /session, /claimkill, /lives, /givelife, /boogeyman, /lastlife"));
+            }
+            else {
+                player.sendMessage(Text.of("§7Last Life non-admin commands: §r/claimkill, /lives, /givelife"));
+            }
+        });
     }
 
     @Override

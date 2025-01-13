@@ -4,6 +4,8 @@ import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.utils.PermissionManager;
+import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
@@ -28,6 +30,14 @@ public class ThirdLife extends Series {
             int lives = seriesConfig.getOrCreateInt("default_lives", 3);
             setPlayerLives(player, lives);
         }
+        TaskScheduler.scheduleTask(99, () -> {
+            if (PermissionManager.isAdmin(player)) {
+                player.sendMessage(Text.of("§7Third Life commands: §r/lifeseries, /session, /claimkill, /lives"));
+            }
+            else {
+                player.sendMessage(Text.of("§7Third Life non-admin commands: §r/claimkill, /lives"));
+            }
+        });
     }
 
     @Override
