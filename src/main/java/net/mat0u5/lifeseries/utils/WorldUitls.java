@@ -15,34 +15,6 @@ import java.util.List;
 import java.util.Random;
 
 public class WorldUitls {
-    static Random rnd = new Random();
-
-    public static boolean shouldChunkLoad(ServerWorld world, ChunkPos chunkPos) {
-        var border = world.getWorldBorder();
-        double minX = border.getBoundWest() - 32; // 2 chunks = 32 blocks
-        double maxX = border.getBoundEast() + 32;
-        double minZ = border.getBoundNorth() - 32;
-        double maxZ = border.getBoundSouth() + 32;
-
-        double chunkMinX = chunkPos.getStartX();
-        double chunkMaxX = chunkPos.getEndX();
-        double chunkMinZ = chunkPos.getStartZ();
-        double chunkMaxZ = chunkPos.getEndZ();
-
-        return !(chunkMaxX < minX || chunkMinX > maxX || chunkMaxZ < minZ || chunkMinZ > maxZ);
-    }
-
-    public static BlockPos getRandomCoords(World world) {
-        WorldBorder border = world.getWorldBorder();
-        double minX = border.getBoundWest();
-        double maxX = border.getBoundEast();
-        double minZ = border.getBoundNorth();
-        double maxZ = border.getBoundSouth();
-        int chosenX = (int) rnd.nextDouble(minX, maxX);
-        int chosenZ = (int) rnd.nextDouble(minZ, maxZ);
-        int safeY = (int) findSafeY(world, new Vec3d(chosenX, world.getHeight(), chosenZ));
-        return new BlockPos(chosenX, safeY, chosenZ);
-    }
 
     public static double findSafeY(World world, Vec3d pos) {
         BlockPos.Mutable mutablePos = new BlockPos.Mutable(pos.getX(), pos.getY(), pos.getZ());

@@ -36,7 +36,7 @@ loom {
 
 processResources {
  filesMatching("fabric.mod.json") {
-  expand "version": version,
+  expand "version": project.property('mod_version'),
           "targetVersion": project.property('target_version'),
           "minecraftVersion": stonecutter.current.version
  }

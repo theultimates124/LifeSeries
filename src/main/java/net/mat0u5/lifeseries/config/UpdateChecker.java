@@ -71,12 +71,12 @@ public class UpdateChecker {
                                 .withColor(Formatting.BLUE)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/QWJxfb4zQZ"))
                                 .withUnderline(true)
-                        )).append(Text.of("§7 to join the mod development discord if you have any questions, issues, requests, or if you just want to hang out :)\n"));
+                        )).append(Text.of("§7 to join the mod development discord if you have any questions, issues, requests, or if you just want to hang out :)"));
 
             Text updateText =
                     Text.literal("A new version of the Life Series Mod is available ("+versionName+"). \n")
                             .append(
-                                    Text.literal("Click to download on Modrinth\n")
+                                    Text.literal("Click to download on Modrinth")
                                             .styled(style -> style
                                                     .withColor(Formatting.BLUE)
                                                     .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://modrinth.com/mod/life-series"))

@@ -12,6 +12,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.command.WorldBorderCommand;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -20,6 +21,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.border.WorldBorder;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
@@ -221,23 +223,25 @@ public class DoubleLife extends Series {
     }
 
     public void distributePlayers() {
+        if (server == null) return;
         List<ServerPlayerEntity> players = getNonAssignedPlayers();
+        if (players.isEmpty()) return;
         PlayerUtils.playSoundToPlayers(players, SoundEvents.ENTITY_ENDERMAN_TELEPORT);
 
-        for (ServerPlayerEntity player : players) {
-            BlockPos pos;
-            do {
-                pos = WorldUitls.getRandomCoords(player.getServerWorld());
-            }
-            while(player.getServerWorld().getBlockState(pos).isLiquid());
-            Vec3d tpPos = pos.toBottomCenterPos();
-            //? if <=1.21 {
-            player.teleport(player.getServerWorld(), tpPos.getX(), tpPos.getY(), tpPos.getZ(), player.getYaw(), player.getPitch());
-             //?} else {
-            /*Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
-            player.teleport(player.getServerWorld(), tpPos.getX(), tpPos.getY(), tpPos.getZ(), flags, player.getYaw(), player.getPitch(), false);
-            *///?}
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            player.removeCommandTag("randomTeleport");
+        }
 
+        for (ServerPlayerEntity player : players) {
+            player.addCommandTag("randomTeleport");
+            player.sendMessage(Text.of("§6Woosh!"));
+        }
+        WorldBorder border = server.getOverworld().getWorldBorder();
+        OtherUtils.executeCommand("spreadplayers " + border.getCenterX() + " " + border.getCenterZ() + " 0 " + (border.getSize()/2) + " false @a[tag=randomTeleport]");
+        OtherUtils.broadcastMessageToAdmins(Text.of("Randomly distributed players."));
+
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            player.removeCommandTag("randomTeleport");
         }
     }
 
@@ -247,7 +251,7 @@ public class DoubleLife extends Series {
         if (playersToRoll.size()%2 != 0) {
             ServerPlayerEntity remove = playersToRoll.getFirst();
             playersToRoll.remove(remove);
-            OtherUtils.broadcastMessageToAdmins(Text.literal(" [DoubleLife] ").append(remove.getStyledDisplayName()).append(" was not paired with anyone, as there is an odd number of players online."));
+            OtherUtils.broadcastMessageToAdmins(Text.literal(" [DoubleLife] ").append(remove.getStyledDisplayName()).append(" was not paired with anyone, as there is an odd number of non-assigned players online."));
         }
         while(!playersToRoll.isEmpty()) {
             ServerPlayerEntity player1 = playersToRoll.get(0);

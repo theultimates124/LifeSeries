@@ -181,10 +181,10 @@ public class Session {
     public void checkPlayerPosition(ServerPlayerEntity player) {
         WorldBorder border = player.getWorld().getWorldBorder();
         double playerSize = player.getBoundingBox().getLengthX()/2;
-        double minX = border.getBoundWest() + playerSize;
-        double maxX = border.getBoundEast() - playerSize;
-        double minZ = border.getBoundNorth() + playerSize;
-        double maxZ = border.getBoundSouth() - playerSize;
+        double minX = Math.floor(border.getBoundWest()) + playerSize;
+        double maxX = Math.ceil(border.getBoundEast()) - playerSize;
+        double minZ = Math.floor(border.getBoundNorth()) + playerSize;
+        double maxZ = Math.ceil(border.getBoundSouth()) - playerSize;
 
         double playerX = player.getX();
         double playerZ = player.getZ();

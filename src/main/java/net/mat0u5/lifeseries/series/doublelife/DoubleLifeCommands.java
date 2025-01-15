@@ -153,8 +153,9 @@ public class DoubleLifeCommands {
         DoubleLife series = ((DoubleLife) currentSeries);
 
         PlayerManager playerManager = source.getServer().getPlayerManager();
-
+        boolean noSoulmates = true;
         for (Map.Entry<UUID, UUID> entry : series.soulmatesOrdered.entrySet()) {
+            noSoulmates = false;
             ServerPlayerEntity player = playerManager.getPlayer(entry.getKey());
             ServerPlayerEntity soulmate = playerManager.getPlayer(entry.getValue());
             MutableText pt1 = Text.literal(entry.getKey().toString());
@@ -167,6 +168,10 @@ public class DoubleLifeCommands {
                 pt3 = soulmate.getStyledDisplayName();
             }
             source.sendMessage(pt1.append(pt2).append(pt3));
+        }
+
+        if (noSoulmates) {
+            source.sendMessage(Text.of("There are no soulmates currently assigned."));
         }
 
 
