@@ -7,14 +7,17 @@ import net.mat0u5.lifeseries.series.wildlife.wildcards.SizeShifting;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PermissionManager;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.HashMap;
+import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.seriesConfig;
 
 public class WildLife extends Series {
+
     public HashMap<Wildcards, Wildcard> activeWildcards = new HashMap<>();
 
     @Override
@@ -43,6 +46,7 @@ public class WildLife extends Series {
                 player.sendMessage(Text.of("§7Wild Life non-admin commands: §r/claimkill, /lives"));
             }
         });
+        WildcardManager.resetWildcardsOnPlayerJoin(player);
     }
 
     @Override
@@ -66,20 +70,24 @@ public class WildLife extends Series {
     public void tickSessionOn() {
         super.tickSessionOn();
         for (Wildcard wildcard : activeWildcards.values()) {
-            wildcard.onTick();
+            wildcard.tickSessionOn();
         }
     }
 
+    @Override
+    public void tick(MinecraftServer server) {
+        super.tick(server);
+        for (Wildcard wildcard : activeWildcards.values()) {
+            wildcard.tick();
+        }
+    }
 
     @Override
     public boolean sessionStart() {
         if (super.sessionStart()) {
-            activeWildcards.clear();
-            Wildcard.chooseWildcards();
-            for (Wildcard wildcard : activeWildcards.values()) {
-                //TODO activation timer
-                wildcard.activate();
-            }
+            activeActions.addAll(
+                    List.of(WildcardManager.wildcardNotice, WildcardManager.startWildcards)
+            );
             return true;
         }
         return false;
@@ -91,7 +99,6 @@ public class WildLife extends Series {
         for (Wildcard wildcard : activeWildcards.values()) {
             wildcard.deactivate();
         }
-        activeWildcards.clear();
     }
 
     public void onJump(ServerPlayerEntity player) {
@@ -100,4 +107,5 @@ public class WildLife extends Series {
             sizeShifting.onJump(player);
         }
     }
+
 }

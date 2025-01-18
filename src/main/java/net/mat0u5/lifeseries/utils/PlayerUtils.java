@@ -79,8 +79,11 @@ public class PlayerUtils {
     public static void playSoundToPlayers(Collection<ServerPlayerEntity> players, SoundEvent sound) {
         playSoundToPlayers(players,sound,SoundCategory.MASTER,1,1);
     }
+    public static void playSoundToPlayers(Collection<ServerPlayerEntity> players, SoundEvent sound, float volume, float pitch) {
+        playSoundToPlayers(players,sound, SoundCategory.MASTER, volume, pitch);
+    }
 
-    public static void playSoundToPlayers(Collection<ServerPlayerEntity> players, SoundEvent sound, SoundCategory soundCategory, int volume, int pitch) {
+    public static void playSoundToPlayers(Collection<ServerPlayerEntity> players, SoundEvent sound, SoundCategory soundCategory, float volume, float pitch) {
         for (ServerPlayerEntity player : players) {
             player.playSoundToPlayer(sound, soundCategory, volume, pitch);
         }

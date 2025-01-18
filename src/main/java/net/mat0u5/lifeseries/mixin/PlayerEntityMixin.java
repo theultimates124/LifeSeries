@@ -39,6 +39,8 @@ public abstract class PlayerEntityMixin {
         }
     }
 
+    //? if <=1.21 {
+    
     @Inject(method = "jump", at = @At("TAIL"))
     public void onJump(CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
@@ -48,4 +50,5 @@ public abstract class PlayerEntityMixin {
             }
         }
     }
+     //?}
 }
