@@ -21,6 +21,8 @@ import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.mat0u5.lifeseries.series.lastlife.LastLife;
 import net.mat0u5.lifeseries.series.limitedlife.LimitedLife;
 import net.mat0u5.lifeseries.series.thirdlife.ThirdLife;
+import net.mat0u5.lifeseries.series.wildlife.WildLife;
+import net.mat0u5.lifeseries.series.wildlife.WildLifeConfig;
 import net.mat0u5.lifeseries.utils.ModRegistries;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.server.MinecraftServer;
@@ -34,7 +36,7 @@ import java.util.List;
 
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "dev-1.2.2.4";
+	public static final String MOD_VERSION = "dev-1.2.2.5";
 	public static final String MOD_ID = "lifeseries";
 	public static final String GITHUB_API_URL = "https://api.github.com/repos/Mat0u5/LifeSeries/releases/latest";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -82,6 +84,9 @@ public class Main implements ModInitializer {
 		if (series.equalsIgnoreCase("secretlife")) {
 			currentSeries = new SecretLife();
 		}
+		if (series.equalsIgnoreCase("wildlife")) {
+			currentSeries = new WildLife();
+		}
 		currentSession = currentSeries;
 		seriesConfig = currentSeries.getConfig();
 		blacklist = currentSeries.createBlacklist();
@@ -93,6 +98,7 @@ public class Main implements ModInitializer {
 		new DoubleLifeConfig();
 		new LimitedLifeConfig();
 		new SecretLifeConfig();
+		new WildLifeConfig();
 	}
 
 	public static void reload() {

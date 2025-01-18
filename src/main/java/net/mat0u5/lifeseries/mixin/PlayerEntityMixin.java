@@ -1,11 +1,15 @@
 package net.mat0u5.lifeseries.mixin;
 
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
+import net.mat0u5.lifeseries.series.wildlife.WildLife;
+import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.CraftingResultInventory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -22,14 +26,26 @@ public abstract class PlayerEntityMixin {
      //?} else
     /*private void onApplyDamage(ServerWorld world, DamageSource source, float amount, CallbackInfo info) {*/
         PlayerEntity player = (PlayerEntity) (Object) this;
-        currentSeries.onPlayerDamage((ServerPlayerEntity) player, source, amount);
+        if (player instanceof  ServerPlayerEntity serverPlayer) {
+            currentSeries.onPlayerDamage(serverPlayer, source, amount);
+        }
     }
 
     @Inject(method = "canFoodHeal", at = @At("HEAD"), cancellable = true)
     private void canFoodHeal(CallbackInfoReturnable<Boolean> cir) {
-        if (currentSeries instanceof DoubleLife)  {
+        if (currentSeries instanceof DoubleLife doubleLife)  {
             PlayerEntity player = (PlayerEntity) (Object) this;
-            ((DoubleLife) currentSeries).canFoodHeal(player, cir);
+            doubleLife.canFoodHeal(player, cir);
+        }
+    }
+
+    @Inject(method = "jump", at = @At("TAIL"))
+    public void onJump(CallbackInfo ci) {
+        PlayerEntity player = (PlayerEntity) (Object) this;
+        if (currentSeries instanceof WildLife wildLife) {
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                wildLife.onJump(serverPlayer);
+            }
         }
     }
 }
