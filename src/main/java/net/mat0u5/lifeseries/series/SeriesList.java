@@ -22,16 +22,12 @@ public enum SeriesList {
         return "unassigned";
     }
 
-    public static List<SeriesList> getAll() {
+    public static List<SeriesList> getAllImplemented() {
         return List.of(THIRD_LIFE,LAST_LIFE,DOUBLE_LIFE,LIMITED_LIFE,SECRET_LIFE,WILD_LIFE);
     }
 
-    public static List<SeriesList> getAllImplemented() {
-        return List.of(THIRD_LIFE,LAST_LIFE,DOUBLE_LIFE,LIMITED_LIFE,SECRET_LIFE);
-    }
-
     public static List<String> getImplementedSeriesNames() {
-        return List.of("thirdlife", "lastlife", "doublelife", "limitedlife", "secretlife");
+        return List.of("thirdlife", "lastlife", "doublelife", "limitedlife", "secretlife", "wildlife");
     }
 
     public static String getDatapackName(SeriesList series) {

@@ -104,8 +104,8 @@ public class DoubleLife extends Series {
         if (soulmate != null) {
             if (soulmate == killer) return;
         }
-        OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + " was killed by "
-                +killer.getNameForScoreboard() + ", who is not §cred name§f."));
+        OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + "§7 was killed by §f"
+                +killer.getNameForScoreboard() + "§7, who is not §cred name§7."));
     }
 
     @Override

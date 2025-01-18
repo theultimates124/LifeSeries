@@ -270,8 +270,8 @@ public class SecretLife extends Series {
             }
             return;
         }
-        OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + " was killed by "
-                +killer.getNameForScoreboard() + ". The kill was not permitted with a task."));
+        OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + "§7 was killed by §f"
+                +killer.getNameForScoreboard() + "§7, who is not §cred name§7."));
     }
 
     @Override
