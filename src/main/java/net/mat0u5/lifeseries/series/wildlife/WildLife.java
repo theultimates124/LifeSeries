@@ -3,7 +3,7 @@ package net.mat0u5.lifeseries.series.wildlife;
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.SizeShifting;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PermissionManager;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
@@ -11,14 +11,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.seriesConfig;
 
 public class WildLife extends Series {
 
-    public HashMap<Wildcards, Wildcard> activeWildcards = new HashMap<>();
 
     @Override
     public SeriesList getSeries() {
@@ -69,17 +67,13 @@ public class WildLife extends Series {
     @Override
     public void tickSessionOn() {
         super.tickSessionOn();
-        for (Wildcard wildcard : activeWildcards.values()) {
-            wildcard.tickSessionOn();
-        }
+        WildcardManager.tickSessionOn();
     }
 
     @Override
     public void tick(MinecraftServer server) {
         super.tick(server);
-        for (Wildcard wildcard : activeWildcards.values()) {
-            wildcard.tick();
-        }
+        WildcardManager.tick();
     }
 
     @Override
@@ -96,16 +90,7 @@ public class WildLife extends Series {
     @Override
     public void sessionEnd() {
         super.sessionEnd();
-        for (Wildcard wildcard : activeWildcards.values()) {
-            wildcard.deactivate();
-        }
-    }
-
-    public void onJump(ServerPlayerEntity player) {
-        if (!activeWildcards.containsKey(Wildcards.SIZE_SHIFTING)) return;
-        if (activeWildcards.get(Wildcards.SIZE_SHIFTING) instanceof SizeShifting sizeShifting) {
-            sizeShifting.onJump(player);
-        }
+        WildcardManager.onSessionEnd();
     }
 
 }

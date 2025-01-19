@@ -278,7 +278,7 @@ public class TaskManager {
     }
 
     public static boolean hasSessionStarted(ServerPlayerEntity player) {
-        if (currentSession.status == SessionStatus.NOT_STARTED) {
+        if (currentSession.statusNotStarted()) {
             player.sendMessage(Text.of("§cThe session has not started yet."));
             return false;
         }

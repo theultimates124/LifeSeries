@@ -75,6 +75,8 @@ This command **always** available
   - `/session timer showDisplay` - Displays a permanent session timer in the actionbar of a player. *No permissions required.*
 </details>
 
+
+
 <details open>
 <summary>/lives</summary>
 
@@ -89,12 +91,25 @@ This command **always** available
 - `/lives resetAll` - Resets the lives of all online and offline players.
 </details>
 
+
 <details open>
 <summary>/claimkill</summary>
 
 *This command is only available when you have selected a Series.*
 - `/claimkill <player>` - Used when you'd want to claim credit for a kill. For example you kill a player as the Boogeyman with a trap, so you don't get automatically cured. Or when you gain something for killing players in a series (like Limited Life). An admin must confirm this claim for you to be given the kill rewards. *No permissions required.*
 - `/claimkill validate <killer> <victim>` - This is the command the admin uses to validate a claimed kill.
+</details>
+
+
+
+<details open>
+<summary>/wildcard</summary>
+
+*This command is only available when playing Wild Life.*
+- `/wildcard list` - Shows a list of all possible wildcards
+- `/wildcard listActive` - Shows a list of all **active** wildcards
+- `/wildcard activate <wildcard>` - Activates Wildcard with the name `<wildcard>`
+- `/wildcard deactivate <wildcard>` - Deactivates Wildcard with the name `<wildcard>`
 </details>
 
 

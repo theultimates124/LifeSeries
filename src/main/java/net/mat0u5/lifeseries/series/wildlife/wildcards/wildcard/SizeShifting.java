@@ -1,11 +1,9 @@
-package net.mat0u5.lifeseries.series.wildlife.wildcards;
+package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard;
 
-import net.mat0u5.lifeseries.series.wildlife.Wildcard;
-import net.mat0u5.lifeseries.series.wildlife.Wildcards;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.HashMap;
@@ -18,7 +16,7 @@ public class SizeShifting extends Wildcard {
     public static double MAX_SIZE_HARD = 16;
 
     public static double MIN_SIZE = 0.25;
-    public static double MAX_SIZE = 6;
+    public static double MAX_SIZE = 3;
 
     public static double SNEAK_STEP = -0.0015;
     public static double JUMP_STEP = 0.015;
@@ -31,7 +29,7 @@ public class SizeShifting extends Wildcard {
     }
 
     @Override
-    public void tickSessionOn() {
+    public void tick() {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             if (player.isSneaking()) {
                 addPlayerSize(player, SNEAK_STEP);
@@ -49,23 +47,6 @@ public class SizeShifting extends Wildcard {
             }
         }
     }
-    @Override
-    public void tick() {
-        if (active) return;
-        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
-            float size = getPlayerSize(player);
-            if (size == 1) return;
-            if (size < 0.98) {
-                addPlayerSize(player, 0.01);
-            }
-            else if (size > 1.02) {
-                addPlayerSize(player, -0.01);
-            }
-            else {
-                setPlayerSize(player, 1);
-            }
-        }
-    }
 
     public void onJump(ServerPlayerEntity player) {
         if (!active) return;
@@ -76,7 +57,7 @@ public class SizeShifting extends Wildcard {
         return player.getScale();
     }
 
-    public void addPlayerSize(ServerPlayerEntity player, double amount) {
+    public static void addPlayerSize(ServerPlayerEntity player, double amount) {
         setPlayerSize(player, getPlayerSize(player)+amount);
     }
 
@@ -92,5 +73,21 @@ public class SizeShifting extends Wildcard {
          //?} else {
         /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.SCALE)).setBaseValue(size);
         *///?}
+    }
+
+    public static void resetSizesTick() {
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            float size = getPlayerSize(player);
+            if (size == 1) return;
+            if (size < 0.98) {
+                addPlayerSize(player, 0.01);
+            }
+            else if (size > 1.02) {
+                addPlayerSize(player, -0.01);
+            }
+            else {
+                setPlayerSize(player, 1);
+            }
+        }
     }
 }

@@ -45,21 +45,21 @@ public class LimitedLife extends Series {
     public void displayTimers(MinecraftServer server) {
         //This function is called once every second, so we can
         String message = "";
-        if (status == SessionStatus.NOT_STARTED) {
+        if (statusNotStarted()) {
             message = "Session has not started";
         }
-        else if (status == SessionStatus.STARTED) {
+        else if (statusStarted()) {
             message = getRemainingLength();
         }
-        else if (status == SessionStatus.PAUSED) {
+        else if (statusPaused()) {
             message = "Session has been paused";
         }
-        else if (status == SessionStatus.FINISHED) {
+        else if (statusFinished()) {
             message = "Session has ended";
         }
 
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
-            if (status == SessionStatus.STARTED && isAlive(player)) {
+            if (statusStarted() && isAlive(player)) {
                 // One second has passed - remove a players life
                 removePlayerLife(player);
             }

@@ -1,7 +1,9 @@
-package net.mat0u5.lifeseries.series.wildlife;
+package net.mat0u5.lifeseries.series.wildlife.wildcards;
 
 import net.mat0u5.lifeseries.series.SessionAction;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.SizeShifting;
+import net.mat0u5.lifeseries.series.wildlife.WildLife;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
@@ -10,15 +12,14 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
 public class WildcardManager {
-    /*
-    TODO Config
-     */
+    public static HashMap<Wildcards, Wildcard> activeWildcards = new HashMap<>();
     public static Random rnd = new Random();
     public static SessionAction wildcardNotice = new SessionAction(OtherUtils.secondsToTicks(30)) {
         @Override
@@ -29,7 +30,9 @@ public class WildcardManager {
     public static SessionAction startWildcards = new SessionAction(OtherUtils.secondsToTicks(210),"§7Activate Wildcard §f[00:03:30]") {
         @Override
         public void trigger() {
-            activateWildcards();
+            if (activeWildcards.isEmpty()) {
+                activateWildcards();
+            }
         }
     };
 
@@ -38,37 +41,34 @@ public class WildcardManager {
         return null;
     }
 
-    public static void chooseWildcards() {
-        WildLife series = getSeries();
-        if (series == null) return;
+    public static void chooseRandomWildcard() {
         //TODO
-        series.activeWildcards.put(Wildcards.SIZE_SHIFTING, new SizeShifting());
+        //activeWildcards.put(Wildcards.SIZE_SHIFTING, new SizeShifting());
+        activeWildcards.put(Wildcards.HUNGER, new Hunger());
     }
 
     public static void resetWildcardsOnPlayerJoin(ServerPlayerEntity player) {
-        WildLife series = getSeries();
-        if (series == null) return;
-
-        if (!series.activeWildcards.containsKey(Wildcards.SIZE_SHIFTING)) {
+        if (!activeWildcards.containsKey(Wildcards.SIZE_SHIFTING)) {
             if (SizeShifting.getPlayerSize(player) != 1) SizeShifting.setPlayerSize(player, 1);
         }
     }
 
     public static void activateWildcards() {
-        WildLife series = getSeries();
-        if (series == null) return;
-
-
         showDots();
         TaskScheduler.scheduleTask(90, () -> {
-            PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE, 0.2f, 1);
             showCryptTitle("A wildcard is active!");
-            series.activeWildcards.clear();
-            chooseWildcards();
-            for (Wildcard wildcard : series.activeWildcards.values()) {
+            if (activeWildcards.isEmpty()) {
+                chooseRandomWildcard();
+            }
+            for (Wildcard wildcard : activeWildcards.values()) {
                 wildcard.activate();
             }
         });
+    }
+
+    public static void fadedWildcard() {
+        OtherUtils.broadcastMessage(Text.of("§7A Wildcard has faded..."));
+        PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.BLOCK_BEACON_DEACTIVATE);
     }
 
     public static void showDots() {
@@ -86,6 +86,7 @@ public class WildcardManager {
     }
 
     public static void showCryptTitle(String text) {
+        PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE, 0.2f, 1);
         String colorCrypt = "§r§6§l§k";
         String colorNormal = "§r§6§l";
         String cryptedText = "";
@@ -107,6 +108,38 @@ public class WildcardManager {
             TaskScheduler.scheduleTask(pos, () -> {
                 PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal(finalCryptedText),0,30,20);
             });
+        }
+    }
+
+    public static void tick() {
+        for (Wildcard wildcard : activeWildcards.values()) {
+            wildcard.tick();
+        }
+        if (!activeWildcards.containsKey(Wildcards.SIZE_SHIFTING)) {
+            SizeShifting.resetSizesTick();
+        }
+    }
+
+    public static void tickSessionOn() {
+        for (Wildcard wildcard : activeWildcards.values()) {
+            wildcard.tick();
+        }
+    }
+
+    public static void onSessionEnd() {
+        if (!activeWildcards.isEmpty()) {
+            fadedWildcard();
+        }
+        for (Wildcard wildcard : activeWildcards.values()) {
+            wildcard.deactivate();
+        }
+        activeWildcards.clear();
+    }
+
+    public static void onJump(ServerPlayerEntity player) {
+        if (!activeWildcards.containsKey(Wildcards.SIZE_SHIFTING)) return;
+        if (activeWildcards.get(Wildcards.SIZE_SHIFTING) instanceof SizeShifting sizeShifting) {
+            sizeShifting.onJump(player);
         }
     }
 }

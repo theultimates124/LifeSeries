@@ -69,7 +69,7 @@ public class Session {
     }
 
     public void sessionPause() {
-        if (status == SessionStatus.PAUSED) {
+        if (statusPaused()) {
             OtherUtils.broadcastMessage(Text.literal("Session unpaused!").formatted(Formatting.GOLD));
             status = SessionStatus.STARTED;
         }
@@ -81,8 +81,8 @@ public class Session {
 
     public boolean canStartSession() {
         if (!validTime()) return false;
-        if (status == SessionStatus.STARTED) return false;
-        if (status == SessionStatus.PAUSED) return false;
+        if (statusStarted()) return false;
+        if (statusPaused()) return false;
         return true;
     }
 
@@ -155,7 +155,7 @@ public class Session {
         }
 
         if (!validTime()) return;
-        if (status != SessionStatus.STARTED) return;
+        if (!statusStarted()) return;
         tickSessionOn();
     }
 
@@ -207,16 +207,16 @@ public class Session {
 
     public void displayTimers(MinecraftServer server) {
         String message = "";
-        if (status == SessionStatus.NOT_STARTED) {
+        if (statusNotStarted()) {
             message = "Session has not started";
         }
-        else if (status == SessionStatus.STARTED) {
+        else if (statusStarted()) {
             message = getRemainingLength();
         }
-        else if (status == SessionStatus.PAUSED) {
+        else if (statusPaused()) {
             message = "Session has been paused";
         }
-        else if (status == SessionStatus.FINISHED) {
+        else if (statusFinished()) {
             message = "Session has ended";
         }
         for (UUID uuid : displayTimer) {
@@ -234,5 +234,21 @@ public class Session {
             if (actionMessage.isEmpty()) continue;
             OtherUtils.broadcastMessageToAdmins(Text.of("§7- "+actionMessage));
         }
+    }
+
+    public boolean statusStarted() {
+        return status == SessionStatus.STARTED;
+    }
+
+    public boolean statusPaused() {
+        return status == SessionStatus.PAUSED;
+    }
+
+    public boolean statusFinished() {
+        return status == SessionStatus.FINISHED;
+    }
+
+    public boolean statusNotStarted() {
+        return status == SessionStatus.NOT_STARTED;
     }
 }

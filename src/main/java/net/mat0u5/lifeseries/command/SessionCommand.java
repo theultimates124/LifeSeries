@@ -144,11 +144,11 @@ public class SessionCommand {
             source.sendError(Text.of("The session time is not set! Use '/session timer set <time>' to set the session time."));
             return -1;
         }
-        if (currentSession.status == SessionStatus.STARTED) {
+        if (currentSession.statusStarted()) {
             source.sendError(Text.of("The session has already started!"));
             return -1;
         }
-        if (currentSession.status == SessionStatus.PAUSED) {
+        if (currentSession.statusPaused()) {
             currentSession.sessionPause();
             return 1;
         }
@@ -164,7 +164,7 @@ public class SessionCommand {
         if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
 
-        if (currentSession.status == SessionStatus.NOT_STARTED || currentSession.status == SessionStatus.FINISHED) {
+        if (currentSession.statusNotStarted() || currentSession.statusFinished()) {
             source.sendError(Text.of("The session has not yet started!"));
             return -1;
         }
@@ -178,7 +178,7 @@ public class SessionCommand {
         if (checkBanned(source)) return -1;
         MinecraftServer server = source.getServer();
 
-        if (currentSession.status == SessionStatus.NOT_STARTED || currentSession.status == SessionStatus.FINISHED) {
+        if (currentSession.statusNotStarted() || currentSession.statusFinished()) {
             source.sendError(Text.of("The session has not yet started!"));
             return -1;
         }

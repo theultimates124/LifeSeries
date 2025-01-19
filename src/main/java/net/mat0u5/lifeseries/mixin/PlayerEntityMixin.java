@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.mixin;
 
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -46,7 +47,7 @@ public abstract class PlayerEntityMixin {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (currentSeries instanceof WildLife wildLife) {
             if (player instanceof ServerPlayerEntity serverPlayer) {
-                wildLife.onJump(serverPlayer);
+                WildcardManager.onJump(serverPlayer);
             }
         }
     }

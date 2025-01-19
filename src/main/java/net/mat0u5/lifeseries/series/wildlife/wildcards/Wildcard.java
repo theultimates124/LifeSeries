@@ -1,7 +1,9 @@
-package net.mat0u5.lifeseries.series.wildlife;
+package net.mat0u5.lifeseries.series.wildlife.wildcards;
 
 import net.mat0u5.lifeseries.Main;
-import static net.mat0u5.lifeseries.series.wildlife.WildcardManager.getSeries;
+import net.mat0u5.lifeseries.series.wildlife.WildLife;
+
+import static net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager.getSeries;
 
 public abstract class Wildcard {
 
