@@ -7,10 +7,14 @@ import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +28,9 @@ public class WildcardManager {
     public static SessionAction wildcardNotice = new SessionAction(OtherUtils.secondsToTicks(30)) {
         @Override
         public void trigger() {
-            OtherUtils.broadcastMessage(Text.literal("A Wildcard will be activated in 3 minutes!").formatted(Formatting.GRAY));
+            if (activeWildcards.isEmpty()) {
+                OtherUtils.broadcastMessage(Text.literal("A Wildcard will be activated in 3 minutes!").formatted(Formatting.GRAY));
+            }
         }
     };
     public static SessionAction startWildcards = new SessionAction(OtherUtils.secondsToTicks(210),"§7Activate Wildcard §f[00:03:30]") {
@@ -48,9 +54,16 @@ public class WildcardManager {
     }
 
     public static void resetWildcardsOnPlayerJoin(ServerPlayerEntity player) {
-        if (!activeWildcards.containsKey(Wildcards.SIZE_SHIFTING)) {
+
+        if (!isActiveWildcard(Wildcards.SIZE_SHIFTING)) {
             if (SizeShifting.getPlayerSize(player) != 1) SizeShifting.setPlayerSize(player, 1);
         }
+        if (!isActiveWildcard(Wildcards.HUNGER)) {
+            player.removeStatusEffect(StatusEffects.HUNGER);
+        }
+        TaskScheduler.scheduleTask(1, () -> {
+            Hunger.updateInventory(player);
+        });
     }
 
     public static void activateWildcards() {
@@ -115,7 +128,7 @@ public class WildcardManager {
         for (Wildcard wildcard : activeWildcards.values()) {
             wildcard.tick();
         }
-        if (!activeWildcards.containsKey(Wildcards.SIZE_SHIFTING)) {
+        if (!isActiveWildcard(Wildcards.SIZE_SHIFTING)) {
             SizeShifting.resetSizesTick();
         }
     }
@@ -136,10 +149,29 @@ public class WildcardManager {
         activeWildcards.clear();
     }
 
+    public static boolean isActiveWildcard(Wildcards wildcard) {
+        return activeWildcards.containsKey(wildcard);
+    }
+
     public static void onJump(ServerPlayerEntity player) {
-        if (!activeWildcards.containsKey(Wildcards.SIZE_SHIFTING)) return;
+        if (!isActiveWildcard(Wildcards.SIZE_SHIFTING)) return;
         if (activeWildcards.get(Wildcards.SIZE_SHIFTING) instanceof SizeShifting sizeShifting) {
             sizeShifting.onJump(player);
         }
+    }
+
+
+    public static void onInventoryUpdated(PlayerEntity player, PlayerInventory inventory, CallbackInfo ci) {
+        TaskScheduler.scheduleTask(1, () -> {
+            for (int i = 0; i < inventory.size(); i++) {
+                Hunger.handleItemStack(inventory.getStack(i));
+            }
+            player.currentScreenHandler.sendContentUpdates();
+            player.playerScreenHandler.onContentChanged(player.getInventory());
+        });
+    }
+
+    public static void onUseItem(ServerPlayerEntity player) {
+        Hunger.onUseItem(player);
     }
 }

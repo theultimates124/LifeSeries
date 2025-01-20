@@ -14,7 +14,8 @@
 		"ServerPlayerEntityMixin",
 		"AnvilScreenHandlerMixin",
 		"ForgingScreenHandlerAccessor",
-		"RecipeManagerMixin"
+		"RecipeManagerMixin",
+		"ItemStackMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

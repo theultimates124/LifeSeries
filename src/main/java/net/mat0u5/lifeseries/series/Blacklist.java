@@ -203,14 +203,10 @@ public class Blacklist {
         if (Main.server == null) return;
         if (player.isCreative() && seriesConfig.getOrCreateBoolean("creative_ignore_blacklist", true)) return;
         for (int i = 0; i < inventory.size(); i++) {
-            ItemStack stack = inventory.getStack(i);
-            ItemStack newItem = processItemStack(player, stack);
-            inventory.setStack(i, newItem);
-            if (stack.equals(newItem)) {
-                player.currentScreenHandler.sendContentUpdates();
-                player.playerScreenHandler.onContentChanged(player.getInventory());
-            }
+            processItemStack(player, inventory.getStack(i));
         }
+        player.currentScreenHandler.sendContentUpdates();
+        player.playerScreenHandler.onContentChanged(player.getInventory());
     }
 
     public boolean isBlacklistedItemSimple(ItemStack itemStack) {
@@ -232,19 +228,18 @@ public class Blacklist {
         return false;
     }
 
-    public ItemStack processItemStack(PlayerEntity player, ItemStack itemStack) {
-        if (itemStack.isEmpty()) return itemStack;
-        if (itemStack.getItem() == Items.AIR) return itemStack;
+    public void processItemStack(PlayerEntity player, ItemStack itemStack) {
+        if (itemStack.isEmpty()) return;
+        if (itemStack.getItem() == Items.AIR) return;
         if (isBlacklistedItem(itemStack) && !ItemStackUtils.hasCustomComponentEntry(itemStack, "IgnoreBlacklist")) {
             itemStack.setCount(0);
             player.getInventory().updateItems();
-            return ItemStack.EMPTY;
+            return;
         }
         ItemEnchantmentsComponent enchants = itemStack.getComponents().get(DataComponentTypes.ENCHANTMENTS);
         ItemEnchantmentsComponent enchantsStored = itemStack.getComponents().get(DataComponentTypes.STORED_ENCHANTMENTS);
         if (enchants != null) clampEnchantments(enchants);
         if (enchantsStored != null) clampEnchantments(enchantsStored);
-        return itemStack;
     }
 
     public void clampEnchantments(ItemEnchantmentsComponent enchants) {

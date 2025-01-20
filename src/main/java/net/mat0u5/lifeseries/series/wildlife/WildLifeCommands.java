@@ -6,6 +6,7 @@ import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
+import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.CommandManager;
@@ -70,7 +71,7 @@ public class WildLifeCommands {
             source.sendError(Text.of("That Wildcard doesn't exist."));
             return -1;
         }
-        if (!WildcardManager.activeWildcards.containsKey(wildcard)) {
+        if (!WildcardManager.isActiveWildcard(wildcard)) {
             source.sendError(Text.of("That Wildcard is not active."));
             return -1;
         }
@@ -90,7 +91,7 @@ public class WildLifeCommands {
             source.sendError(Text.of("That Wildcard doesn't exist."));
             return -1;
         }
-        if (WildcardManager.activeWildcards.containsKey(wildcard)) {
+        if (WildcardManager.isActiveWildcard(wildcard)) {
             source.sendError(Text.of("That Wildcard is already active."));
             return -1;
         }
@@ -99,7 +100,7 @@ public class WildLifeCommands {
             source.sendError(Text.of("That Wildcard has not been implemented yet."));
             return -1;
         }
-        WildcardManager.activeWildcards.put(wildcard, actualWildcard);
+        TaskScheduler.scheduleTask(89, () -> WildcardManager.activeWildcards.put(wildcard, actualWildcard));
         WildcardManager.activateWildcards();
         source.sendMessage(Text.of("Activated " + wildcardName + "."));
         return 1;

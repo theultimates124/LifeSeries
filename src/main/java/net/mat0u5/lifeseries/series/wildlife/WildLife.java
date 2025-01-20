@@ -38,7 +38,7 @@ public class WildLife extends Series {
         }
         TaskScheduler.scheduleTask(99, () -> {
             if (PermissionManager.isAdmin(player)) {
-                player.sendMessage(Text.of("§7Wild Life commands: §r/lifeseries, /session, /claimkill, /lives"));
+                player.sendMessage(Text.of("§7Wild Life commands: §r/lifeseries, /session, /claimkill, /lives, /wildcard"));
             }
             else {
                 player.sendMessage(Text.of("§7Wild Life non-admin commands: §r/claimkill, /lives"));

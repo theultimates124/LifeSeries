@@ -1,8 +1,11 @@
 package net.mat0u5.lifeseries.mixin;
 
+import net.mat0u5.lifeseries.series.wildlife.WildLife;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.TextUtils;
 import net.minecraft.network.message.SignedMessage;
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -11,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Objects;
+import static net.mat0u5.lifeseries.Main.currentSeries;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class ServerPlayNetworkHandlerMixin {
@@ -33,6 +36,15 @@ public class ServerPlayNetworkHandlerMixin {
 
             OtherUtils.broadcastMessage(finalMessage);
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "onPlayerInteractItem", at = @At("HEAD"))
+    private void onPlayerAction(PlayerInteractItemC2SPacket packet, CallbackInfo ci) {
+        ServerPlayNetworkHandler handler = (ServerPlayNetworkHandler) (Object) this;
+        ServerPlayerEntity player = handler.player;
+        if (currentSeries instanceof WildLife) {
+            WildcardManager.onUseItem(player);
         }
     }
 }

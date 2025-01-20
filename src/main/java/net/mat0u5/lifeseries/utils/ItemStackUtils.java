@@ -129,6 +129,20 @@ public class ItemStackUtils {
         return nbt.contains(componentEntry);
     }
 
+    public static void removeCustomComponentEntry(ItemStack itemStack, String componentEntry) {
+        NbtComponent nbt = itemStack.getComponents().get(DataComponentTypes.CUSTOM_DATA);
+        if (nbt == null) return;
+        if (!nbt.contains(componentEntry)) return;
+        NbtCompound nbtComp = nbt.copyNbt();
+        nbtComp.remove(componentEntry);
+        if (nbtComp.isEmpty()) {
+            itemStack.set(DataComponentTypes.CUSTOM_DATA, itemStack.getDefaultComponents().get(DataComponentTypes.CUSTOM_DATA));
+        }
+        else {
+            itemStack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbtComp));
+        }
+    }
+
     public static void spawnItem(ServerWorld world, Vec3d position, ItemStack stack) {
         spawnItemForPlayer(world, position, stack, null);
     }
