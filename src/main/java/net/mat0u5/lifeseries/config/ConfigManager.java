@@ -26,13 +26,13 @@ public abstract class ConfigManager {
     protected abstract void defaultProperties();
 
     protected void defaultSessionProperties() {
-        getOrCreateProperty("spawn_egg_drop_chance", "0.05");
-        getOrCreateProperty("spawn_egg_allow_on_spawner", "false");
-        getOrCreateProperty("creative_ignore_blacklist", "true");
-        getOrCreateProperty("auto_set_worldborder", "true");
-        getOrCreateProperty("auto_keep_inventory", "true");
-        getOrCreateProperty("players_drop_items_on_last_death", "false");
-        getOrCreateProperty("show_death_title_on_last_death", "true");
+        getOrCreateDouble("spawn_egg_drop_chance", 0.05);
+        getOrCreateBoolean("spawn_egg_allow_on_spawner", false);
+        getOrCreateBoolean("creative_ignore_blacklist", true);
+        getOrCreateBoolean("auto_set_worldborder", true);
+        getOrCreateBoolean("auto_keep_inventory", true);
+        getOrCreateBoolean("players_drop_items_on_last_death", false);
+        getOrCreateBoolean("show_death_title_on_last_death", true);
     }
 
     public static void moveOldMainFileIfExists() {

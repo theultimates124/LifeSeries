@@ -52,17 +52,17 @@ public class SecretLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
-        getOrCreateProperty("task_health_easy_pass", "20");
-        getOrCreateProperty("task_health_easy_fail", "0");
-        getOrCreateProperty("task_health_hard_pass", "40");
-        getOrCreateProperty("task_health_hard_fail", "-20");
-        getOrCreateProperty("task_health_red_pass", "10");
-        getOrCreateProperty("task_health_red_fail", "-5");
+        getOrCreateInt("task_health_easy_pass", 20);
+        getOrCreateInt("task_health_easy_fail", 0);
+        getOrCreateInt("task_health_hard_pass", 40);
+        getOrCreateInt("task_health_hard_fail", -20);
+        getOrCreateInt("task_health_red_pass", 10);
+        getOrCreateInt("task_health_red_fail", -5);
 
 
-        getOrCreateProperty("max_player_health", "60");
-        getOrCreateProperty("default_lives", "3");
-        getOrCreateProperty("custom_enchanter_algorithm", "false");
+        getOrCreateInt("max_player_health", 60);
+        getOrCreateInt("default_lives", 3);
+        getOrCreateBoolean("custom_enchanter_algorithm", false);
         getOrCreateProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
         getOrCreateProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
         getOrCreateProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");

@@ -55,9 +55,9 @@ public class ThirdLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
-        getOrCreateProperty("max_player_health", "20");
-        getOrCreateProperty("default_lives", "3");
-        getOrCreateProperty("custom_enchanter_algorithm", "true");
+        getOrCreateInt("max_player_health", 20);
+        getOrCreateInt("default_lives", 3);
+        getOrCreateBoolean("custom_enchanter_algorithm", true);
         getOrCreateProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
         getOrCreateProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
         getOrCreateProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");

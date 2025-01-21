@@ -60,11 +60,11 @@ public class LimitedLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
-        getOrCreateProperty("max_player_health", "20");
-        getOrCreateProperty("time_default", "86400");
-        getOrCreateProperty("time_yellow", "57600");
-        getOrCreateProperty("time_red", "28800");
-        getOrCreateProperty("custom_enchanter_algorithm", "true");
+        getOrCreateInt("max_player_health", 20);
+        getOrCreateInt("time_default", 86400);
+        getOrCreateInt("time_yellow", 57600);
+        getOrCreateInt("time_red", 28800);
+        getOrCreateBoolean("custom_enchanter_algorithm", true);
         getOrCreateProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
         getOrCreateProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
         getOrCreateProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");

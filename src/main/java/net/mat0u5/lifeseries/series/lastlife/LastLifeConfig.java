@@ -60,11 +60,11 @@ public class LastLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
-        getOrCreateProperty("max_player_health", "20");
-        getOrCreateProperty("random_lives_min", "2");
-        getOrCreateProperty("random_lives_max", "6");
-        getOrCreateProperty("givelife_lives_max", "99");
-        getOrCreateProperty("custom_enchanter_algorithm", "true");
+        getOrCreateInt("max_player_health", 20);
+        getOrCreateInt("random_lives_min", 2);
+        getOrCreateInt("random_lives_max", 6);
+        getOrCreateInt("givelife_lives_max", 99);
+        getOrCreateBoolean("custom_enchanter_algorithm", true);
         getOrCreateProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
         getOrCreateProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
         getOrCreateProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");

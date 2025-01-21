@@ -18,6 +18,7 @@ public class SizeShifting extends Wildcard {
     public static double MIN_SIZE = 0.25;
     public static double MAX_SIZE = 3;
 
+    public static double SIZE_CHANGE_MULTIPLIER = 1;
     public static double SNEAK_STEP = -0.0015;
     public static double JUMP_STEP = 0.015;
     public static int JUMP_STEP_TIME = 5;
@@ -32,10 +33,10 @@ public class SizeShifting extends Wildcard {
     public void tick() {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             if (player.isSneaking()) {
-                addPlayerSize(player, SNEAK_STEP);
+                addPlayerSize(player, SNEAK_STEP * SIZE_CHANGE_MULTIPLIER);
             }
             if (ticksAddingSize.containsKey(player.getUuid())) {
-                addPlayerSize(player, JUMP_STEP / JUMP_STEP_TIME);
+                addPlayerSize(player, (JUMP_STEP / JUMP_STEP_TIME) * SIZE_CHANGE_MULTIPLIER);
                 int remaining = ticksAddingSize.get(player.getUuid());
                 remaining--;
                 if (remaining > 0) {

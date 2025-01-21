@@ -4,6 +4,7 @@ import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.utils.ItemStackUtils;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.component.DataComponentTypes;
@@ -31,11 +32,11 @@ import net.minecraft.item.consume.UseAction;
 *///?}
 
 public class Hunger extends Wildcard {
-    //TODO make the shuffle work with time skiping
-    //TODO randomize shuffleVersion
+    private static Random rnd = new Random();
+    public static int SWITCH_DELAY = 36000;
     private static int shuffleVersion = 0;
-    public static int SWITCH_DELAY = 200;//29*60*20
-    private int currentDelay = 0;
+    private static boolean shuffledBefore = false;
+    private static int lastVersion = -1;
 
     private static final List<RegistryEntry<StatusEffect>> effects = List.of(
             StatusEffects.SPEED,
@@ -74,6 +75,15 @@ public class Hunger extends Wildcard {
             StatusEffects.INFESTED
     );
 
+    private static final List<RegistryEntry<StatusEffect>> levelLimit = List.of(
+            StatusEffects.STRENGTH,
+            StatusEffects.INSTANT_HEALTH,
+            StatusEffects.REGENERATION,
+            StatusEffects.RESISTANCE,
+            StatusEffects.WITHER,
+            StatusEffects.ABSORPTION
+    );
+
     @Override
     public Wildcards getType() {
         return Wildcards.HUNGER;
@@ -81,31 +91,36 @@ public class Hunger extends Wildcard {
 
     @Override
     public void tick() {
-        if (currentSession.statusStarted()) {
-            currentDelay--;
-        }
-        if (currentDelay <= 0) {
-            currentDelay = SWITCH_DELAY;
-            TaskScheduler.scheduleTask(2, this::newFoodRules);
+        if (currentSession.sessionLength - currentSession.passedTime > 6000) {
+            int currentVersion = (int) Math.floor((double) currentSession.passedTime / (double) SWITCH_DELAY);
+            if (lastVersion != currentVersion) {
+                lastVersion = currentVersion;
+                TaskScheduler.scheduleTask(2, this::newFoodRules);
+            }
         }
     }
 
     @Override
     public void deactivate() {
+        shuffledBefore = false;
         super.deactivate();
         TaskScheduler.scheduleTask(2, Hunger::updateInventories);
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             player.removeStatusEffect(StatusEffects.HUNGER);
         }
     }
+    @Override
+    public void activate() {
+        shuffleVersion = rnd.nextInt(0,100);
+        shuffledBefore = false;
+        super.activate();
+    }
 
     public void newFoodRules() {
-        if (shuffleVersion != 0) {
+        if (shuffledBefore) {
             PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.BLOCK_NOTE_BLOCK_PLING.value());
             PlayerUtils.sendTitleWithSubtitleToPlayers(PlayerUtils.getAllPlayers(), Text.of(""), Text.of("§7Food is about to be randomised..."), 0, 140, 0);
-            TaskScheduler.scheduleTask(40, () -> {
-                WildcardManager.showDots();
-            });
+            TaskScheduler.scheduleTask(40, WildcardManager::showDots);
             TaskScheduler.scheduleTask(140, () -> {
                 updateInventories(true);
                 PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_ELDER_GUARDIAN_CURSE, 0.2f, 1);
@@ -114,6 +129,7 @@ public class Hunger extends Wildcard {
         else {
             updateInventories(true);
         }
+        shuffledBefore = true;
         shuffleVersion++;
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             addHunger(player);
@@ -187,7 +203,7 @@ public class Hunger extends Wildcard {
         //? if <=1.21 {
         
         if (itemStack.getDefaultComponents().contains(DataComponentTypes.FOOD)) {
-            StatusEffectInstance statusEffectInstance = new StatusEffectInstance(StatusEffects.HUNGER, 6000, 7);
+            StatusEffectInstance statusEffectInstance = new StatusEffectInstance(StatusEffects.HUNGER, 3600, 7);
             FoodComponent.StatusEffectEntry statusEffect = new FoodComponent.StatusEffectEntry(statusEffectInstance, 1);
             itemStack.set(DataComponentTypes.FOOD, new FoodComponent(0, 0, false, 1.6f, Optional.empty(), List.of(statusEffect)));
             return;
@@ -197,14 +213,17 @@ public class Hunger extends Wildcard {
         if ((hash % 13) % 3 != 0) {
             int amplifier = hash % 5; // 0 -> 4
             int duration = ((3 + hash) % 18) * 20; // 1 -> 20 seconds
-
-            StatusEffectInstance statusEffectInstance = new StatusEffectInstance(effects.get(hash % effects.size()), duration, amplifier);
+            RegistryEntry<StatusEffect> registryEntryEffect = effects.get(hash % effects.size());
+            if (levelLimit.contains(registryEntryEffect)) {
+                amplifier = 0;
+            }
+            StatusEffectInstance statusEffectInstance = new StatusEffectInstance(registryEntryEffect, duration, amplifier);
             FoodComponent.StatusEffectEntry statusEffect = new FoodComponent.StatusEffectEntry(statusEffectInstance, 1);
             foodEffects.add(statusEffect);
         }
 
-        int nutrition = hash % 16 - 7; // -7 -> 8
-        int saturation = hash % 12 - 5; // -5 -> 6
+        int nutrition = hash % 19 - 10; // -10 -> 8
+        int saturation = hash % 12 - 7; // -7 -> 4
         if (nutrition < 0) nutrition = 0;
         if (saturation < 0) saturation = 0;
         if (saturation > nutrition) saturation = nutrition;
@@ -212,7 +231,7 @@ public class Hunger extends Wildcard {
         return;
          //?} else {
         /*if (itemStack.getDefaultComponents().contains(DataComponentTypes.CONSUMABLE)) {
-            StatusEffectInstance statusEffectInstance = new StatusEffectInstance(StatusEffects.HUNGER, 6000, 7);
+            StatusEffectInstance statusEffectInstance = new StatusEffectInstance(StatusEffects.HUNGER, 3600, 7);
             ApplyEffectsConsumeEffect statusEffect = new ApplyEffectsConsumeEffect(statusEffectInstance, 1);
             itemStack.set(DataComponentTypes.CONSUMABLE,
                     new ConsumableComponent(ConsumableComponent.DEFAULT_CONSUME_SECONDS, UseAction.EAT, SoundEvents.ENTITY_GENERIC_EAT, true, List.of(statusEffect))
@@ -225,14 +244,17 @@ public class Hunger extends Wildcard {
         if ((hash % 13) % 3 != 0) {
             int amplifier = hash % 5; // 0 -> 4
             int duration = ((3 + hash) % 18) * 20; // 1 -> 20 seconds
-
-            StatusEffectInstance statusEffectInstance = new StatusEffectInstance(effects.get(hash % effects.size()), duration, amplifier);
+            RegistryEntry<StatusEffect> registryEntryEffect = effects.get(hash % effects.size());
+            if (levelLimit.contains(registryEntryEffect)) {
+                amplifier = 0;
+            }
+            StatusEffectInstance statusEffectInstance = new StatusEffectInstance(registryEntryEffect, duration, amplifier);
             ApplyEffectsConsumeEffect statusEffect = new ApplyEffectsConsumeEffect(statusEffectInstance, 1);
             foodEffects.add(statusEffect);
         }
 
-        int nutrition = hash % 16 - 7; // -7 -> 8
-        int saturation = hash % 12 - 5; // -5 -> 6
+        int nutrition = hash % 19 - 10; // -10 -> 8
+        int saturation = hash % 12 - 7; // -7 -> 4
         if (nutrition < 0) nutrition = 0;
         if (saturation < 0) saturation = 0;
         if (saturation > nutrition) saturation = nutrition;

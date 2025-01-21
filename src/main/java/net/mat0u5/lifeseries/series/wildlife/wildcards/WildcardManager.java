@@ -29,11 +29,11 @@ public class WildcardManager {
         @Override
         public void trigger() {
             if (activeWildcards.isEmpty()) {
-                OtherUtils.broadcastMessage(Text.literal("A Wildcard will be activated in 3 minutes!").formatted(Formatting.GRAY));
+                OtherUtils.broadcastMessage(Text.literal("A Wildcard will be activated in 2 minutes!").formatted(Formatting.GRAY));
             }
         }
     };
-    public static SessionAction startWildcards = new SessionAction(OtherUtils.secondsToTicks(210),"§7Activate Wildcard §f[00:03:30]") {
+    public static SessionAction startWildcards = new SessionAction(OtherUtils.secondsToTicks(150),"§7Activate Wildcard §f[00:02:30]") {
         @Override
         public void trigger() {
             if (activeWildcards.isEmpty()) {

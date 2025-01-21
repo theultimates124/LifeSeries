@@ -60,9 +60,15 @@ public class WildLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
-        getOrCreateProperty("max_player_health", "20");
-        getOrCreateProperty("default_lives", "6");
-        getOrCreateProperty("custom_enchanter_algorithm", "true");
+        getOrCreateInt("wildcard_hunger_randomize_interval", 36000);
+
+        getOrCreateDouble("wildcard_sizeshifting_min_size", 0.25);
+        getOrCreateDouble("wildcard_sizeshifting_max_size", 3);
+        getOrCreateDouble("wildcard_sizeshifting_size_change_multiplier", 1);
+
+        getOrCreateInt("max_player_health", 20);
+        getOrCreateInt("default_lives", 6);
+        getOrCreateBoolean("custom_enchanter_algorithm", true);
         getOrCreateProperty("blacklist_items","["+String.join(", ", BLACKLISTED_ITEMS)+"]");
         getOrCreateProperty("blacklist_blocks","["+String.join(", ", BLACKLISTED_BLOCKS)+"]");
         getOrCreateProperty("blacklist_clamped_enchants","["+String.join(", ", CLAMPED_ENCHANTMENTS)+"]");

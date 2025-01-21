@@ -4,6 +4,8 @@ import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PermissionManager;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
@@ -93,4 +95,11 @@ public class WildLife extends Series {
         WildcardManager.onSessionEnd();
     }
 
+    @Override
+    public void reload() {
+        Hunger.SWITCH_DELAY = seriesConfig.getOrCreateInt("wildcard_hunger_randomize_interval", 36000);
+        SizeShifting.MIN_SIZE = seriesConfig.getOrCreateDouble("wildcard_sizeshifting_min_size", 0.25);
+        SizeShifting.MAX_SIZE = seriesConfig.getOrCreateDouble("wildcard_sizeshifting_max_size", 3);
+        SizeShifting.SIZE_CHANGE_MULTIPLIER = seriesConfig.getOrCreateDouble("wildcard_sizeshifting_size_change_multiplier", 1);
+    }
 }
