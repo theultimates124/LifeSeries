@@ -5,6 +5,7 @@ import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.WorldUitls;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerTickManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -13,6 +14,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.border.WorldBorder;
 
 import java.util.*;
+
+import static net.mat0u5.lifeseries.Main.server;
 
 public class Session {
     public Map<UUID, Integer> playerNaturalDeathLog = new HashMap<>();
@@ -23,7 +26,7 @@ public class Session {
     public int currentTimer = 20;
 
     public Integer sessionLength = null;
-    public int passedTime;
+    public double passedTime;
     public SessionStatus status = SessionStatus.NOT_STARTED;
 
     SessionAction endWarning1 = new SessionAction(OtherUtils.minutesToTicks(-5)) {
@@ -107,7 +110,7 @@ public class Session {
 
     public String getRemainingLength() {
         if (sessionLength == null) return "";
-        return OtherUtils.formatTime(sessionLength-passedTime);
+        return OtherUtils.formatTime(sessionLength - ((int) passedTime));
     }
 
     public boolean validTime() {
@@ -156,11 +159,18 @@ public class Session {
 
         if (!validTime()) return;
         if (!statusStarted()) return;
-        tickSessionOn();
+        tickSessionOn(server);
     }
 
-    public void tickSessionOn() {
-        passedTime++;
+    public void tickSessionOn(MinecraftServer server) {
+        float tickRate = server.getTickManager().getTickRate();
+        if (tickRate == 20) {
+            passedTime++;
+        }
+        else {
+            passedTime += (20/tickRate);
+        }
+
         if (passedTime >= sessionLength) {
             sessionEnd();
         }
@@ -170,7 +180,7 @@ public class Session {
         if (activeActions.isEmpty()) return;
         List<SessionAction> remaining = new ArrayList<>();
         for (SessionAction action : activeActions) {
-            boolean triggered = action.tick(passedTime, sessionLength);
+            boolean triggered = action.tick((int) passedTime, sessionLength);
             if (!triggered) {
                 remaining.add(action);
             }

@@ -67,8 +67,8 @@ public class WildLife extends Series {
     }
 
     @Override
-    public void tickSessionOn() {
-        super.tickSessionOn();
+    public void tickSessionOn(MinecraftServer server) {
+        super.tickSessionOn(server);
         WildcardManager.tickSessionOn();
     }
 

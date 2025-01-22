@@ -115,10 +115,10 @@ public class WildLifeCommands {
     public static int listActiveWildcards(ServerCommandSource source) {
         if (checkBanned(source)) return -1;
         if (Wildcards.getActiveWildcards().isEmpty()) {
-            source.sendMessage(Text.of("There are no active Wildcards right now. \nA Wildcard will be randomly selected when the session starts, or you can use §'/wildcard activate <wildcard>' to activate a specific wildcard."));
+            source.sendMessage(Text.of("§7There are no active Wildcards right now. \nA Wildcard will be randomly selected when the session starts, or you can use §r'/wildcard activate <wildcard>'§7 to activate a specific Wildcard."));
             return 1;
         }
-        source.sendMessage(Text.of("Activated Wildcards: " + String.join(", ", Wildcards.getActiveWildcards())));
+        source.sendMessage(Text.of("§7Activated Wildcards: " + String.join(", ", Wildcards.getActiveWildcards())));
         return 1;
     }
 }

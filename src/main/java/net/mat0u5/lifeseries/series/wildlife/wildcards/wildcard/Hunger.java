@@ -21,6 +21,7 @@ import net.minecraft.text.Text;
 
 import java.util.*;
 
+import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.currentSession;
 
 
@@ -91,6 +92,7 @@ public class Hunger extends Wildcard {
 
     @Override
     public void tick() {
+        if (!currentSeries.statusStarted()) return;
         if (currentSession.sessionLength - currentSession.passedTime > 6000) {
             int currentVersion = (int) Math.floor((double) currentSession.passedTime / (double) SWITCH_DELAY);
             if (lastVersion != currentVersion) {

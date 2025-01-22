@@ -4,6 +4,7 @@ import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
@@ -50,7 +51,8 @@ public class WildcardManager {
     public static void chooseRandomWildcard() {
         //TODO
         //activeWildcards.put(Wildcards.SIZE_SHIFTING, new SizeShifting());
-        activeWildcards.put(Wildcards.HUNGER, new Hunger());
+       // activeWildcards.put(Wildcards.HUNGER, new Hunger());
+        activeWildcards.put(Wildcards.TIME_DILATION, new TimeDilation());
     }
 
     public static void resetWildcardsOnPlayerJoin(ServerPlayerEntity player) {
@@ -69,12 +71,17 @@ public class WildcardManager {
     public static void activateWildcards() {
         showDots();
         TaskScheduler.scheduleTask(90, () -> {
-            showCryptTitle("A wildcard is active!");
             if (activeWildcards.isEmpty()) {
                 chooseRandomWildcard();
             }
             for (Wildcard wildcard : activeWildcards.values()) {
                 wildcard.activate();
+            }
+            if (!isActiveWildcard(Wildcards.TIME_DILATION)) {
+                showCryptTitle("A wildcard is active!", 4);
+            }
+            else {
+                showCryptTitle("A wildcard is active!", 0.5f);
             }
         });
     }
@@ -98,7 +105,7 @@ public class WildcardManager {
         });
     }
 
-    public static void showCryptTitle(String text) {
+    public static void showCryptTitle(String text, float speed) {
         PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE, 0.2f, 1);
         String colorCrypt = "§r§6§l§k";
         String colorNormal = "§r§6§l";
@@ -107,9 +114,9 @@ public class WildcardManager {
             cryptedText += "<"+character;
         }
 
-        int pos = 0;
+        float pos = 0;
         for (int i = 0; i < text.length(); i++) {
-            pos += 4;
+            pos += speed;
             if (!cryptedText.contains("<")) return;
             String[] split = cryptedText.split("<");
             int timesRemaining = split.length;
@@ -118,8 +125,13 @@ public class WildcardManager {
             cryptedText = String.join("<", split).replaceAll("<>", colorNormal);
 
             String finalCryptedText = cryptedText.replaceAll("<",colorCrypt);
-            TaskScheduler.scheduleTask(pos, () -> {
-                PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal(finalCryptedText),0,30,20);
+            TaskScheduler.scheduleTask((int) pos, () -> {
+                if (speed < 1) {
+                    PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal(finalCryptedText),0,2,1);
+                }
+                else {
+                    PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal(finalCryptedText),0,30,20);
+                }
             });
         }
     }
