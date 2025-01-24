@@ -3,6 +3,7 @@ package net.mat0u5.lifeseries.series.wildlife.wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.snails.Snails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ public enum Wildcards {
     public static Wildcard getInstance(Wildcards wildcard) {
         if (wildcard == Wildcards.SIZE_SHIFTING) return new SizeShifting();
         if (wildcard == Wildcards.HUNGER) return new Hunger();
-        if (wildcard == Wildcards.SNAILS) return null;
+        if (wildcard == Wildcards.SNAILS) return new Snails();
         if (wildcard == Wildcards.TIME_DILATION) return new TimeDilation();
         if (wildcard == Wildcards.TRIVIA_BOT) return null;
         if (wildcard == Wildcards.MOB_SWAP) return null;

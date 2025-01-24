@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries;
 
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
@@ -23,7 +24,7 @@ import net.mat0u5.lifeseries.series.limitedlife.LimitedLife;
 import net.mat0u5.lifeseries.series.thirdlife.ThirdLife;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.WildLifeConfig;
-import net.mat0u5.lifeseries.utils.ModRegistries;
+import net.mat0u5.lifeseries.registries.ModRegistries;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -36,7 +37,7 @@ import java.util.List;
 
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "dev-1.2.2.10";
+	public static final String MOD_VERSION = "dev-1.2.2.11";
 	public static final String MOD_ID = "lifeseries";
 	public static final String GITHUB_API_URL = "https://api.github.com/repos/Mat0u5/LifeSeries/releases/latest";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -53,6 +54,9 @@ public class Main implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		PolymerResourcePackUtils.addModAssets(MOD_ID);
+		PolymerResourcePackUtils.markAsRequired();
+
 		ConfigManager.moveOldMainFileIfExists();
 		config = new MainConfig();
 
