@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         java: [21]
-        minecraft_version: [1.21, 1.21.2]
+        minecraft_version: [1.21, 1.21.2, 1.21.4]
     runs-on: ubuntu-22.04
     steps:
       - name: Get branch name
@@ -38,15 +38,6 @@ jobs:
           url: ${{ secrets.DISCORD_WEBHOOK }}
           method: POST
           payload: '{ "embeds": [{ "title": "[${{ github.repository }}:${{ env.BRANCH_NAME }}] - new commit", "author": {"name": "${{ github.event.head_commit.author.name}}","url": "https://github.com/${{ github.event.head_commit.author.name}}","icon_url": "https://github.com/${{ github.event.head_commit.author.name}}.png"},"description": "```Commit Message:\n\n${{ env.COMMIT_MESSAGE }}```", "url": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}", "color": 5315202 }] }'
-
-      - name: Discord Message #2
-        if: ${{ matrix.minecraft_version == '1.21' }} # Only run for the first Minecraft version
-        uses: satak/webrequest-action@master
-        with:
-          url: ${{ secrets.DISCORD_WEBHOOK_2 }}
-          method: POST
-          payload: '{ "embeds": [{ "title": "[${{ github.repository }}:${{ env.BRANCH_NAME }}] - new commit", "author": {"name": "${{ github.event.head_commit.author.name}}","url": "https://github.com/${{ github.event.head_commit.author.name}}","icon_url": "https://github.com/${{ github.event.head_commit.author.name}}.png"},"description": "```Commit Message:\n\n${{ env.COMMIT_MESSAGE }}```", "url": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}", "color": 5315202 }] }'
-
 
       - name: checkout repository
         uses: actions/checkout@v4
