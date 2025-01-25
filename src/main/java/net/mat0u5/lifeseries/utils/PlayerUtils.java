@@ -93,7 +93,9 @@ public class PlayerUtils {
         return server.getPlayerManager().getPlayerList();
     }
 
-    public static void applyResorucepack(ServerPlayerEntity player) {
+    public static void applyResorucepack(UUID uuid) {
+        if (server == null) return;
+        ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             ClientHandler.applyResourcepack(player);
             return;
@@ -101,7 +103,7 @@ public class PlayerUtils {
         applyServerResourcepack(player);
     }
     public static void applyServerResourcepack(ServerPlayerEntity player) {
-        applySingleResourcepack(player, Series.RESOURCEPACK_MAIN_URL, Series.RESOURCEPACK_MAIN_SHA, "Life Series Main Resourcepack.");
+        //applySingleResourcepack(player, Series.RESOURCEPACK_MAIN_URL, Series.RESOURCEPACK_MAIN_SHA, "Life Series Main Resourcepack.");
         if (currentSeries instanceof SecretLife) {
             applySingleResourcepack(player, SecretLife.RESOURCEPACK_SECRETLIFE_URL, SecretLife.RESOURCEPACK_SECRETLIFE_SHA, "Secret Life Resourcepack.");
         }

@@ -529,7 +529,8 @@ public class TaskManager {
 
     public static void onBlockUse(ServerPlayerEntity player, ServerWorld world, BlockHitResult hitResult) {
         BlockPos pos = hitResult.getBlockPos();
-        if (world.getBlockState(pos).getBlock().getName().getString().contains("Button")) {
+        String name = world.getBlockState(pos).getBlock().getName().getString().toLowerCase();
+        if (name.contains("button")) {
             if (searchingForLocations) {
                 positionFound(pos, true);
             }
@@ -549,7 +550,8 @@ public class TaskManager {
         if (successButtonPos == null || rerollButtonPos == null || failButtonPos == null) return;
         BlockPos placePos = pos.offset(hitResult.getSide());
         TaskScheduler.scheduleTask(1, () -> {
-            if (world.getBlockState(placePos).getBlock().getName().getString().equalsIgnoreCase("Bedrock")) {
+            String name2 = world.getBlockState(placePos).getBlock().getName().getString().toLowerCase();
+            if (name2.contains("bedrock")) {
                 positionFound(placePos, false);
                 world.breakBlock(placePos, false);
             }

@@ -1,12 +1,6 @@
 package net.mat0u5.lifeseries;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import eu.pb4.polymer.autohost.impl.AutoHost;
-import eu.pb4.polymer.autohost.impl.AutoHostConfig;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import eu.pb4.polymer.resourcepack.impl.PolymerResourcePackImpl;
-import eu.pb4.polymer.resourcepack.impl.client.rendering.PolymerResourcePack;
 import net.fabricmc.api.ModInitializer;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
@@ -40,10 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-
-
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "dev-1.2.2.13";
+	public static final String MOD_VERSION = "dev-1.2.2.14";
 	public static final String MOD_ID = "lifeseries";
 	public static final String GITHUB_API_URL = "https://api.github.com/repos/Mat0u5/LifeSeries/releases/latest";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -60,9 +52,11 @@ public class Main implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		ConfigManager.createPolymerConfig();
+		ConfigManager.moveOldMainFileIfExists();
+
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 
-		ConfigManager.moveOldMainFileIfExists();
 		config = new MainConfig();
 
 		String series = config.getOrCreateProperty("currentSeries", "unassigned");

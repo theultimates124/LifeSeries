@@ -382,8 +382,8 @@ public abstract class Series extends Session {
             /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(health);*/
         }
         reloadPlayerTeam(player);
-        TaskScheduler.scheduleTask(1, () -> {
-            PlayerUtils.applyResorucepack(player);
+        TaskScheduler.scheduleTask(2, () -> {
+            PlayerUtils.applyResorucepack(player.getUuid());
         });
 
         if (statusNotStarted() && PermissionManager.isAdmin(player)) {

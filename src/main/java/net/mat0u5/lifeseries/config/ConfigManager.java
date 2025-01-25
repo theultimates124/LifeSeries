@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.Properties;
 
 public abstract class ConfigManager {
@@ -56,6 +57,33 @@ public abstract class ConfigManager {
             } catch (IOException e) {
                 Main.LOGGER.info("Failed to move old config file.");
             }
+        }
+    }
+
+    public static void createPolymerConfig() {
+        File newFolder = new File("./config/polymer/");
+        if (!newFolder.exists()) {
+            newFolder.mkdirs();
+        }
+        String resourcePack = "{\n  \"_c0\": \"UUID of default/main resource pack.\",\n  \"main_uuid\": \"e18b8296-585a-4be0-aee2-5125a3bebca6\",\n  \"_c1\": \"Marks resource pack as required, only effects clients and mods using api to check it\",\n  \"markResourcePackAsRequiredByDefault\": false,\n  \"_c2\": \"Force-enables offset of CustomModelData\",\n  \"forcePackOffset\": false,\n  \"_c3\": \"Value of CustomModelData offset when enabled\",\n  \"offsetValue\": 100000,\n  \"_c4\": \"Enables usage of alternative armor rendering for increased mod compatibility. (Always on with Iris or Canvas present)\",\n  \"use_alternative_armor_rendering\": false,\n  \"_c5\": \"Included resource packs from mods!\",\n  \"include_mod_assets\": [],\n  \"_c6\": \"Included resource packs from zips!\",\n  \"include_zips\": [\n    \"world/resources.zip\"\n  ],\n  \"_c7\": \"Path used for creation of default resourcepack!\",\n  \"resource_pack_location\": \"config/lifeseries/resource_pack.zip\",\n  \"_c8\": \"Prevents selected paths from being added to resource pack, if they start with provided text.\",\n  \"prevent_path_with\": []\n}";
+        String autoHost = "{\n  \"_c1\": \"Enables Polymer's ResourcePack Auto Hosting\",\n  \"enabled\": true,\n  \"_c2\": \"Marks resource pack as required\",\n  \"required\": false,\n  \"_c3\": \"Type of resource pack provider. Default: 'polymer:automatic'\",\n  \"type\": \"polymer:automatic\",\n  \"_c4\": \"Configuration of type, see provider's source for more details\",\n  \"settings\": {},\n  \"_c5\": \"Message sent to clients before pack is loaded\",\n  \"message\": \"The Life Series uses a resource pack to enhance gameplay with custom textures, models and sounds. Some of these features are necessary.\",\n  \"_c6\": \"Disconnect message in case of failure\",\n  \"disconnect_message\": \"Couldn't apply server resourcepack!\",\n  \"external_resource_packs\": [],\n  \"setup_early\": false\n}";
+        createOrModifyFile(new File("./config/polymer/resource-pack.json"), resourcePack);
+        createOrModifyFile(new File("./config/polymer/auto-host.json"), autoHost);
+    }
+
+    private static void createOrModifyFile(File file, String defaultContents) {
+        try {
+            if (file.exists()) {
+                Main.LOGGER.info("[Life Series] Modifying existing configuration file: " + file.getAbsolutePath());
+                Files.write(file.toPath(), defaultContents.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+            } else {
+                try (FileWriter writer = new FileWriter(file)) {
+                    writer.write(defaultContents);
+                    Main.LOGGER.info("[Life Series] Polymer configuration file created at: " + file.getAbsolutePath());
+                }
+            }
+        } catch (IOException e) {
+            Main.LOGGER.error("[Life Series] Failed to create or modify the polymer configuration file: " + e.getMessage());
         }
     }
 
