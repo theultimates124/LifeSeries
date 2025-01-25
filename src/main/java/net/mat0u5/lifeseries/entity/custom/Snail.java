@@ -53,9 +53,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     protected void initGoals() {
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new AttackGoal(this));
-
         this.targetSelector.add(0, new ActiveTargetGoal<>(this, PlayerEntity.class, false));
-
     }
 
 

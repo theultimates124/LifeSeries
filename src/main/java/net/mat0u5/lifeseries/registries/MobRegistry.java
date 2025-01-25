@@ -35,11 +35,13 @@ public class MobRegistry {
                     .dimensions(EntityDimensions.changing(0.5f, 0.6f))
                     .defaultAttributes(Snail::createAttributes)
     );
+
     private static <T extends Entity> EntityType<T> register(Identifier id, FabricEntityTypeBuilder<T> builder) {
         EntityType<T> type = builder.build();
         PolymerEntityUtils.registerType(type);
         return Registry.register(Registries.ENTITY_TYPE, id, type);
     }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static void addSpawnEgg(EntityType type, Item item) {
         Item spawnEgg = new PolymerSpawnEggItem(type, item, new Item.Settings());
@@ -80,8 +82,6 @@ public class MobRegistry {
         addSpawnEgg(SNAIL, Items.HORSE_SPAWN_EGG);
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(Main.MOD_ID, "spawn-eggs"), ITEM_GROUP);
     }
-
-
 
     public static final Object2ObjectOpenHashMap<Identifier, Item> SPAWN_EGGS = new Object2ObjectOpenHashMap<>();
     public static final ItemGroup ITEM_GROUP = new ItemGroup.Builder (null, -1)
