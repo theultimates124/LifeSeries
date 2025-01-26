@@ -1,7 +1,6 @@
 package net.mat0u5.lifeseries.series;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
-import net.mat0u5.lifeseries.series.secretlife.TaskManager;
 import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -12,9 +11,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.ElderGuardianEntity;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.item.SpawnEggItem;
-import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -206,6 +203,20 @@ public abstract class Series extends Session {
         return isOnLife;
     }
 
+    @Nullable
+    public Boolean isOnAtLeastLives(ServerPlayerEntity player, int check) {
+        if (!isAlive(player)) return null;
+        Integer lives = currentSeries.getPlayerLives(player);
+        return lives >= check;
+    }
+
+    public boolean isOnAtLeastLives(ServerPlayerEntity player, int check, boolean fallback) {
+        Boolean isOnLife = isOnSpecificLives(player, check);
+        if (isOnLife == null) return fallback;
+        return isOnLife;
+    }
+
+
     private HashMap<UUID, HashMap<Vec3d,List<Float>>> respawnPositions = new HashMap<>();
     public void playerLostAllLives(ServerPlayerEntity player) {
         player.changeGameMode(GameMode.SPECTATOR);
@@ -280,14 +291,14 @@ public abstract class Series extends Session {
         return alivePlayers;
     }
 
-    public boolean anyGreenPlayers() {
+    public boolean getGreenPlayers() {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             if (isOnSpecificLives(player, 3, false)) return true;
         }
         return false;
     }
 
-    public boolean anyYellowPlayers() {
+    public boolean getYellowPlayers() {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             if (isOnSpecificLives(player, 2, false)) return true;
         }

@@ -61,9 +61,15 @@ public class WildLife extends Series {
 
     @Override
     public void onPlayerKilledByPlayer(ServerPlayerEntity victim, ServerPlayerEntity killer) {
+        boolean gaveLife = false;
+        if (isOnAtLeastLives(victim, 4, false)) {
+            addPlayerLife(killer);
+            gaveLife = true;
+        }
         if (isAllowedToAttack(killer, victim)) return;
         OtherUtils.broadcastMessageToAdmins(Text.of("§c [Unjustified Kill?] §f"+victim.getNameForScoreboard() + "§7 was killed by §f"
                 +killer.getNameForScoreboard() + "§7, who is not §cred name§7 (nor a §eyellow name§7, with the victim being a §agreen name§7)"));
+        if (gaveLife) OtherUtils.broadcastMessageToAdmins(Text.of("§7Remember to remove a life from the killer (using §f/lives remove <player>§7) if this was indeed an unjustified kill."));
     }
 
     @Override

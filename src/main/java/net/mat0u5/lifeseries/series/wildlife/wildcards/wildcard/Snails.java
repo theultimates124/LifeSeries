@@ -1,4 +1,4 @@
-package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.snails;
+package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard;
 
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
