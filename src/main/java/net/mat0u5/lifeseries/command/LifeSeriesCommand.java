@@ -3,13 +3,18 @@ package net.mat0u5.lifeseries.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.mat0u5.lifeseries.Main;
+import net.mat0u5.lifeseries.entity.snail.Snail;
+import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.series.SeriesList;
-import net.mat0u5.lifeseries.series.secretlife.TaskManager;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -60,6 +65,17 @@ public class LifeSeriesCommand {
                     )
                 )
         );
+        if (Main.isDevVersion()) {
+            dispatcher.register(
+                literal("lifeseries")
+                    .then(literal("test")
+                            .executes(context -> test(context.getSource()))
+                    )
+                        .then(literal("test2")
+                                .executes(context -> test2(context.getSource()))
+                        )
+            );
+        }
     }
 
     public static int setSeries(ServerCommandSource source, String setTo, boolean confirmed) {
@@ -139,6 +155,31 @@ public class LifeSeriesCommand {
         source.sendMessage(Text.of("The Life Series was originally created by " + Credits_IdeaCreator +
                 ", and this mod aims to implement every season of the Life Series. "));
         source.sendMessage(Text.of("This mod was created by " + Credits_ModCreator + "."));
+        return 1;
+    }
+
+    public static int test(ServerCommandSource source) {
+        ServerPlayerEntity player = source.getPlayer();
+        if (player == null) return -1;
+        source.sendMessage(Text.of("Test Command"));
+        Snail snail = MobRegistry.SNAIL.spawn(player.getServerWorld(), player.getBlockPos(), SpawnReason.COMMAND);
+        if (snail != null) {
+            snail.setBoundPlayer(player);
+            snail.setPersistent();
+        }
+        return 1;
+    }
+
+    public static int test2(ServerCommandSource source) {
+        ServerPlayerEntity player = source.getPlayer();
+        if (player == null) return -1;
+        for (Entity entity : player.getWorld().getEntitiesByClass(MobEntity.class, player.getBoundingBox().expand(500), entity -> entity instanceof Snail)) {
+            // Check if the entity is an instance of Snail
+            if (entity instanceof Snail snail) {
+                // Kill the snail
+                snail.kill();
+            }
+        }
         return 1;
     }
 }

@@ -4,7 +4,7 @@ import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Snails;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
@@ -51,8 +51,9 @@ public class WildcardManager {
     public static void chooseRandomWildcard() {
         //TODO
         //activeWildcards.put(Wildcards.SIZE_SHIFTING, new SizeShifting());
-       // activeWildcards.put(Wildcards.HUNGER, new Hunger());
-        activeWildcards.put(Wildcards.TIME_DILATION, new TimeDilation());
+        //activeWildcards.put(Wildcards.HUNGER, new Hunger());
+        //activeWildcards.put(Wildcards.TIME_DILATION, new TimeDilation());
+        activeWildcards.put(Wildcards.SNAILS, new Snails());
     }
 
     public static void resetWildcardsOnPlayerJoin(ServerPlayerEntity player) {

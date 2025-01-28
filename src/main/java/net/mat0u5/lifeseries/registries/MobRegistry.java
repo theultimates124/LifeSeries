@@ -4,25 +4,20 @@ import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polymer.core.api.item.PolymerSpawnEggItem;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityType;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.mat0u5.lifeseries.Main;
-import net.mat0u5.lifeseries.entity.custom.Snail;
+import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-
-import java.util.function.Function;
 
 public class MobRegistry {
 
@@ -33,6 +28,7 @@ public class MobRegistry {
                     .entityFactory(Snail::new)
                     .spawnGroup(SpawnGroup.MONSTER)
                     .dimensions(EntityDimensions.changing(0.5f, 0.6f))
+                    .trackRangeChunks(10)
                     .defaultAttributes(Snail::createAttributes)
     );
 
@@ -58,6 +54,7 @@ public class MobRegistry {
             FabricEntityType.Builder.createMob(Snail::new, SpawnGroup.MONSTER, x -> x
                             .defaultAttributes(Snail::createAttributes))
                         .dimensions(0.5f, 0.6f)
+                        .trackRangeChunks(10)
     );
 
     private static <T extends Entity> EntityType<T> register(Identifier id, EntityType.Builder<T> builder) {

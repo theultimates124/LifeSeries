@@ -65,7 +65,7 @@ public class UpdateChecker {
             return;
         }
         TaskScheduler.scheduleTask(98, () -> {
-            if (!Main.MOD_VERSION.contains("dev")) {
+            if (!Main.isDevVersion()) {
                 Text discordText = Text.literal("§7Click ").append(
                         Text.literal("here")
                                 .styled(style -> style

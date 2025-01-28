@@ -1,5 +1,8 @@
 package net.mat0u5.lifeseries.utils;
 
+import de.tomalbrc.bil.api.AnimatedHolder;
+import de.tomalbrc.bil.api.Animator;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;

@@ -4,8 +4,7 @@ import de.tomalbrc.bil.api.AnimatedHolder;
 import de.tomalbrc.bil.api.Animator;
 import net.minecraft.entity.LivingEntity;
 
-public class AnimationHelper {
-
+public class AnimationHandler {
     public static void updateWalkAnimation(LivingEntity entity, AnimatedHolder holder) {
         updateWalkAnimation(entity, holder, 0);
     }
