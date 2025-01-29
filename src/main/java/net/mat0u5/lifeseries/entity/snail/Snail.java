@@ -129,7 +129,13 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         ServerPlayerEntity boundPlayer = getBoundPlayer();
         if (boundPlayer != null) {
             if (this.getBoundingBox().expand(0.05).intersects(boundPlayer.getBoundingBox())) {
-                boundPlayer.kill(); //TODO
+                //TODO
+                //? if <= 1.21 {
+                boundPlayer.kill();
+                 //?} else {
+                /*boundPlayer.kill(boundPlayer.getServerWorld());
+                *///?}
+
             }
             if (age % 100 == 0 || !setNavigation) {
                 setNavigation = true;
@@ -148,10 +154,17 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
     public void updatePathFinders() {
         ServerWorld world = (ServerWorld) this.getWorld();
+        //? if <= 1.21 {
         this.pathFinder.teleport(world, this.getX(), this.getY(), this.getZ(), EnumSet.noneOf(PositionFlag.class), getYaw(), getPitch());
         BlockPos pos = getGroundBlock();
         if (pos == null) return;
         this.groundPathFinder.teleport(world, this.getX(), pos.getY()+1, this.getZ(), EnumSet.noneOf(PositionFlag.class), getYaw(), getPitch());
+        //?} else {
+        /*this.pathFinder.teleport(world, this.getX(), this.getY(), this.getZ(), EnumSet.noneOf(PositionFlag.class), getYaw(), getPitch(), false);
+        BlockPos pos = getGroundBlock();
+        if (pos == null) return;
+        this.groundPathFinder.teleport(world, this.getX(), pos.getY()+1, this.getZ(), EnumSet.noneOf(PositionFlag.class), getYaw(), getPitch(), false);
+        *///?}
     }
 
     @Nullable
@@ -189,7 +202,12 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
         BlockPos tpTo = getBlockPosNearTarget(minDistanceFromPlayer);
         Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
+        //? if <= 1.21 {
         teleport(serverWorld, tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch());
+        //?} else {
+        /*teleport(serverWorld, tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch(), false);
+        *///?}
+
     }
 
     public BlockPos getBlockPosNearTarget(double minDistanceFromTarget) {

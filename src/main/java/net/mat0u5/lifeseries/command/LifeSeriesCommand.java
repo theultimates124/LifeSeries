@@ -17,6 +17,7 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -182,12 +183,21 @@ public class LifeSeriesCommand {
         if (player == null) return -1;
         for (Entity entity : player.getWorld().getEntitiesByClass(MobEntity.class, player.getBoundingBox().expand(500), entity -> entity instanceof Snail)) {
             if (entity instanceof Snail snail) {
+
+                //? if <= 1.21 {
                 snail.kill();
+                 //?} else {
+                /*snail.kill((ServerWorld) snail.getWorld());
+                *///?}
             }
         }
         for (Entity entity : player.getWorld().getEntitiesByClass(AmbientEntity.class, player.getBoundingBox().expand(500), entity -> entity instanceof PathFinder)) {
             if (entity instanceof PathFinder pathfinder) {
+                //? if <= 1.21 {
                 pathfinder.kill();
+                 //?} else {
+                /*pathfinder.kill((ServerWorld) pathfinder.getWorld());
+                *///?}
             }
         }
         return 1;

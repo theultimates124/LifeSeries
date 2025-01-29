@@ -3,7 +3,9 @@ package net.mat0u5.lifeseries.registries;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polymer.core.api.item.PolymerSpawnEggItem;
+import it.unimi.dsi.fastutil.Function;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityType;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.entity.pathfinder.PathFinder;
@@ -12,11 +14,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -59,19 +63,20 @@ public class MobRegistry {
         SPAWN_EGGS.putIfAbsent(identifier, item);
     }
      //?} else {
-    /*
-    public static final EntityType<Snail> SNAIL = register(
+    
+    /*public static final EntityType<Snail> SNAIL = register(
             Snail.ID,
             FabricEntityType.Builder.createMob(Snail::new, SpawnGroup.MONSTER, x -> x
                             .defaultAttributes(Snail::createAttributes))
                         .dimensions(0.5f, 0.6f)
-                        .trackRangeChunks(10)
+                    .maxTrackingRange(10)
+    );
     public static final EntityType<PathFinder> PATH_FINDER = register(
             PathFinder.ID,
             FabricEntityType.Builder.createMob(PathFinder::new, SpawnGroup.AMBIENT, x -> x
                             .defaultAttributes(PathFinder::createAttributes))
-                        .dimensions(0.5f, 0.6f)
-                        .trackRangeChunks(10)
+                    .dimensions(0.5f, 0.6f)
+                    .maxTrackingRange(10)
     );
 
     private static <T extends Entity> EntityType<T> register(Identifier id, EntityType.Builder<T> builder) {
@@ -82,7 +87,9 @@ public class MobRegistry {
     }
 
     private static void addSpawnEgg(EntityType<? extends MobEntity> type, Item vanillaItem) {
-        register(Identifier.of(Main.MOD_ID,EntityType.getId(type).getPath() + "_spawn_egg"), properties-> new PolymerSpawnEggItem(type, vanillaItem, properties));
+        register(Identifier.of(Main.MOD_ID,
+                EntityType.getId(type).getPath() + "_spawn_egg"),
+                properties -> new PolymerSpawnEggItem(type, vanillaItem, (Item.Settings) properties));
     }
 
     static public <T extends Item> void register(Identifier identifier, Function<Item.Settings, T> function) {
