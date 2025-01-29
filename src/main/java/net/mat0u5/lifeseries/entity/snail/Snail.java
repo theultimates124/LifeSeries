@@ -8,9 +8,11 @@ import de.tomalbrc.bil.file.loader.BbModelLoader;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.entity.AnimationHandler;
+import net.mat0u5.lifeseries.entity.pathfinder.PathFinder;
 import net.mat0u5.lifeseries.entity.snail.goal.*;
-import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.control.FlightMoveControl;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.pathing.*;
@@ -20,12 +22,10 @@ import net.minecraft.entity.mob.*;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -33,12 +33,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class Snail extends HostileEntity implements AnimatedEntity {
     public static final Identifier ID = Identifier.of(Main.MOD_ID, "snail");
     public static final Model MODEL = BbModelLoader.load(ID);
     private final EntityHolder<Snail> holder;
     public ServerPlayerEntity boundPlayer;
+    public UUID boundPlayerUUID;
     public boolean attacking;
     public boolean flying;
     public boolean gliding;
@@ -46,10 +48,11 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public boolean setNavigation = false;
     public static final float MOVEMENT_SPEED = 0.35f;
     public static final float FLYING_SPEED = 0.3f;
-
+    public PathFinder groundPathFinder;
+    public PathFinder pathFinder;
     public static final int STATIONARY_TP_COOLDOWN = 1200; // No movement for 1 minute teleports the snail
     public static final int TP_MIN_RANGE = 15;
-    public static final int MAX_DISTANCE = 100; // Distance over this teleports the snail to the player
+    public static final int MAX_DISTANCE = 150; // Distance over this teleports the snail to the player
     public static final int JUMP_COOLDOWN = 40;
     public static final int JUMP_RANGE_SQUARED = 12;
 
@@ -58,10 +61,14 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         this.holder = new LivingEntityHolder<>(this, MODEL);
         EntityAttachment.ofTicking(holder, this);
         setInvulnerable(true);
+        groundPathFinder = MobRegistry.PATH_FINDER.spawn((ServerWorld) this.getWorld(), this.getBlockPos(), SpawnReason.COMMAND);
+        pathFinder = MobRegistry.PATH_FINDER.spawn((ServerWorld) this.getWorld(), this.getBlockPos(), SpawnReason.COMMAND);
     }
 
     public void setBoundPlayer(ServerPlayerEntity player) {
+        if (player == null) return;
         boundPlayer = player;
+        boundPlayerUUID = player.getUuid();
     }
 
     @Override
@@ -75,15 +82,16 @@ public class Snail extends HostileEntity implements AnimatedEntity {
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 10000)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, MOVEMENT_SPEED)
                 .add(EntityAttributes.GENERIC_FLYING_SPEED, FLYING_SPEED)
-                //.add(EntityAttributes.GENERIC_SAFE_FALL_DISTANCE, 10)
-                //.add(EntityAttributes.GENERIC_JUMP_STRENGTH, 0.5)
                 .add(EntityAttributes.GENERIC_STEP_HEIGHT, 1)
+                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 150)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 20);
         //?} else {
         /*return MobEntity.createMobAttributes()
                 .add(EntityAttributes.MAX_HEALTH, 10000)
                 .add(EntityAttributes.MOVEMENT_SPEED, MOVEMENT_SPEED)
                 .add(EntityAttributes.FLYING_SPEED, FLYING_SPEED)
+                .add(EntityAttributes.STEP_HEIGHT, 1)
+                .add(EntityAttributes.FOLLOW_RANGE, 150)
                 .add(EntityAttributes.ATTACK_DAMAGE, 20);
         *///?}
     }
@@ -103,13 +111,26 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
     @Override
     public void tick() {
+        Vec3d velocity = getVelocity();
+        if (velocity.y > 0.15) {
+            setVelocity(velocity.x,0.15,velocity.z);
+        }
+        else if (velocity.y < -0.15) {
+            setVelocity(velocity.x,-0.15,velocity.z);
+        }
+
+
         super.tick();
         if (age % 2 == 0) {
             //TODO
             AnimationHandler.updateHurtVariant(this, holder);
             AnimationHandler.updateWalkAnimation(this, holder);
         }
-        if (getBoundPlayer() != null) {
+        ServerPlayerEntity boundPlayer = getBoundPlayer();
+        if (boundPlayer != null) {
+            if (this.getBoundingBox().expand(0.05).intersects(boundPlayer.getBoundingBox())) {
+                boundPlayer.kill(); //TODO
+            }
             if (age % 100 == 0 || !setNavigation) {
                 setNavigation = true;
                 updateMoveControl();
@@ -119,6 +140,18 @@ public class Snail extends HostileEntity implements AnimatedEntity {
                 updateNavigationTarget();
             }
         }
+        if (boundPlayerUUID != null && (age % 100 == 0 || boundPlayer == null)) {
+            setBoundPlayer(getServer().getPlayerManager().getPlayer(boundPlayerUUID));
+        }
+        updatePathFinders();
+    }
+
+    public void updatePathFinders() {
+        ServerWorld world = (ServerWorld) this.getWorld();
+        this.pathFinder.teleport(world, this.getX(), this.getY(), this.getZ(), EnumSet.noneOf(PositionFlag.class), getYaw(), getPitch());
+        BlockPos pos = getGroundBlock();
+        if (pos == null) return;
+        this.groundPathFinder.teleport(world, this.getX(), pos.getY()+1, this.getZ(), EnumSet.noneOf(PositionFlag.class), getYaw(), getPitch());
     }
 
     @Nullable
@@ -172,21 +205,11 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     }
 
     public boolean canPathToPlayer(boolean flying) {
-        if (getBoundPlayer() == null) return false;
-        EntityNavigation testNavigation = flying ? new BirdNavigation(this, getWorld()) : new MobNavigation(this, getWorld());
-        /*if (flying) {
-            setMoveControlFlight();
-        }
-        else {
-            setMoveControlWalking();
-        }*/
+        return pathFinder.canPathfind(getBoundPlayer(), flying);
+    }
 
-        Path path = testNavigation.findPathTo(getBoundPlayer(), 0);
-        if (path == null) return false;
-        PathNode end = path.getEnd();
-        if (end == null) return false;
-        boolean canPath = end.getBlockPos().equals(getBoundPlayer().getBlockPos());
-        return canPath;
+    public boolean canPathToPlayerFromGround(boolean flying) {
+        return groundPathFinder.canPathfind(getBoundPlayer(), flying);
     }
 
     public void updateNavigation() {
@@ -240,11 +263,13 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     }
 
     public void setMoveControlFlight() {
+        System.out.println("setMoveControlFlight");
         setNoGravity(true);
         moveControl = new FlightMoveControl(this, 20, true);
     }
 
     public void setMoveControlWalking() {
+        System.out.println("setMoveControlWalking");
         setNoGravity(false);
         moveControl = new MoveControl(this);
     }

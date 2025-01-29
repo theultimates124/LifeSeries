@@ -6,6 +6,7 @@ import eu.pb4.polymer.core.api.item.PolymerSpawnEggItem;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.mat0u5.lifeseries.Main;
+import net.mat0u5.lifeseries.entity.pathfinder.PathFinder;
 import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
@@ -31,6 +32,15 @@ public class MobRegistry {
                     .trackRangeChunks(10)
                     .defaultAttributes(Snail::createAttributes)
     );
+    public static final EntityType<PathFinder> PATH_FINDER = register(
+            PathFinder.ID,
+            FabricEntityTypeBuilder.createMob()
+                    .entityFactory(PathFinder::new)
+                    .spawnGroup(SpawnGroup.AMBIENT)
+                    .dimensions(EntityDimensions.changing(0.5f, 0.6f))
+                    .trackRangeChunks(10)
+                    .defaultAttributes(PathFinder::createAttributes)
+    );
 
     private static <T extends Entity> EntityType<T> register(Identifier id, FabricEntityTypeBuilder<T> builder) {
         EntityType<T> type = builder.build();
@@ -49,10 +59,17 @@ public class MobRegistry {
         SPAWN_EGGS.putIfAbsent(identifier, item);
     }
      //?} else {
-    /*public static final EntityType<Snail> SNAIL = register(
+    /*
+    public static final EntityType<Snail> SNAIL = register(
             Snail.ID,
             FabricEntityType.Builder.createMob(Snail::new, SpawnGroup.MONSTER, x -> x
                             .defaultAttributes(Snail::createAttributes))
+                        .dimensions(0.5f, 0.6f)
+                        .trackRangeChunks(10)
+    public static final EntityType<PathFinder> PATH_FINDER = register(
+            PathFinder.ID,
+            FabricEntityType.Builder.createMob(PathFinder::new, SpawnGroup.AMBIENT, x -> x
+                            .defaultAttributes(PathFinder::createAttributes))
                         .dimensions(0.5f, 0.6f)
                         .trackRangeChunks(10)
     );

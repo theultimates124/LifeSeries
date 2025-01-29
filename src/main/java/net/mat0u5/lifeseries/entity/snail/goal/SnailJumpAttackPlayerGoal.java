@@ -39,7 +39,7 @@ public final class SnailJumpAttackPlayerGoal extends Goal {
             return false;
         }
 
-        return mob.canSee(boundPlayer) && mob.isOnGround();
+        return mob.canSee(boundPlayer);
     }
 
     @Override
@@ -48,7 +48,7 @@ public final class SnailJumpAttackPlayerGoal extends Goal {
             return false;
         }
 
-        return mob.isOnGround() && mob.squaredDistanceTo(boundPlayer) <= Snail.JUMP_RANGE_SQUARED;
+        return mob.squaredDistanceTo(boundPlayer) <= Snail.JUMP_RANGE_SQUARED;
     }
 
     @Override

@@ -11,7 +11,7 @@ public final class SnailStartFlyingGoal extends Goal {
     @NotNull
     private final Snail mob;
     private int startFlyingCounter;
-    private final int startFlyingDelay = 10;
+    private final int startFlyingDelay = 70;
     private boolean canWalk = true;
 
     public SnailStartFlyingGoal(@NotNull Snail mob) {

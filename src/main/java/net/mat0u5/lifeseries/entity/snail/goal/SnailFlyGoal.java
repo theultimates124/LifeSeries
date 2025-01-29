@@ -61,5 +61,7 @@ public class SnailFlyGoal extends Goal {
     public void stop() {
         OtherUtils.broadcastMessage(Text.of("STOPP_SnailFlyTowardsPlayerGoal"));
         mob.flying = false;
+        mob.updateNavigation();
+        mob.updateMoveControl();
     }
 }

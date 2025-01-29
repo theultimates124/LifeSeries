@@ -56,16 +56,18 @@ public final class SnailGlideGoal extends Goal {
 
     @Override
     public void tick() {
-        parachuteTowardsTarget();
+        glideToPlayer();
     }
 
     @Override
     public void stop() {
         mob.gliding = false;
         mob.flying = false;
+        mob.updateNavigation();
+        mob.updateMoveControl();
     }
 
-    private void parachuteTowardsTarget() {
+    private void glideToPlayer() {
         ServerPlayerEntity boundPlayer = mob.getBoundPlayer();
         if (boundPlayer == null) {
             return;

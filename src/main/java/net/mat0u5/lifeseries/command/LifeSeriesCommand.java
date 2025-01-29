@@ -3,6 +3,7 @@ package net.mat0u5.lifeseries.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.mat0u5.lifeseries.Main;
+import net.mat0u5.lifeseries.entity.pathfinder.PathFinder;
 import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.series.SeriesList;
@@ -11,6 +12,7 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -18,6 +20,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
+import java.nio.file.Path;
 
 import static net.mat0u5.lifeseries.Main.*;
 import static net.mat0u5.lifeseries.utils.PermissionManager.isAdmin;
@@ -71,8 +75,11 @@ public class LifeSeriesCommand {
                     .then(literal("test")
                             .executes(context -> test(context.getSource()))
                     )
-                        .then(literal("test2")
-                                .executes(context -> test2(context.getSource()))
+                    .then(literal("test2")
+                            .executes(context -> test2(context.getSource()))
+                    )
+                        .then(literal("test3")
+                                .executes(context -> test3(context.getSource()))
                         )
             );
         }
@@ -174,11 +181,24 @@ public class LifeSeriesCommand {
         ServerPlayerEntity player = source.getPlayer();
         if (player == null) return -1;
         for (Entity entity : player.getWorld().getEntitiesByClass(MobEntity.class, player.getBoundingBox().expand(500), entity -> entity instanceof Snail)) {
-            // Check if the entity is an instance of Snail
             if (entity instanceof Snail snail) {
-                // Kill the snail
                 snail.kill();
             }
+        }
+        for (Entity entity : player.getWorld().getEntitiesByClass(AmbientEntity.class, player.getBoundingBox().expand(500), entity -> entity instanceof PathFinder)) {
+            if (entity instanceof PathFinder pathfinder) {
+                pathfinder.kill();
+            }
+        }
+        return 1;
+    }
+    public static int test3(ServerCommandSource source) {
+        ServerPlayerEntity player = source.getPlayer();
+        if (player == null) return -1;
+        source.sendMessage(Text.of("Test Command"));
+        PathFinder snail = MobRegistry.PATH_FINDER.spawn(player.getServerWorld(), player.getBlockPos(), SpawnReason.COMMAND);
+        if (snail != null) {
+            snail.setPersistent();
         }
         return 1;
     }

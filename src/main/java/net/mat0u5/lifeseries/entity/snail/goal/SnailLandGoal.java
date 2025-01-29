@@ -45,11 +45,7 @@ public final class SnailLandGoal extends Goal {
         if (!isMobAboveTarget) {
             return false;
         }
-
-        double height = mob.getDistanceToGroundBlock();
-        boolean shouldLand = height <= 1 + mob.getY() - boundPlayer.getY();
-
-        return shouldLand && canPathfindFromGround();
+        return mob.canPathToPlayerFromGround(false);
     }
 
     @Override
@@ -76,22 +72,6 @@ public final class SnailLandGoal extends Goal {
     }
 
     private void land() {
-        OtherUtils.broadcastMessage(Text.of("landddd"));
-        mob.setVelocity(0.0D, -0.1D, 0.0D);
-    }
-
-    private boolean canPathfindFromGround() {
-
-        Vec3d originalPos = mob.getPos();
-        BlockPos groundPos = mob.getGroundBlock();
-        if (groundPos == null) {
-            return false;
-        }
-
-        mob.setPosition(groundPos.getX(), groundPos.getY() + 1, groundPos.getZ());
-        boolean canPathfind = mob.canPathToPlayer(false);
-        mob.setPosition(originalPos.getX(), originalPos.getY(), originalPos.getZ());
-
-        return canPathfind;
+        mob.setVelocity(0.0D, -0.15D, 0.0D);
     }
 }
