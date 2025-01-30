@@ -87,6 +87,7 @@ public class WildLife extends Series {
     @Override
     public boolean sessionStart() {
         if (super.sessionStart()) {
+            WildcardManager.resetWildcardsOnSessionStart();
             activeActions.addAll(
                     List.of(WildcardManager.wildcardNotice, WildcardManager.startWildcards)
             );
@@ -98,7 +99,14 @@ public class WildLife extends Series {
     @Override
     public void sessionEnd() {
         super.sessionEnd();
+        WildcardManager.resetWildcardsOnSessionEnd();
         WildcardManager.onSessionEnd();
+    }
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        WildcardManager.resetWildcardsOnServerStart();
     }
 
     @Override

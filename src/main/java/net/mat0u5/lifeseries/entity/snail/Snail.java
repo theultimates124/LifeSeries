@@ -35,21 +35,25 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static net.mat0u5.lifeseries.Main.currentSeries;
+import static net.mat0u5.lifeseries.Main.server;
+
 public class Snail extends HostileEntity implements AnimatedEntity {
     public static final Identifier ID = Identifier.of(Main.MOD_ID, "snail");
     public static final Model MODEL = BbModelLoader.load(ID);
     private final EntityHolder<Snail> holder;
-    public ServerPlayerEntity boundPlayer;
     public UUID boundPlayerUUID;
     public boolean attacking;
     public boolean flying;
     public boolean gliding;
     public boolean mining;
     public boolean setNavigation = false;
-    public static final float MOVEMENT_SPEED = 0.35f;
-    public static final float FLYING_SPEED = 0.3f;
     public PathFinder groundPathFinder;
     public PathFinder pathFinder;
+    public int nullPlayerChecks = 0;
+
+    public static final float MOVEMENT_SPEED = 0.35f;
+    public static final float FLYING_SPEED = 0.3f;
     public static final int STATIONARY_TP_COOLDOWN = 1200; // No movement for 1 minute teleports the snail
     public static final int TP_MIN_RANGE = 15;
     public static final int MAX_DISTANCE = 150; // Distance over this teleports the snail to the player
@@ -61,13 +65,13 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         this.holder = new LivingEntityHolder<>(this, MODEL);
         EntityAttachment.ofTicking(holder, this);
         setInvulnerable(true);
+        setPersistent();
         groundPathFinder = MobRegistry.PATH_FINDER.spawn((ServerWorld) this.getWorld(), this.getBlockPos(), SpawnReason.COMMAND);
         pathFinder = MobRegistry.PATH_FINDER.spawn((ServerWorld) this.getWorld(), this.getBlockPos(), SpawnReason.COMMAND);
     }
 
     public void setBoundPlayer(ServerPlayerEntity player) {
         if (player == null) return;
-        boundPlayer = player;
         boundPlayerUUID = player.getUuid();
     }
 
@@ -100,7 +104,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     protected void initGoals() {
         goalSelector.add(0, new SnailTeleportGoal(this));
 
-        goalSelector.add(1, new SnailLandGoal(this)); //TODO
+        goalSelector.add(1, new SnailLandGoal(this));
         goalSelector.add(2, new SnailMineTowardsPlayerGoal(this)); //TODO
         goalSelector.add(3, new SnailFlyGoal(this));
 
@@ -111,6 +115,25 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
     @Override
     public void tick() {
+        super.tick();
+
+        if (nullPlayerChecks > 1000) {
+            //Despawn
+
+            //? if <= 1.21 {
+            groundPathFinder.kill();
+            pathFinder.kill();
+            kill();
+            //?} else {
+            /*groundPathFinder.kill((ServerWorld) groundPathFinder.getWorld());
+            pathFinder.kill((ServerWorld) groundPathFinder.getWorld());
+            kill((ServerWorld) getWorld());
+             *///?}
+            groundPathFinder.remove(RemovalReason.KILLED);
+            pathFinder.remove(RemovalReason.KILLED);
+            this.remove(RemovalReason.KILLED);
+        }
+
         Vec3d velocity = getVelocity();
         if (velocity.y > 0.15) {
             setVelocity(velocity.x,0.15,velocity.z);
@@ -118,9 +141,6 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         else if (velocity.y < -0.15) {
             setVelocity(velocity.x,-0.15,velocity.z);
         }
-
-
-        super.tick();
         if (age % 2 == 0) {
             //TODO
             AnimationHandler.updateHurtVariant(this, holder);
@@ -146,9 +166,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
                 updateNavigationTarget();
             }
         }
-        if (boundPlayerUUID != null && (age % 100 == 0 || boundPlayer == null)) {
-            setBoundPlayer(getServer().getPlayerManager().getPlayer(boundPlayerUUID));
-        }
+
         updatePathFinders();
     }
 
@@ -251,19 +269,16 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         }
     }
     public void setNavigationFlying() {
-        System.out.println("setNavigationFlying");
         navigation = new BirdNavigation(this, getWorld());
         updateNavigationTarget();
     }
 
     public void setNavigationWalking() {
-        System.out.println("setNavigationWalking");
         navigation = new MobNavigation(this, getWorld());
         updateNavigationTarget();
     }
 
     public void setNavigationMining() {
-        System.out.println("setNavigationMining");
         navigation = new MiningNavigation(this, getWorld());
         updateNavigationTarget();
     }
@@ -281,13 +296,11 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     }
 
     public void setMoveControlFlight() {
-        System.out.println("setMoveControlFlight");
         setNoGravity(true);
         moveControl = new FlightMoveControl(this, 20, true);
     }
 
     public void setMoveControlWalking() {
-        System.out.println("setMoveControlWalking");
         setNoGravity(false);
         moveControl = new MoveControl(this);
     }
@@ -298,6 +311,16 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
     @Nullable
     public ServerPlayerEntity getBoundPlayer() {
-        return boundPlayer;
+        if (server == null) return null;
+        ServerPlayerEntity player = server.getPlayerManager().getPlayer(boundPlayerUUID);
+        if (player == null) {
+            nullPlayerChecks++;
+            return null;
+        }
+        nullPlayerChecks = 0;
+        if (player.isSpectator()) return null;
+        //if (player.isCreative()) return null;
+        //if (!currentSeries.isAlive(player)) return null;
+        return player;
     }
 }

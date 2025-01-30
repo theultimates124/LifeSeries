@@ -69,6 +69,19 @@ public class WildcardManager {
         });
     }
 
+    public static void resetWildcardsOnServerStart() {
+        TaskScheduler.scheduleTask(50, Snails::killAllSnails);
+
+    }
+
+    public static void resetWildcardsOnSessionStart() {
+        Snails.killAllSnails();
+    }
+
+    public static void resetWildcardsOnSessionEnd() {
+        Snails.killAllSnails();
+    }
+
     public static void activateWildcards() {
         showDots();
         TaskScheduler.scheduleTask(90, () -> {

@@ -173,7 +173,6 @@ public class LifeSeriesCommand {
         Snail snail = MobRegistry.SNAIL.spawn(player.getServerWorld(), player.getBlockPos(), SpawnReason.COMMAND);
         if (snail != null) {
             snail.setBoundPlayer(player);
-            snail.setPersistent();
         }
         return 1;
     }
@@ -181,25 +180,6 @@ public class LifeSeriesCommand {
     public static int test2(ServerCommandSource source) {
         ServerPlayerEntity player = source.getPlayer();
         if (player == null) return -1;
-        for (Entity entity : player.getWorld().getEntitiesByClass(MobEntity.class, player.getBoundingBox().expand(500), entity -> entity instanceof Snail)) {
-            if (entity instanceof Snail snail) {
-
-                //? if <= 1.21 {
-                snail.kill();
-                 //?} else {
-                /*snail.kill((ServerWorld) snail.getWorld());
-                *///?}
-            }
-        }
-        for (Entity entity : player.getWorld().getEntitiesByClass(AmbientEntity.class, player.getBoundingBox().expand(500), entity -> entity instanceof PathFinder)) {
-            if (entity instanceof PathFinder pathfinder) {
-                //? if <= 1.21 {
-                pathfinder.kill();
-                 //?} else {
-                /*pathfinder.kill((ServerWorld) pathfinder.getWorld());
-                *///?}
-            }
-        }
         return 1;
     }
     public static int test3(ServerCommandSource source) {

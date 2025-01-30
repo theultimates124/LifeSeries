@@ -27,6 +27,9 @@ public final class SnailTeleportGoal extends Goal {
 
     @Override
     public boolean canStart() {
+        if (mob.getBoundPlayer() == null) {
+            return false;
+        }
         if (!mob.getBlockPos().equals(this.lastPosition)) {
             this.ticksSinceLastPositionChange = 0;
             this.lastPosition = mob.getBlockPos();
@@ -34,9 +37,6 @@ public final class SnailTeleportGoal extends Goal {
 
         this.ticksSinceLastPositionChange++;
 
-        if (mob.getBoundPlayer() == null) {
-            return false;
-        }
 
         ServerPlayerEntity boundPlayer = mob.getBoundPlayer();
         float distFromPlayer = mob.distanceTo(boundPlayer);
