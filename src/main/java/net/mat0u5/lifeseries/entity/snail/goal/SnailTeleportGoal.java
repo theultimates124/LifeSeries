@@ -46,7 +46,6 @@ public final class SnailTeleportGoal extends Goal {
 
     @Override
     public void start() {
-        OtherUtils.broadcastMessage(Text.of("test_SnailTeleportNearTargetGoal"));
         mob.teleportNearPlayer(Snail.TP_MIN_RANGE);
     }
 

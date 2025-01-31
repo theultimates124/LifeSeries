@@ -48,14 +48,12 @@ public final class SnailMineTowardsPlayerGoal extends SnailFlyGoal {
 
     @Override
     public void start() {
-        OtherUtils.broadcastMessage(Text.of("test_SnailMineTowardsPlayerGoal"));
         getMob().mining = true;
         getMob().updateNavigation();
     }
 
     @Override
     public void stop() {
-        OtherUtils.broadcastMessage(Text.of("test_STOPP_SnailMineTowardsPlayerGoal"));
         getMob().mining = false;
         getMob().flying = true;
         getMob().updateNavigation();

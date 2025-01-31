@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.entity.snail;
 
 import de.tomalbrc.bil.api.AnimatedEntity;
+import de.tomalbrc.bil.api.Animator;
 import de.tomalbrc.bil.core.holder.entity.EntityHolder;
 import de.tomalbrc.bil.core.holder.entity.living.LivingEntityHolder;
 import de.tomalbrc.bil.core.model.Model;
@@ -19,14 +20,9 @@ import net.minecraft.entity.ai.pathing.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
-import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -35,8 +31,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -56,6 +50,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public boolean attacking;
     public boolean flying;
     public boolean gliding;
+    public boolean landing;
     public boolean mining;
     public boolean setNavigation = false;
     public PathFinder groundPathFinder;
@@ -147,9 +142,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         }
 
         if (age % 2 == 0) {
-            //TODO
-            AnimationHandler.updateHurtVariant(this, holder);
-            AnimationHandler.updateWalkAnimation(this, holder);
+            updateAnimations();
         }
         ServerPlayerEntity boundPlayer = getBoundPlayer();
         if (boundPlayer != null) {
@@ -173,6 +166,57 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         }
 
         updatePathFinders();
+    }
+
+    private int flyAnimation = 0;
+    public void updateAnimations() {
+        AnimationHandler.updateHurtVariant(this, holder);
+        Animator animator = holder.getAnimator();
+        if (flyAnimation < 0) {
+            flyAnimation++;
+            pauseAllAnimations("stopFly");
+        }
+        else if (flyAnimation > 0) {
+            flyAnimation--;
+            pauseAllAnimations("startFly");
+        }
+        else if (this.flying) {
+            pauseAllAnimations("fly");
+            animator.playAnimation("fly", 3);
+        }
+        else if (this.gliding || this.landing) {
+            pauseAllAnimations("glide");
+            animator.playAnimation("glide", 2);
+        }
+        else if (this.limbAnimator.isLimbMoving() && this.limbAnimator.getSpeed() > 0.02) {
+            pauseAllAnimations("walk");
+            animator.playAnimation("walk", 1);
+        }
+        else {
+            pauseAllAnimations("idle");
+            animator.playAnimation("idle", 0, true);
+        }
+    }
+
+    public void pauseAllAnimations(String except) {
+        OtherUtils.broadcastMessage(Text.of("pauseAllAnimations_"+except));
+        Animator animator = holder.getAnimator();
+        if (!except.equalsIgnoreCase("glide")) animator.pauseAnimation("glide");
+        if (!except.equalsIgnoreCase("fly")) animator.pauseAnimation("fly");
+        if (!except.equalsIgnoreCase("walk")) animator.pauseAnimation("walk");
+        if (!except.equalsIgnoreCase("idle")) animator.pauseAnimation("idle");
+    }
+
+    public void playStartFlyAnimation() {
+        flyAnimation = 7;
+        Animator animator = holder.getAnimator();
+        animator.playAnimation("startFly", 4);
+    }
+
+    public void playStopFlyAnimation() {
+        flyAnimation = -7;
+        Animator animator = holder.getAnimator();
+        animator.playAnimation("stopFly", 5);
     }
 
     public void updatePathFinders() {

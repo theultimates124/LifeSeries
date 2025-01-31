@@ -52,13 +52,10 @@ public class SnailFlyGoal extends Goal {
 
     @Override
     public void start() {
-        OtherUtils.broadcastMessage(Text.of("test_SnailFlyTowardsPlayerGoal"));
-        if (this.path == null) return;
     }
 
     @Override
     public void stop() {
-        OtherUtils.broadcastMessage(Text.of("STOPP_SnailFlyTowardsPlayerGoal"));
         mob.flying = false;
         mob.updateNavigation();
         mob.updateMoveControl();

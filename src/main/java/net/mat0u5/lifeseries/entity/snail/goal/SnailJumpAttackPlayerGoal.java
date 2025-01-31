@@ -57,7 +57,6 @@ public final class SnailJumpAttackPlayerGoal extends Goal {
     @Override
     public void start() {
         ServerPlayerEntity boundPlayer = mob.getBoundPlayer();
-        OtherUtils.broadcastMessage(Text.of("test_SnailJumpAttackPlayerGoal"));
         if (boundPlayer != null) {
             this.previousTargetPosition = boundPlayer.getPos();
         }
@@ -94,7 +93,6 @@ public final class SnailJumpAttackPlayerGoal extends Goal {
         if (boundPlayer == null) {
             return;
         }
-        OtherUtils.broadcastMessage(Text.of("test_jumpAttackPlayer"));
         this.attackCooldown = Snail.JUMP_COOLDOWN;
 
         Vec3d mobVelocity = mob.getVelocity();

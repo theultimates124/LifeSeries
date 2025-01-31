@@ -26,6 +26,10 @@ public final class SnailGlideGoal extends Goal {
             return true;
         }
 
+        if (mob.landing) {
+            return false;
+        }
+
         if (mob.getVelocity().y >= 0 || mob.isOnGround() || mob.flying) {
             return false;
         }
@@ -44,7 +48,6 @@ public final class SnailGlideGoal extends Goal {
 
     @Override
     public void start() {
-        OtherUtils.broadcastMessage(Text.of("test_SnailGlideGoal"));
         ticksWaited = 0;
         mob.gliding = true;
     }
@@ -70,6 +73,7 @@ public final class SnailGlideGoal extends Goal {
         mob.gliding = false;
         mob.updateNavigation();
         mob.updateMoveControl();
+        mob.playStopFlyAnimation();
     }
 
     private void glideToPlayer() {

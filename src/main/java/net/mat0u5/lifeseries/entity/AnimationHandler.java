@@ -16,9 +16,18 @@ public class AnimationHandler {
             animator.pauseAnimation("idle");
         }
         else {
-            animator.pauseAnimation("walk");
             animator.playAnimation("idle", priority, true);
         }
+    }
+
+    public static void playAnimation(AnimatedHolder holder, String name, int priority) {
+        Animator animator = holder.getAnimator();
+        animator.playAnimation(name, priority);
+    }
+
+    public static void stopAnimation(AnimatedHolder holder, String name) {
+        Animator animator = holder.getAnimator();
+        animator.stopAnimation(name);
     }
 
     public static void updateHurtVariant(LivingEntity entity, AnimatedHolder holder) {

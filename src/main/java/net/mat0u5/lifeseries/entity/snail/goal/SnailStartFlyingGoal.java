@@ -53,10 +53,10 @@ public final class SnailStartFlyingGoal extends Goal {
 
     @Override
     public void start() {
-        OtherUtils.broadcastMessage(Text.of("test_SnailStartFlyingGoal"));
         mob.flying = true;
         mob.updateNavigation();
         mob.updateMoveControl();
+        mob.playStartFlyAnimation();
     }
 
     @Override

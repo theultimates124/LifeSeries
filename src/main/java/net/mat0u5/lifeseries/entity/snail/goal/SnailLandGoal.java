@@ -60,15 +60,20 @@ public final class SnailLandGoal extends Goal {
 
     @Override
     public void start() {
-        OtherUtils.broadcastMessage(Text.of("test_SnailLandGoal"));
+        mob.landing = true;
+        mob.flying = false;
+        mob.gliding = false;
     }
 
     @Override
     public void stop() {
+        mob.landing = false;
         mob.gliding = false;
         mob.flying = false;
         mob.updateNavigation();
         mob.updateMoveControl();
+
+        mob.playStopFlyAnimation();
     }
 
     private void land() {
