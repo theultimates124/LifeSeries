@@ -13,6 +13,7 @@ import net.mat0u5.lifeseries.entity.pathfinder.PathFinder;
 import net.mat0u5.lifeseries.entity.snail.goal.*;
 import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.control.FlightMoveControl;
 import net.minecraft.entity.ai.control.MoveControl;
@@ -22,8 +23,11 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.*;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.command.DataCommand;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -81,6 +85,22 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     }
 
     @Override
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+        if (boundPlayerUUID == null) return;
+        nbt.putUuid("boundPlayer", boundPlayerUUID);
+    }
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+        UUID newUUID = nbt.getUuid("boundPlayer");
+        if (newUUID != null) {
+            boundPlayerUUID = newUUID;
+        }
+    }
+
+    @Override
     public EntityHolder<Snail> getHolder() {
         return holder;
     }
@@ -127,10 +147,9 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
         if (nullPlayerChecks > 1000) {
             //Despawn
-            OtherUtils.broadcastMessage(Text.of("Despawning snail"));
-            groundPathFinder.remove(RemovalReason.KILLED);
-            pathFinder.remove(RemovalReason.KILLED);
-            this.remove(RemovalReason.KILLED);
+            groundPathFinder.discard();
+            pathFinder.discard();
+            this.discard();
         }
 
         Vec3d velocity = getVelocity();
@@ -199,7 +218,6 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     }
 
     public void pauseAllAnimations(String except) {
-        OtherUtils.broadcastMessage(Text.of("pauseAllAnimations_"+except));
         Animator animator = holder.getAnimator();
         if (!except.equalsIgnoreCase("glide")) animator.pauseAnimation("glide");
         if (!except.equalsIgnoreCase("fly")) animator.pauseAnimation("fly");
@@ -264,15 +282,14 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     }
 
     public void teleportNearPlayer(double minDistanceFromPlayer) {
-        if (!(getWorld() instanceof ServerWorld serverWorld)) return;
         if (getBoundPlayer() == null) return;
 
         BlockPos tpTo = getBlockPosNearTarget(minDistanceFromPlayer);
         Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
         //? if <= 1.21 {
-        teleport(serverWorld, tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch());
+        teleport(getBoundPlayer().getServerWorld(), tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch());
         //?} else {
-        /*teleport(serverWorld, tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch(), false);
+        /*teleport(getBoundPlayer().getServerWorld(), tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch(), false);
         *///?}
 
     }
@@ -427,7 +444,16 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     @Override
     public void onDeath(DamageSource damageSource) {
         super.onDeath(damageSource);
-        groundPathFinder.remove(RemovalReason.KILLED);
-        pathFinder.remove(RemovalReason.KILLED);
+        groundPathFinder.discard();
+        pathFinder.discard();
+    }
+
+    @Override
+    protected boolean canStartRiding(Entity entity) {
+        return false;
+    }
+
+    @Override
+    public void slowMovement(BlockState state, Vec3d multiplier) {
     }
 }

@@ -81,7 +81,7 @@ public class Snails extends Wildcard {
                     //?} else {
                     /*entity.kill((ServerWorld) entity.getWorld());
                      *///?}
-                    entity.remove(Entity.RemovalReason.KILLED);
+                    entity.discard();
                 }
             });
         });
