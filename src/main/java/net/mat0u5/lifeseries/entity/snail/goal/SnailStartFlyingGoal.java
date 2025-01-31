@@ -13,6 +13,7 @@ public final class SnailStartFlyingGoal extends Goal {
     private int startFlyingCounter;
     private final int startFlyingDelay = 70;
     private boolean canWalk = true;
+    private boolean canFly = true;
 
     public SnailStartFlyingGoal(@NotNull Snail mob) {
         this.mob = mob;
@@ -38,11 +39,12 @@ public final class SnailStartFlyingGoal extends Goal {
         }
 
         canWalk = mob.canPathToPlayer(false);
+        canFly = mob.canPathToPlayer(true);
 
         if (canWalk) {
             startFlyingCounter = 0;
         }
-        else {
+        else if (canFly) {
             startFlyingCounter++;
         }
 

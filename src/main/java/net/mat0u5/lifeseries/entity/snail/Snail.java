@@ -11,21 +11,32 @@ import net.mat0u5.lifeseries.entity.AnimationHandler;
 import net.mat0u5.lifeseries.entity.pathfinder.PathFinder;
 import net.mat0u5.lifeseries.entity.snail.goal.*;
 import net.mat0u5.lifeseries.registries.MobRegistry;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
+import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.control.FlightMoveControl;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.pathing.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.*;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.vehicle.BoatEntity;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
+import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -35,7 +46,6 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
 
 public class Snail extends HostileEntity implements AnimatedEntity {
@@ -54,7 +64,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
     public static final float MOVEMENT_SPEED = 0.35f;
     public static final float FLYING_SPEED = 0.3f;
-    public static final int STATIONARY_TP_COOLDOWN = 1200; // No movement for 1 minute teleports the snail
+    public static final int STATIONARY_TP_COOLDOWN = 600; // No movement for 30 seconds teleports the snail
     public static final int TP_MIN_RANGE = 15;
     public static final int MAX_DISTANCE = 150; // Distance over this teleports the snail to the player
     public static final int JUMP_COOLDOWN = 40;
@@ -88,6 +98,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
                 .add(EntityAttributes.GENERIC_FLYING_SPEED, FLYING_SPEED)
                 .add(EntityAttributes.GENERIC_STEP_HEIGHT, 1)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 150)
+                .add(EntityAttributes.GENERIC_WATER_MOVEMENT_EFFICIENCY, 1)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 20);
         //?} else {
         /*return MobEntity.createMobAttributes()
@@ -96,6 +107,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
                 .add(EntityAttributes.FLYING_SPEED, FLYING_SPEED)
                 .add(EntityAttributes.STEP_HEIGHT, 1)
                 .add(EntityAttributes.FOLLOW_RANGE, 150)
+                .add(EntityAttributes.WATER_MOVEMENT_EFFICIENCY, 1)
                 .add(EntityAttributes.ATTACK_DAMAGE, 20);
         *///?}
     }
@@ -105,12 +117,13 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         goalSelector.add(0, new SnailTeleportGoal(this));
 
         goalSelector.add(1, new SnailLandGoal(this));
-        goalSelector.add(2, new SnailMineTowardsPlayerGoal(this)); //TODO
+        goalSelector.add(2, new SnailMineTowardsPlayerGoal(this));
         goalSelector.add(3, new SnailFlyGoal(this));
 
         goalSelector.add(4, new SnailGlideGoal(this));
         goalSelector.add(5, new SnailJumpAttackPlayerGoal(this));
         goalSelector.add(6, new SnailStartFlyingGoal(this));
+        goalSelector.add(7, new SnailBlockInteractGoal(this));
     }
 
     @Override
@@ -119,16 +132,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
         if (nullPlayerChecks > 1000) {
             //Despawn
-
-            //? if <= 1.21 {
-            groundPathFinder.kill();
-            pathFinder.kill();
-            kill();
-            //?} else {
-            /*groundPathFinder.kill((ServerWorld) groundPathFinder.getWorld());
-            pathFinder.kill((ServerWorld) groundPathFinder.getWorld());
-            kill((ServerWorld) getWorld());
-             *///?}
+            OtherUtils.broadcastMessage(Text.of("Despawning snail"));
             groundPathFinder.remove(RemovalReason.KILLED);
             pathFinder.remove(RemovalReason.KILLED);
             this.remove(RemovalReason.KILLED);
@@ -141,6 +145,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         else if (velocity.y < -0.15) {
             setVelocity(velocity.x,-0.15,velocity.z);
         }
+
         if (age % 2 == 0) {
             //TODO
             AnimationHandler.updateHurtVariant(this, holder);
@@ -232,12 +237,34 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         if (getBoundPlayer() == null) return getBlockPos();
 
         BlockPos targetPos = getBoundPlayer().getBlockPos();
-        Vec3d offset = new Vec3d(
-                random.nextDouble() * 2 - 1,
-                0,
-                random.nextDouble() * 2 - 1
-        ).normalize().multiply(minDistanceFromTarget);
-        return targetPos.add((int) offset.getX(), (int) offset.getY(), (int) offset.getZ());
+        World world = getWorld();
+
+        for (int attempts = 0; attempts < 10; attempts++) {
+            Vec3d offset = new Vec3d(
+                    random.nextDouble() * 2 - 1,
+                    0,
+                    random.nextDouble() * 2 - 1
+            ).normalize().multiply(minDistanceFromTarget);
+
+            BlockPos pos = targetPos.add((int) offset.getX(), 0, (int) offset.getZ());
+
+            BlockPos validPos = findNearestAirBlock(pos, world);
+            if (validPos != null) {
+                return validPos;
+            }
+        }
+
+        return targetPos;
+    }
+
+    private BlockPos findNearestAirBlock(BlockPos pos, World world) {
+        for (int yOffset = -5; yOffset <= 5; yOffset++) {
+            BlockPos newPos = pos.up(yOffset);
+            if (world.getBlockState(newPos).isAir()) {
+                return newPos;
+            }
+        }
+        return null;
     }
 
     public boolean canPathToPlayer(boolean flying) {
@@ -261,24 +288,28 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     }
 
     public void updateMoveControl() {
-        if (flying) {
+        if (flying || mining) {
             setMoveControlFlight();
         }
         else {
             setMoveControlWalking();
         }
     }
+
     public void setNavigationFlying() {
+        setPathfindingPenalty(PathNodeType.BLOCKED, -1);
         navigation = new BirdNavigation(this, getWorld());
         updateNavigationTarget();
     }
 
     public void setNavigationWalking() {
+        setPathfindingPenalty(PathNodeType.BLOCKED, -1);
         navigation = new MobNavigation(this, getWorld());
         updateNavigationTarget();
     }
 
     public void setNavigationMining() {
+        setPathfindingPenalty(PathNodeType.BLOCKED, 0);
         navigation = new MiningNavigation(this, getWorld());
         updateNavigationTarget();
     }
@@ -322,5 +353,37 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         //if (player.isCreative()) return null;
         //if (!currentSeries.isAlive(player)) return null;
         return player;
+    }
+
+    @Override
+    public Vec3d applyFluidMovingSpeed(double gravity, boolean falling, Vec3d motion) {
+        return motion;
+    }
+
+    @Override
+    protected boolean shouldSwimInFluids() {
+        return false;
+    }
+
+    @Override
+    public boolean isTouchingWater() {
+        return false;
+    }
+
+    @Override
+    public void setSwimming(boolean swimming) {
+        this.setFlag(4, false);
+    }
+
+    @Override
+    public boolean updateMovementInFluid(TagKey<Fluid> tag, double speed) {
+        return false;
+    }
+
+    @Override
+    public void onDeath(DamageSource damageSource) {
+        super.onDeath(damageSource);
+        groundPathFinder.remove(RemovalReason.KILLED);
+        pathFinder.remove(RemovalReason.KILLED);
     }
 }

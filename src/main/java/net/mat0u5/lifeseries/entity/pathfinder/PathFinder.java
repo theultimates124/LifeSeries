@@ -82,6 +82,7 @@ public class PathFinder extends AmbientEntity implements AnimatedEntity {
     }
 
     public boolean canPathfind(Entity pathfindTo, boolean flying) {
+        if (pathfindTo == null) return false;
         setNavigation(flying);
         Path path = navigation.findPathTo(pathfindTo, 0);
         if (path == null) return false;

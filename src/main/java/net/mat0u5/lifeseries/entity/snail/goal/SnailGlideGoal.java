@@ -44,13 +44,19 @@ public final class SnailGlideGoal extends Goal {
 
     @Override
     public void start() {
-        OtherUtils.broadcastMessage(Text.of("test_SnailParachuteGoal"));
+        OtherUtils.broadcastMessage(Text.of("test_SnailGlideGoal"));
         ticksWaited = 0;
         mob.gliding = true;
     }
 
     @Override
     public boolean shouldContinue() {
+        boolean canWalk = mob.canPathToPlayer(false);
+        if (!canWalk) {
+            mob.flying = true;
+            return false;
+        }
+
         return mob.getBoundPlayer() != null && mob.getDistanceToGroundBlock() >= 1;
     }
 
@@ -62,7 +68,6 @@ public final class SnailGlideGoal extends Goal {
     @Override
     public void stop() {
         mob.gliding = false;
-        mob.flying = false;
         mob.updateNavigation();
         mob.updateMoveControl();
     }

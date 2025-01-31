@@ -19,6 +19,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 //? if <=1.21
 import net.minecraft.item.EnchantedBookItem;
+import org.jetbrains.annotations.Nullable;
 
 
 import java.util.ArrayList;
@@ -162,23 +163,32 @@ public class ItemStackUtils {
     public static ItemStack createEnchantedBook(RegistryKey<Enchantment> enchantment, int level) {
         if (server == null) return null;
         //? if <=1.21 {
-        RegistryEntry<Enchantment> entry = server.getRegistryManager()
-                .getWrapperOrThrow(RegistryKeys.ENCHANTMENT)
-                .getOrThrow(enchantment);
+        RegistryEntry<Enchantment> entry = getEnchantmentEntry(enchantment);
         ItemStack enchantedBook = EnchantedBookItem.forEnchantment(
                 new EnchantmentLevelEntry(entry, level)
         );
         return enchantedBook;
         //?} else {
-        
-        /*RegistryEntry<Enchantment> entry = server.getRegistryManager()
-                .getOrThrow(RegistryKeys.ENCHANTMENT)
-                .getOrThrow(enchantment);
+
+        /*RegistryEntry<Enchantment> entry = getEnchantmentEntry(enchantment);
         ItemStack enchantedBook = EnchantmentHelper.getEnchantedBookWith(
                 new EnchantmentLevelEntry(entry, level)
         );
         return enchantedBook;
         *///?}
+    }
 
+    @Nullable
+    public static RegistryEntry<Enchantment> getEnchantmentEntry(RegistryKey<Enchantment> enchantment) {
+        if (server == null) return null;
+        //? if <=1.21 {
+        return server.getRegistryManager()
+                .getWrapperOrThrow(RegistryKeys.ENCHANTMENT)
+                .getOrThrow(enchantment);
+        //?} else {
+        /*return server.getRegistryManager()
+                .getOrThrow(RegistryKeys.ENCHANTMENT)
+                .getOrThrow(enchantment);
+        *///?}
     }
 }

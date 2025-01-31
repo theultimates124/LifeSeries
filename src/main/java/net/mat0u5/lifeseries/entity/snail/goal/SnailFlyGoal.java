@@ -37,15 +37,14 @@ public class SnailFlyGoal extends Goal {
             return false;
         }
 
-        this.path = mob.getNavigation().findPathTo(boundPlayer, 0);
-        return this.path != null;
+        return getMob().canPathToPlayer(true);
     }
 
     @Override
     public boolean shouldContinue() {
-        if (mob.isOnGround() && mob.flying) {
+        /*if (mob.isOnGround() && mob.flying) {
             mob.flying = false;
-        }
+        }*/
         if (!mob.flying) return false;
         if (mob.getBoundPlayer() == null) return false;
         return true;
