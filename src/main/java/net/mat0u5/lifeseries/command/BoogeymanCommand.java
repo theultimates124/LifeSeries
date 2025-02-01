@@ -68,6 +68,12 @@ public class BoogeymanCommand {
                         .executes(context -> cureBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
                     )
                 )
+                .then(literal("fail")
+                        .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                        .then(argument("player", EntityArgumentType.player())
+                                .executes(context -> failBoogey(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+                        )
+                )
                 .then(literal("chooseRandom")
                     .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                     .executes(context -> boogeyChooseRandom(
@@ -82,6 +88,22 @@ public class BoogeymanCommand {
         if (currentSeries.getSeries() == SeriesList.LAST_LIFE) return ((LastLife) currentSeries).boogeymanManager;
         if (currentSeries.getSeries() == SeriesList.LIMITED_LIFE) return ((LimitedLife) currentSeries).boogeymanManager;
         return null;
+    }
+
+    public static int failBoogey(ServerCommandSource source, ServerPlayerEntity target) {
+        if (checkBanned(source)) return -1;
+        if (target == null) return -1;
+
+        BoogeymanManager bm = getBM();
+        if (bm == null) return -1;
+
+        if (!bm.isBoogeyman(target)) {
+            source.sendError(Text.of("That player is not a boogeyman!"));
+            return -1;
+        }
+        bm.playerFailBoogeyman(target);
+
+        return 1;
     }
 
     public static int cureBoogey(ServerCommandSource source, ServerPlayerEntity target) {

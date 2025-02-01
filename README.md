@@ -122,6 +122,7 @@ This command **always** available
 - `/boogeyman add <player>` - Makes `<player>` the Boogeyman if they aren't one already.
 - `/boogeyman remove <player>` - Makes `<player>` not be the Boogeyman if they were one.
 - `/boogeyman cure <player>` - Cures `<player>` of the Boogeyman curse if they were the Boogeyman.
+- `/boogeyman fail <player>` - Makes `<player>` fail the Boogeyman curse if they were the Boogeyman.
 - `/boogeyman chooseRandom` - Chooses the Boogeyman / Boogeymen from the list of online players.
 </details>
 

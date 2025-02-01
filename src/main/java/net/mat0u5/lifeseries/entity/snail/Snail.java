@@ -26,6 +26,7 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.mob.*;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
@@ -215,6 +216,9 @@ public class Snail extends HostileEntity implements AnimatedEntity {
                 updateNavigationTarget();
             }
         }
+        if (getAir() == 0) {
+            damageFromDrowning();
+        }
 
         handleHighVelocity();
         updatePathFinders();
@@ -287,6 +291,22 @@ public class Snail extends HostileEntity implements AnimatedEntity {
                 .getOrThrow(RegistryKeys.DAMAGE_TYPE).getOrThrow(SNAIL_DAMAGE));
         player.setAttacker(this);
         player.damage(player.getServerWorld(), damageSource, 1000);
+        *///?}
+    }
+
+    public void damageFromDrowning() {
+        ServerPlayerEntity player = getBoundPlayer();
+        if (player == null) return;
+        //? if <=1.21 {
+        DamageSource damageSource = new DamageSource( player.getServerWorld().getRegistryManager()
+                .get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.DROWN));
+        player.setAttacker(this);
+        player.damage(damageSource, 2);
+        //?} else {
+        /*DamageSource damageSource = new DamageSource( player.getServerWorld().getRegistryManager()
+                .getOrThrow(RegistryKeys.DAMAGE_TYPE).getOrThrow(DamageTypes.DROWN));
+        player.setAttacker(this);
+        player.damage(player.getServerWorld(), damageSource, 2);
         *///?}
     }
 
