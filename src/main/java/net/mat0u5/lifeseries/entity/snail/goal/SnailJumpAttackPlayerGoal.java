@@ -107,10 +107,10 @@ public final class SnailJumpAttackPlayerGoal extends Goal {
 
         Vec3d attackVector = mobVelocity;
         if (relativeTargetPos.lengthSquared() > 0.0001) {
-            attackVector = expectedTargetPos.normalize().multiply(0.5);
+            attackVector = expectedTargetPos.normalize().multiply(0.7);
         }
 
-        float velocity = 0.35f;
+        float velocity = 0.45f;
         mob.setVelocity(attackVector.x, velocity, attackVector.z);
     }
 }

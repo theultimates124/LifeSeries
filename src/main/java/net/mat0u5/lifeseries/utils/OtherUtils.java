@@ -24,6 +24,14 @@ public class OtherUtils {
         broadcastMessageToAdmins(message, 1);
     }
 
+    public static void log(String string) {
+        Text message = Text.of(string);
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            player.sendMessage(message, false);
+        }
+        Main.LOGGER.info(string);
+    }
+
     public static void broadcastMessage(Text message, int cooldownTicks) {
         if (cooldown.containsKey(message)) return;
         cooldown.put(message, cooldownTicks);

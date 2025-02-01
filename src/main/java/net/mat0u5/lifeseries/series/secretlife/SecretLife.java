@@ -76,14 +76,12 @@ public class SecretLife extends Series {
     }
 
     @Override
-    public void onPlayerRespawn(ServerPlayerEntity oldPlayer) {
-        TaskScheduler.scheduleTask(1, () -> {
-            ServerPlayerEntity player = oldPlayer.server.getPlayerManager().getPlayer(oldPlayer.getUuid());
-            TaskType type = TaskManager.getPlayersTaskType(player);
-            if (isOnLastLife(player, false) && TaskManager.submittedOrFailed.contains(player.getUuid()) && type == null) {
-                TaskManager.chooseTasks(List.of(player), TaskType.RED);
-            }
-        });
+    public void onPlayerRespawn(ServerPlayerEntity player) {
+        super.onPlayerRespawn(player);
+        TaskType type = TaskManager.getPlayersTaskType(player);
+        if (isOnLastLife(player, false) && TaskManager.submittedOrFailed.contains(player.getUuid()) && type == null) {
+            TaskManager.chooseTasks(List.of(player), TaskType.RED);
+        }
     }
 
     public void initializeItemSpawner() {

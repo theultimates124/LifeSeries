@@ -158,4 +158,14 @@ public class AnimationUtils {
             });
         }
     }
+
+    public static void spawnTeleportParticles(ServerWorld world, Vec3d pos) {
+        world.spawnParticles(
+                ParticleTypes.PORTAL,
+                pos.x, pos.y, pos.z,
+                30,
+                0, 0, 0,
+                0.35
+        );
+    }
 }

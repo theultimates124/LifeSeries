@@ -5,6 +5,7 @@ import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SpawnReason;
@@ -20,7 +21,7 @@ import static net.mat0u5.lifeseries.Main.server;
 
 public class Snails extends Wildcard {
 
-    HashMap<UUID, Snail> snails = new HashMap<>();
+    public static HashMap<UUID, Snail> snails = new HashMap<>();
     int ticks = 0;
 
     @Override
@@ -50,7 +51,7 @@ public class Snails extends Wildcard {
                 UUID playerUUID = player.getUuid();
                 if (snails.containsKey(playerUUID)) {
                     Snail snail = snails.get(playerUUID);
-                    if (snail == null || snail.isDead()) {
+                    if (snail == null || snail.isDead() || snail.isRemoved()) {
                         snails.remove(playerUUID);
                         spawnSnailFor(player);
                     }

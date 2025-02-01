@@ -1,6 +1,5 @@
 package net.mat0u5.lifeseries.mixin;
 
-import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
@@ -15,7 +14,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Objects;
 import java.util.OptionalInt;
+import java.util.UUID;
 
 import static net.mat0u5.lifeseries.Main.blacklist;
 import static net.mat0u5.lifeseries.Main.currentSeries;
@@ -25,8 +26,10 @@ public class ServerPlayerEntityMixin {
     @Inject(method = "getRespawnTarget", at = @At("HEAD"), cancellable = true)
     private void getRespawnTarget(boolean alive, TeleportTarget.PostDimensionTransition postDimensionTransition, CallbackInfoReturnable<TeleportTarget> cir) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-        currentSeries.getRespawnTarget(player, postDimensionTransition, cir);
-        currentSeries.onPlayerRespawn(player);
+        UUID uuid = player.getUuid();
+        TaskScheduler.scheduleTask(1, () -> {
+            currentSeries.onPlayerRespawn(Objects.requireNonNull(Objects.requireNonNull(player.getServer()).getPlayerManager().getPlayer(uuid)));
+        });
     }
 
     //? if >= 1.21.2 {

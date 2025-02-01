@@ -2,12 +2,8 @@ package net.mat0u5.lifeseries.entity.pathfinder;
 
 import de.tomalbrc.bil.api.AnimatedEntity;
 import de.tomalbrc.bil.api.AnimatedEntityHolder;
-import de.tomalbrc.bil.core.holder.entity.EntityHolder;
-import de.tomalbrc.bil.core.holder.entity.living.LivingEntityHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
 import net.mat0u5.lifeseries.Main;
-import net.mat0u5.lifeseries.entity.AnimationHandler;
-import net.mat0u5.lifeseries.entity.snail.Snail;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.control.FlightMoveControl;
@@ -21,22 +17,19 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkCache;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Set;
 
 public class PathFinder extends AmbientEntity implements AnimatedEntity {
     public static final Identifier ID = Identifier.of(Main.MOD_ID, "pathfinder");
     public static final float MOVEMENT_SPEED = 0.35f;
     public static final float FLYING_SPEED = 0.3f;
+    private int despawnTimer = 0;
 
     public PathFinder(EntityType<? extends AmbientEntity> entityType, World world) {
         super(entityType, world);
         setInvulnerable(true);
         setNoGravity(true);
+        setPersistent();
         noClip = true;
     }
 
@@ -66,9 +59,14 @@ public class PathFinder extends AmbientEntity implements AnimatedEntity {
     @Override
     public void tick() {
         setOnGround(true);
+        despawnTimer++;
+        if (despawnTimer > 200) {
+            discard();
+        }
     }
 
     public void setNavigation(boolean flying) {
+        despawnTimer = 0;
         if (flying) {
             moveControl = new FlightMoveControl(this, 20, true);
             navigation = new BirdNavigation(this, getWorld());
@@ -82,6 +80,7 @@ public class PathFinder extends AmbientEntity implements AnimatedEntity {
     }
 
     public boolean canPathfind(Entity pathfindTo, boolean flying) {
+        despawnTimer = 0;
         if (pathfindTo == null) return false;
         setNavigation(flying);
         Path path = navigation.findPathTo(pathfindTo, 0);
@@ -89,5 +88,9 @@ public class PathFinder extends AmbientEntity implements AnimatedEntity {
         PathNode end = path.getEnd();
         if (end == null) return false;
         return end.getBlockPos().equals(pathfindTo.getBlockPos());
+    }
+
+    public void resetDespawnTimer() {
+        despawnTimer = 0;
     }
 }

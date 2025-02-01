@@ -110,13 +110,10 @@ public class DoubleLife extends Series {
 
     @Override
     public void onPlayerRespawn(ServerPlayerEntity player) {
-        TaskScheduler.scheduleTask(1, () -> {
-            ServerPlayerEntity newPlayer = player.server.getPlayerManager().getPlayer(player.getUuid());
-            if (newPlayer == null) return;
-            ServerPlayerEntity soulmate = getSoulmate(newPlayer);
-            if (soulmate == null) return;
-            syncPlayers(newPlayer, soulmate);
-        });
+        super.onPlayerRespawn(player);
+        ServerPlayerEntity soulmate = getSoulmate(player);
+        if (soulmate == null) return;
+        syncPlayers(player, soulmate);
     }
 
     public void loadSoulmates() {

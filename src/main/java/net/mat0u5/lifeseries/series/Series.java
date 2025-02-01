@@ -12,12 +12,14 @@ import net.minecraft.entity.mob.ElderGuardianEntity;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -249,16 +251,6 @@ public abstract class Series extends Session {
         OtherUtils.broadcastMessage(Text.literal("").append(player.getStyledDisplayName()).append(Text.of(" ran out of lives.")));
     }
 
-    public void getRespawnTarget(ServerPlayerEntity player, TeleportTarget.PostDimensionTransition postDimensionTransition, CallbackInfoReturnable<TeleportTarget> cir) {
-        if (!respawnPositions.containsKey(player.getUuid())) return;
-        HashMap<Vec3d, List<Float>> info = respawnPositions.get(player.getUuid());
-        respawnPositions.remove(player.getUuid());
-        for (Map.Entry<Vec3d, List<Float>> entry : info.entrySet()) {
-            cir.setReturnValue(new TeleportTarget(player.getServerWorld(), entry.getKey(), Vec3d.ZERO, entry.getValue().get(0), entry.getValue().get(1), postDimensionTransition));
-            break;
-        }
-    }
-
     public boolean isAllowedToAttack(ServerPlayerEntity attacker, ServerPlayerEntity victim) {
         if (isOnLastLife(attacker, false)) return true;
         if (attacker.getPrimeAdversary() == victim && (isOnLastLife(victim, false))) return true;
@@ -339,6 +331,17 @@ public abstract class Series extends Session {
     }
 
     public void onPlayerRespawn(ServerPlayerEntity player) {
+        if (!respawnPositions.containsKey(player.getUuid())) return;
+        HashMap<Vec3d, List<Float>> info = respawnPositions.get(player.getUuid());
+        respawnPositions.remove(player.getUuid());
+        for (Map.Entry<Vec3d, List<Float>> entry : info.entrySet()) {
+            //? if <= 1.21 {
+            player.teleport(player.getServerWorld(), entry.getKey().x, entry.getKey().y, entry.getKey().z, EnumSet.noneOf(PositionFlag.class), entry.getValue().get(0), entry.getValue().get(1));
+            //?} else {
+            /*player.teleport(player.getServerWorld(), entry.getKey().x, entry.getKey().y, entry.getKey().z, EnumSet.noneOf(PositionFlag.class), entry.getValue().get(0), entry.getValue().get(1), false);
+            *///?}
+            break;
+        }
     }
 
     public void onClaimKill(ServerPlayerEntity killer, ServerPlayerEntity victim) {

@@ -3,6 +3,7 @@ package net.mat0u5.lifeseries.entity.snail.goal;
 
 import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -16,6 +17,7 @@ public final class SnailTeleportGoal extends Goal {
     private final Snail mob;
     private int ticksSinceLastPositionChange;
     private final int maxTicksSinceLastPositionChange;
+    private int teleportCooldown = 0;
     @NotNull
     private BlockPos lastPosition;
 
@@ -27,6 +29,10 @@ public final class SnailTeleportGoal extends Goal {
 
     @Override
     public boolean canStart() {
+        if (teleportCooldown > 0) {
+            teleportCooldown--;
+            return false;
+        }
         if (mob.getBoundPlayer() == null) {
             return false;
         }
@@ -46,12 +52,8 @@ public final class SnailTeleportGoal extends Goal {
 
     @Override
     public void start() {
+        teleportCooldown = 20;
         mob.teleportNearPlayer(Snail.TP_MIN_RANGE);
-    }
-
-    @Override
-    public void tick() {
-        start();
     }
 
     @Override
