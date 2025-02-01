@@ -70,7 +70,7 @@ public class WildcardManager {
     }
 
     public static void resetWildcardsOnServerStart() {
-        TaskScheduler.scheduleTask(50, Snails::killAllSnails);
+        TaskScheduler.scheduleTask(100, Snails::killAllSnails);
 
     }
 

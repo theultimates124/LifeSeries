@@ -4,16 +4,20 @@ import net.mat0u5.lifeseries.Main;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static net.mat0u5.lifeseries.Main.server;
 
 public class OtherUtils {
+    private static Random rnd = new Random();
     private static HashMap<Text, Integer> cooldown = new HashMap<>();
 
     public static void broadcastMessage(Text message) {
@@ -149,5 +153,13 @@ public class OtherUtils {
     public static void throwError(String error) {
         broadcastMessageToAdmins(Text.of("§c"+error));
         Main.LOGGER.error(error);
+    }
+
+    public static SoundEvent getRandomSound(String name, int from, int to) {
+        if (to > from) {
+            int index = rnd.nextInt(from, to + 1);
+            name += index;
+        }
+        return SoundEvent.of(Identifier.of("minecraft", name));
     }
 }

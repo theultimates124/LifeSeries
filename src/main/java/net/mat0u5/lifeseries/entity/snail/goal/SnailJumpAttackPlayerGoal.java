@@ -15,7 +15,8 @@ public final class SnailJumpAttackPlayerGoal extends Goal {
     private final Snail mob;
     @NotNull
     private Vec3d previousTargetPosition = Vec3d.ZERO;
-    private int attackCooldown = Snail.JUMP_COOLDOWN;
+    private int attackCooldown = Snail.JUMP_COOLDOWN_SHORT;
+    private int attackCooldown2 = 0;
 
     public SnailJumpAttackPlayerGoal(@NotNull Snail mob) {
         this.mob = mob;
@@ -42,6 +43,10 @@ public final class SnailJumpAttackPlayerGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
+        if (attackCooldown2 > 0) {
+            attackCooldown2--;
+            return false;
+        }
         ServerPlayerEntity boundPlayer = mob.getBoundPlayer();
         if (boundPlayer == null) {
             return false;
@@ -60,23 +65,30 @@ public final class SnailJumpAttackPlayerGoal extends Goal {
         if (boundPlayer != null) {
             this.previousTargetPosition = boundPlayer.getPos();
         }
-        this.attackCooldown = Snail.JUMP_COOLDOWN;
+        this.attackCooldown = Snail.JUMP_COOLDOWN_SHORT;
         mob.attacking = true;
     }
 
     @Override
     public void stop() {
-        mob.playAttackSound();
-        this.attackCooldown = Snail.JUMP_COOLDOWN;
+        this.attackCooldown = Snail.JUMP_COOLDOWN_SHORT;
         this.previousTargetPosition = Vec3d.ZERO;
         mob.attacking = false;
     }
 
     @Override
     public void tick() {
+        if (attackCooldown2 > 0) {
+            attackCooldown2--;
+            return;
+        }
+
         ServerPlayerEntity boundPlayer = mob.getBoundPlayer();
         if (attackCooldown > 0) {
             attackCooldown--;
+        }
+        if (attackCooldown == 4) {
+            mob.playAttackSound();
         }
         if (attackCooldown <= 0) {
             jumpAttackPlayer();
@@ -93,24 +105,24 @@ public final class SnailJumpAttackPlayerGoal extends Goal {
         if (boundPlayer == null) {
             return;
         }
-        this.attackCooldown = Snail.JUMP_COOLDOWN;
+        this.attackCooldown = Snail.JUMP_COOLDOWN_SHORT;
+        this.attackCooldown2 = Snail.JUMP_COOLDOWN_LONG;
 
         Vec3d mobVelocity = mob.getVelocity();
         Vec3d relativeTargetPos = new Vec3d(
-                boundPlayer.getX() - mob.getX(),
-                0.0D,
-                boundPlayer.getZ() - mob.getZ()
+                previousTargetPosition.getX() - mob.getX(),
+                previousTargetPosition.getY() - mob.getY(),
+                previousTargetPosition.getZ() - mob.getZ()
         );
 
-        Vec3d targetVelocity = boundPlayer.getPos().subtract(previousTargetPosition);
-        Vec3d expectedTargetPos = relativeTargetPos.add(targetVelocity.multiply(3));
+        //Vec3d targetVelocity = boundPlayer.getPos().subtract(previousTargetPosition);
+        //Vec3d expectedTargetPos = relativeTargetPos.add(targetVelocity.multiply(3));
 
         Vec3d attackVector = mobVelocity;
         if (relativeTargetPos.lengthSquared() > 0.0001) {
-            attackVector = expectedTargetPos.normalize().multiply(0.7);
+            attackVector = relativeTargetPos.normalize().multiply(1);
         }
-
-        float velocity = 0.45f;
-        mob.setVelocity(attackVector.x, velocity, attackVector.z);
+        double addY = 0.5 + mob.squaredDistanceTo(boundPlayer) / Snail.JUMP_RANGE_SQUARED;
+        mob.setVelocity(attackVector.x, attackVector.y + addY, attackVector.z);
     }
 }

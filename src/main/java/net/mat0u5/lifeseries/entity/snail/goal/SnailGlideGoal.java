@@ -34,7 +34,7 @@ public final class SnailGlideGoal extends Goal {
             return false;
         }
 
-        if (mob.getDistanceToGroundBlock() <= 3) {
+        if (mob.getDistanceToGroundBlock() <= 1.5) {
             return false;
         }
 

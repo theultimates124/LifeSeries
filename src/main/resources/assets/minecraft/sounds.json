@@ -33,5 +33,63 @@
         "sounds": [
             "secretlife/life"
         ]
-    }
+    },
+    "wildlife_snail_attack1": {"sounds": ["wildlife/snail/attack/attack1"]},
+    "wildlife_snail_attack2": {"sounds": ["wildlife/snail/attack/attack2"]},
+    "wildlife_snail_attack3": {"sounds": ["wildlife/snail/attack/attack3"]},
+    "wildlife_snail_attack4": {"sounds": ["wildlife/snail/attack/attack4"]},
+    "wildlife_snail_attack5": {"sounds": ["wildlife/snail/attack/attack5"]},
+    "wildlife_snail_attack6": {"sounds": ["wildlife/snail/attack/attack6"]},
+    "wildlife_snail_attack7": {"sounds": ["wildlife/snail/attack/attack7"]},
+    "wildlife_snail_attack8": {"sounds": ["wildlife/snail/attack/attack8"]},
+    "wildlife_snail_attack9": {"sounds": ["wildlife/snail/attack/attack9"]},
+
+    "wildlife_snail_burn1": {"sounds": ["wildlife/snail/burn/burn1"]},
+    "wildlife_snail_burn2": {"sounds": ["wildlife/snail/burn/burn2"]},
+    "wildlife_snail_burn3": {"sounds": ["wildlife/snail/burn/burn3"]},
+    "wildlife_snail_burn4": {"sounds": ["wildlife/snail/burn/burn4"]},
+    "wildlife_snail_burn5": {"sounds": ["wildlife/snail/burn/burn5"]},
+    "wildlife_snail_burn6": {"sounds": ["wildlife/snail/burn/burn6"]},
+    "wildlife_snail_burn7": {"sounds": ["wildlife/snail/burn/burn7"]},
+    "wildlife_snail_burn8": {"sounds": ["wildlife/snail/burn/burn8"]},
+    "wildlife_snail_burn9": {"sounds": ["wildlife/snail/burn/burn9"]},
+
+    "wildlife_snail_drown1": {"sounds": ["wildlife/snail/drown/drown1"]},
+    "wildlife_snail_drown2": {"sounds": ["wildlife/snail/drown/drown2"]},
+    "wildlife_snail_drown3": {"sounds": ["wildlife/snail/drown/drown3"]},
+    "wildlife_snail_drown4": {"sounds": ["wildlife/snail/drown/drown4"]},
+    "wildlife_snail_drown5": {"sounds": ["wildlife/snail/drown/drown5"]},
+    "wildlife_snail_drown6": {"sounds": ["wildlife/snail/drown/drown6"]},
+    "wildlife_snail_drown7": {"sounds": ["wildlife/snail/drown/drown7"]},
+    "wildlife_snail_drown8": {"sounds": ["wildlife/snail/drown/drown8"]},
+    "wildlife_snail_drown9": {"sounds": ["wildlife/snail/drown/drown9"]},
+
+    "wildlife_snail_fall1": {"sounds": ["wildlife/snail/fall/fall1"]},
+    "wildlife_snail_fall2": {"sounds": ["wildlife/snail/fall/fall2"]},
+    "wildlife_snail_fall3": {"sounds": ["wildlife/snail/fall/fall3"]},
+    "wildlife_snail_fall4": {"sounds": ["wildlife/snail/fall/fall4"]},
+    "wildlife_snail_fall5": {"sounds": ["wildlife/snail/fall/fall5"]},
+
+    "wildlife_snail_propeller": {"sounds": ["wildlife/snail/fly/propeller"]},
+    "wildlife_snail_fly1": {"sounds": ["wildlife/snail/fly/fly1"]},
+    "wildlife_snail_fly2": {"sounds": ["wildlife/snail/fly/fly2"]},
+    "wildlife_snail_fly3": {"sounds": ["wildlife/snail/fly/fly3"]},
+    "wildlife_snail_fly4": {"sounds": ["wildlife/snail/fly/fly4"]},
+    "wildlife_snail_fly5": {"sounds": ["wildlife/snail/fly/fly5"]},
+    "wildlife_snail_fly6": {"sounds": ["wildlife/snail/fly/fly6"]},
+    "wildlife_snail_fly7": {"sounds": ["wildlife/snail/fly/fly7"]},
+    "wildlife_snail_fly8": {"sounds": ["wildlife/snail/fly/fly8"]},
+
+    "wildlife_snail_lava1": {"sounds": ["wildlife/snail/lava/lava1"]},
+    "wildlife_snail_lava2": {"sounds": ["wildlife/snail/lava/lava2"]},
+
+    "wildlife_snail_throw1": {"sounds": ["wildlife/snail/throw/throw1"]},
+    "wildlife_snail_throw2": {"sounds": ["wildlife/snail/throw/throw2"]},
+    "wildlife_snail_throw3": {"sounds": ["wildlife/snail/throw/throw3"]},
+    "wildlife_snail_throw4": {"sounds": ["wildlife/snail/throw/throw4"]},
+    "wildlife_snail_throw5": {"sounds": ["wildlife/snail/throw/throw5"]},
+    "wildlife_snail_throw6": {"sounds": ["wildlife/snail/throw/throw6"]},
+    "wildlife_snail_throw7": {"sounds": ["wildlife/snail/throw/throw7"]},
+
+    "wildlife_snail_walk": {"sounds": ["wildlife/snail/walk"]}
 }

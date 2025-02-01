@@ -28,15 +28,18 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.mob.*;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -45,6 +48,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -78,8 +82,9 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public static final int STATIONARY_TP_COOLDOWN = 600; // No movement for 30 seconds teleports the snail
     public static final int TP_MIN_RANGE = 15;
     public static final int MAX_DISTANCE = 150; // Distance over this teleports the snail to the player
-    public static final int JUMP_COOLDOWN = 40;
-    public static final int JUMP_RANGE_SQUARED = 12;
+    public static final int JUMP_COOLDOWN_SHORT = 10;
+    public static final int JUMP_COOLDOWN_LONG = 30;
+    public static final int JUMP_RANGE_SQUARED = 20;
 
     public Snail(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
@@ -168,11 +173,13 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         goalSelector.add(1, new SnailLandGoal(this));
         goalSelector.add(2, new SnailMineTowardsPlayerGoal(this));
         goalSelector.add(3, new SnailFlyGoal(this));
-
         goalSelector.add(4, new SnailGlideGoal(this));
         goalSelector.add(5, new SnailJumpAttackPlayerGoal(this));
         goalSelector.add(6, new SnailStartFlyingGoal(this));
+
         goalSelector.add(7, new SnailBlockInteractGoal(this));
+        goalSelector.add(8, new SnailPushEntitiesGoal(this));
+        goalSelector.add(9, new SnailPushProjectilesGoal(this));
     }
 
     @Override
@@ -212,6 +219,8 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         handleHighVelocity();
         updatePathFinders();
         chunkLoading();
+        playSounds();
+        clearStatusEffects();
     }
 
     public void chunkLoading() {
@@ -343,6 +352,11 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         }
         else if (pathFinder == null || pathFinder.isRemoved()) {
             pathFinder = MobRegistry.PATH_FINDER.spawn((ServerWorld) this.getWorld(), this.getBlockPos(), SpawnReason.COMMAND);
+            if (pathFinder != null) {
+                NbtCompound pathFinderNbt = new NbtCompound();
+                pathFinderNbt.putUuid("pathFinder", pathFinder.getUuid());
+                writeCustomDataToNbt(pathFinderNbt);
+            }
         }
         else {
             pathFinder.resetDespawnTimer();
@@ -354,6 +368,11 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         }
         else if (groundPathFinder == null || groundPathFinder.isRemoved()) {
             groundPathFinder = MobRegistry.PATH_FINDER.spawn((ServerWorld) this.getWorld(), this.getBlockPos(), SpawnReason.COMMAND);
+            if (groundPathFinder != null) {
+                NbtCompound pathFinderNbt = new NbtCompound();
+                pathFinderNbt.putUuid("groundPathFinder", groundPathFinder.getUuid());
+                writeCustomDataToNbt(pathFinderNbt);
+            }
         }
         else {
             groundPathFinder.resetDespawnTimer();
@@ -545,10 +564,6 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         moveControl = new MoveControl(this);
     }
 
-    public void playAttackSound() {
-
-    }
-
     @Nullable
     public ServerPlayerEntity getBoundPlayer() {
         if (server == null) return null;
@@ -559,6 +574,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         }
         nullPlayerChecks = 0;
         if (player.isSpectator()) return null;
+        if (player.isDead()) return null;
         //if (player.isCreative()) return null;
         //if (!currentSeries.isAlive(player)) return null;
         return player;
@@ -584,8 +600,42 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         this.setFlag(4, false);
     }
 
+    boolean isInLavaLocal = false;
     @Override
     public boolean updateMovementInFluid(TagKey<Fluid> tag, double speed) {
+        if (FluidTags.LAVA != tag) {
+            return false;
+        }
+
+        if (this.isRegionUnloaded()) {
+            return false;
+        }
+        Box box = this.getBoundingBox().contract(0.001);
+        int i = MathHelper.floor(box.minX);
+        int j = MathHelper.ceil(box.maxX);
+        int k = MathHelper.floor(box.minY);
+        int l = MathHelper.ceil(box.maxY);
+        int m = MathHelper.floor(box.minZ);
+        int n = MathHelper.ceil(box.maxZ);
+        double d = 0.0;
+        BlockPos.Mutable mutable = new BlockPos.Mutable();
+
+        for(int p = i; p < j; ++p) {
+            for(int q = k; q < l; ++q) {
+                for(int r = m; r < n; ++r) {
+                    mutable.set(p, q, r);
+                    FluidState fluidState = this.getWorld().getFluidState(mutable);
+                    if (fluidState.isIn(tag)) {
+                        double e = (double)((float)q + fluidState.getHeight(this.getWorld(), mutable));
+                        if (e >= box.minY) {
+                            d = Math.max(e - box.minY, d);
+                        }
+                    }
+                }
+            }
+        }
+
+        isInLavaLocal = d > 0.0;
         return false;
     }
 
@@ -602,5 +652,112 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
     @Override
     public void slowMovement(BlockState state, Vec3d multiplier) {
+    }
+
+    @Override
+    public boolean isImmuneToExplosion(Explosion explosion) {
+        return true;
+    }
+
+    private int propellerSoundCooldown = 0;
+    private int walkSoundCooldown = 0;
+    private boolean lastFlying = false;
+    private boolean lastGlidingOrLanding = false;
+    public void playSounds() {
+        if (soundCooldown > 0) {
+            soundCooldown--;
+        }
+
+        if (isInLavaLocal && random.nextInt(100) == 0) {
+            playLavaSound();
+        }
+
+        if (isOnFire() && random.nextInt(100) == 0) {
+            playBurnSound();
+        }
+
+        if (getAir() == 0 && random.nextInt(100) == 0) {
+            playDrownSound();
+        }
+
+        if (gliding || landing) {
+            if (!lastGlidingOrLanding) {
+                playFallSound();
+            }
+        }
+
+         if (flying) {
+            if (!lastFlying) {
+                playFlySound();
+            }
+            if (propellerSoundCooldown > 0) {
+                propellerSoundCooldown--;
+            }
+            if (propellerSoundCooldown == 0) {
+                propellerSoundCooldown=40;
+                playPropellerSound();
+            }
+        }
+        if (!flying && !gliding && !landing && forwardSpeed > 0.001) {
+            if (walkSoundCooldown > 0) {
+                walkSoundCooldown--;
+            }
+            if (walkSoundCooldown == 0) {
+                walkSoundCooldown = 22;
+                playWalkSound();
+            }
+        }
+        lastFlying = flying;
+        lastGlidingOrLanding = gliding || landing;
+    }
+
+    public void playAttackSound() {
+        playRandomSound("attack", 0.25f, 1, 9);
+    }
+
+    public void playBurnSound() {
+        playRandomSound("burn", 0.25f, 1, 9);
+    }
+
+    public void playDrownSound() {
+        playRandomSound("drown", 0.25f, 1, 9);
+    }
+
+    public void playFallSound() {
+        playRandomSound("fall", 0.25f, 1, 5);
+    }
+
+    public void playFlySound() {
+        playRandomSound("fly", 0.25f, 1, 8);
+    }
+
+    public void playPropellerSound() {
+        int cooldownBefore = soundCooldown;
+        soundCooldown = 0;
+        playRandomSound("propeller", 0.2f, 0, 0);
+        soundCooldown = cooldownBefore;
+    }
+
+    public void playWalkSound() {
+        int cooldownBefore = soundCooldown;
+        soundCooldown = 0;
+        playRandomSound("walk", 0.2f, 0, 0);
+        soundCooldown = cooldownBefore;
+    }
+
+    public void playLavaSound() {
+        playRandomSound("lava", 0.25f, 1, 2);
+    }
+
+    public void playThrowSound() {
+        playRandomSound("throw", 0.25f, 1, 7);
+    }
+
+    private int soundCooldown = 20;
+    public void playRandomSound(String name, float volume, int from, int to) {
+        if (soundCooldown > 0) return;
+        soundCooldown = 20;
+        SoundEvent sound = OtherUtils.getRandomSound("wildlife_snail_"+name, from, to);
+        this.playSound(sound, volume, 1);
     }
 }
