@@ -10,20 +10,14 @@ import net.mat0u5.lifeseries.series.Blacklist;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.Session;
-import net.mat0u5.lifeseries.series.doublelife.DoubleLifeConfig;
-import net.mat0u5.lifeseries.series.lastlife.LastLifeConfig;
-import net.mat0u5.lifeseries.series.limitedlife.LimitedLifeConfig;
 import net.mat0u5.lifeseries.series.secretlife.SecretLife;
-import net.mat0u5.lifeseries.series.secretlife.SecretLifeConfig;
 import net.mat0u5.lifeseries.series.secretlife.TaskManager;
-import net.mat0u5.lifeseries.series.thirdlife.ThirdLifeConfig;
 import net.mat0u5.lifeseries.series.unassigned.UnassignedSeries;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.mat0u5.lifeseries.series.lastlife.LastLife;
 import net.mat0u5.lifeseries.series.limitedlife.LimitedLife;
 import net.mat0u5.lifeseries.series.thirdlife.ThirdLife;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
-import net.mat0u5.lifeseries.series.wildlife.WildLifeConfig;
 import net.mat0u5.lifeseries.registries.ModRegistries;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.server.MinecraftServer;
@@ -35,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "dev-1.2.2.25";
+	public static final String MOD_VERSION = "dev-1.2.2.26";
 	public static final String MOD_ID = "lifeseries";
 	public static final String GITHUB_API_URL = "https://api.github.com/repos/Mat0u5/LifeSeries/releases/latest";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -58,10 +52,10 @@ public class Main implements ModInitializer {
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 
 		config = new MainConfig();
-
 		String series = config.getOrCreateProperty("currentSeries", "unassigned");
+
 		parseSeries(series);
-		createConfigs();
+		ConfigManager.createConfigs();
 
 		ModRegistries.registerModStuff();
 		UpdateChecker.checkForUpdates();
@@ -93,15 +87,6 @@ public class Main implements ModInitializer {
 		currentSession = currentSeries;
 		seriesConfig = currentSeries.getConfig();
 		blacklist = currentSeries.createBlacklist();
-	}
-
-	public static void createConfigs() {
-		new ThirdLifeConfig();
-		new LastLifeConfig();
-		new DoubleLifeConfig();
-		new LimitedLifeConfig();
-		new SecretLifeConfig();
-		new WildLifeConfig();
 	}
 
 	public static void reload() {

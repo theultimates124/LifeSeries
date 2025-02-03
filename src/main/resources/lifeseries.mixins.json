@@ -16,7 +16,9 @@
 		"ForgingScreenHandlerAccessor",
 		"RecipeManagerMixin",
 		"ItemStackMixin",
-		"EntityMixin"
+		"EntityMixin",
+		"SpawnGroupMixin",
+		"SpawnHelperMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

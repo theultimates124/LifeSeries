@@ -14,7 +14,9 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import static net.mat0u5.lifeseries.Main.server;
@@ -32,6 +34,7 @@ public class Snails extends Wildcard {
     @Override
     public void activate() {
         super.activate();
+        snails.clear();
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             spawnSnailFor(player);
         }
@@ -40,6 +43,7 @@ public class Snails extends Wildcard {
     @Override
     public void deactivate() {
         super.deactivate();
+        snails.clear();
         killAllSnails();
     }
 
@@ -74,17 +78,14 @@ public class Snails extends Wildcard {
 
     public static void killAllSnails() {
         if (server == null) return;
-        server.getWorlds().forEach(world -> {
-            world.iterateEntities().forEach(entity -> {
+        List<Entity> toKill = new ArrayList<>();
+        for (ServerWorld world : server.getWorlds()) {
+            for (Entity entity : world.iterateEntities()) {
                 if (entity instanceof Snail || entity instanceof PathFinder) {
-                    //? if <= 1.21 {
-                    entity.kill();
-                    //?} else {
-                    /*entity.kill((ServerWorld) entity.getWorld());
-                     *///?}
-                    entity.discard();
+                    toKill.add(entity);
                 }
-            });
-        });
+            }
+        }
+        toKill.forEach(Entity::discard);
     }
 }

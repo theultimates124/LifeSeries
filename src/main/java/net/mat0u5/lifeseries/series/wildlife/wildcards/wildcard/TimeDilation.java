@@ -50,7 +50,7 @@ public class TimeDilation extends Wildcard {
 
     @Override
     public void activate() {
-        super.deactivate();
+        super.activate();
         activatedAt = (int) currentSession.passedTime;
         lastDiv = -1;
         setWorldSpeed(MIN_TICK_RATE);

@@ -103,6 +103,7 @@ public class Events {
 
     private static void onServerTickEnd(MinecraftServer server) {
         try {
+            if (server.getTickManager().isFrozen()) return;
             if (Main.currentSession != null) {
                 Main.currentSession.tick(server);
             }

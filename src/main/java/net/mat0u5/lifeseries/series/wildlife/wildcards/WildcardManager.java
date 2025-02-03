@@ -3,6 +3,7 @@ package net.mat0u5.lifeseries.series.wildlife.wildcards;
 import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.MobSwap;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Snails;
 import net.mat0u5.lifeseries.utils.OtherUtils;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
+import static net.mat0u5.lifeseries.Main.server;
 
 public class WildcardManager {
     public static HashMap<Wildcards, Wildcard> activeWildcards = new HashMap<>();
@@ -53,11 +55,11 @@ public class WildcardManager {
         //activeWildcards.put(Wildcards.SIZE_SHIFTING, new SizeShifting());
         //activeWildcards.put(Wildcards.HUNGER, new Hunger());
         //activeWildcards.put(Wildcards.TIME_DILATION, new TimeDilation());
-        activeWildcards.put(Wildcards.SNAILS, new Snails());
+        //activeWildcards.put(Wildcards.SNAILS, new Snails());
+        activeWildcards.put(Wildcards.MOB_SWAP, new MobSwap());
     }
 
     public static void resetWildcardsOnPlayerJoin(ServerPlayerEntity player) {
-
         if (!isActiveWildcard(Wildcards.SIZE_SHIFTING)) {
             if (SizeShifting.getPlayerSize(player) != 1) SizeShifting.setPlayerSize(player, 1);
         }
@@ -69,19 +71,6 @@ public class WildcardManager {
         });
     }
 
-    public static void resetWildcardsOnServerStart() {
-        TaskScheduler.scheduleTask(100, Snails::killAllSnails);
-
-    }
-
-    public static void resetWildcardsOnSessionStart() {
-        Snails.killAllSnails();
-    }
-
-    public static void resetWildcardsOnSessionEnd() {
-        Snails.killAllSnails();
-    }
-
     public static void activateWildcards() {
         showDots();
         TaskScheduler.scheduleTask(90, () -> {
@@ -89,6 +78,7 @@ public class WildcardManager {
                 chooseRandomWildcard();
             }
             for (Wildcard wildcard : activeWildcards.values()) {
+                if (wildcard.active) continue;
                 wildcard.activate();
             }
             if (!isActiveWildcard(Wildcards.TIME_DILATION)) {
@@ -157,12 +147,19 @@ public class WildcardManager {
         if (!isActiveWildcard(Wildcards.SIZE_SHIFTING)) {
             SizeShifting.resetSizesTick();
         }
+        if (!isActiveWildcard(Wildcards.MOB_SWAP) && server != null && server.getTicks() % 200 == 0) {
+            MobSwap.killMobSwapMobs();
+        }
     }
 
     public static void tickSessionOn() {
         for (Wildcard wildcard : activeWildcards.values()) {
             wildcard.tick();
         }
+    }
+
+    public static void onSessionStart() {
+
     }
 
     public static void onSessionEnd() {

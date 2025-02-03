@@ -66,6 +66,13 @@ public class WildLifeConfig extends ConfigManager {
         getOrCreateDouble("wildcard_sizeshifting_max_size", 3);
         getOrCreateDouble("wildcard_sizeshifting_size_change_multiplier", 1);
 
+        getOrCreateDouble("wildcard_snails_speed_multiplier", 1);
+
+        getOrCreateInt("wildcard_mobswap_start_spawn_delay", 7200);
+        getOrCreateInt("wildcard_mobswap_end_spawn_delay", 2400);
+        getOrCreateInt("wildcard_mobswap_spawn_mobs", 250);
+        getOrCreateDouble("wildcard_mobswap_boss_chance_multiplier", 1);
+
         getOrCreateInt("max_player_health", 20);
         getOrCreateInt("default_lives", 6);
         getOrCreateBoolean("custom_enchanter_algorithm", true);

@@ -1,6 +1,12 @@
 package net.mat0u5.lifeseries.config;
 
 import net.mat0u5.lifeseries.Main;
+import net.mat0u5.lifeseries.series.doublelife.DoubleLifeConfig;
+import net.mat0u5.lifeseries.series.lastlife.LastLifeConfig;
+import net.mat0u5.lifeseries.series.limitedlife.LimitedLifeConfig;
+import net.mat0u5.lifeseries.series.secretlife.SecretLifeConfig;
+import net.mat0u5.lifeseries.series.thirdlife.ThirdLifeConfig;
+import net.mat0u5.lifeseries.series.wildlife.WildLifeConfig;
 import net.minecraft.entity.ai.pathing.Path;
 
 import javax.swing.text.DefaultEditorKit;
@@ -58,6 +64,15 @@ public abstract class ConfigManager {
                 Main.LOGGER.info("Failed to move old config file.");
             }
         }
+    }
+
+    public static void createConfigs() {
+        new ThirdLifeConfig();
+        new LastLifeConfig();
+        new DoubleLifeConfig();
+        new LimitedLifeConfig();
+        new SecretLifeConfig();
+        new WildLifeConfig();
     }
 
     public static void createPolymerConfig() {

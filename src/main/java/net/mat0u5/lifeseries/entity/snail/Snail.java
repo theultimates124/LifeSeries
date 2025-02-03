@@ -61,6 +61,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public static final Identifier ID = Identifier.of(Main.MOD_ID, "snail");
     public static final Model MODEL = BbModelLoader.load(ID);
     public static final ChunkTicketType<ChunkPos> SNAIL_TICKET = ChunkTicketType.create("snail", Comparator.comparingLong(ChunkPos::toLong), 100);
+    public static double GLOBAL_SPEED_MULTIPLIER = 1;
 
     private final EntityHolder<Snail> holder;
     public UUID boundPlayerUUID;
@@ -564,11 +565,11 @@ public class Snail extends HostileEntity implements AnimatedEntity {
             if (speedMultiplier != lastSpeedMultiplier) {
                 lastSpeedMultiplier = speedMultiplier;
                 //? if <= 1.21 {
-                Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)).setBaseValue(MOVEMENT_SPEED * speedMultiplier);
-                Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.GENERIC_FLYING_SPEED)).setBaseValue(FLYING_SPEED * speedMultiplier);
+                Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)).setBaseValue(MOVEMENT_SPEED * speedMultiplier * GLOBAL_SPEED_MULTIPLIER);
+                Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.GENERIC_FLYING_SPEED)).setBaseValue(FLYING_SPEED * speedMultiplier * GLOBAL_SPEED_MULTIPLIER);
                 //?} else {
-                /*Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED)).setBaseValue(MOVEMENT_SPEED * speedMultiplier);
-                Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.FLYING_SPEED)).setBaseValue(FLYING_SPEED * speedMultiplier);
+                /*Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED)).setBaseValue(MOVEMENT_SPEED * speedMultiplier * GLOBAL_SPEED_MULTIPLIER);
+                Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.FLYING_SPEED)).setBaseValue(FLYING_SPEED * speedMultiplier * GLOBAL_SPEED_MULTIPLIER);
                 *///?}
             }
         }

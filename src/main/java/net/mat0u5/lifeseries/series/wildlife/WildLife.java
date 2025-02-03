@@ -1,10 +1,12 @@
 package net.mat0u5.lifeseries.series.wildlife;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
+import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.MobSwap;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PermissionManager;
@@ -87,7 +89,7 @@ public class WildLife extends Series {
     @Override
     public boolean sessionStart() {
         if (super.sessionStart()) {
-            WildcardManager.resetWildcardsOnSessionStart();
+            WildcardManager.onSessionStart();
             activeActions.addAll(
                     List.of(WildcardManager.wildcardNotice, WildcardManager.startWildcards)
             );
@@ -99,21 +101,27 @@ public class WildLife extends Series {
     @Override
     public void sessionEnd() {
         super.sessionEnd();
-        WildcardManager.resetWildcardsOnSessionEnd();
         WildcardManager.onSessionEnd();
     }
 
     @Override
     public void initialize() {
         super.initialize();
-        WildcardManager.resetWildcardsOnServerStart();
     }
 
     @Override
     public void reload() {
         Hunger.SWITCH_DELAY = seriesConfig.getOrCreateInt("wildcard_hunger_randomize_interval", 36000);
+
         SizeShifting.MIN_SIZE = seriesConfig.getOrCreateDouble("wildcard_sizeshifting_min_size", 0.25);
         SizeShifting.MAX_SIZE = seriesConfig.getOrCreateDouble("wildcard_sizeshifting_max_size", 3);
         SizeShifting.SIZE_CHANGE_MULTIPLIER = seriesConfig.getOrCreateDouble("wildcard_sizeshifting_size_change_multiplier", 1);
+
+        Snail.GLOBAL_SPEED_MULTIPLIER = seriesConfig.getOrCreateDouble("wildcard_snails_speed_multiplier", 1);
+
+        MobSwap.MAX_DELAY = seriesConfig.getOrCreateInt("wildcard_mobswap_start_spawn_delay", 7200);
+        MobSwap.MIN_DELAY = seriesConfig.getOrCreateInt("wildcard_mobswap_end_spawn_delay", 2400);
+        MobSwap.SPAWN_MOBS = seriesConfig.getOrCreateInt("wildcard_mobswap_spawn_mobs", 250);
+        MobSwap.BOSS_CHANCE_MULTIPLIER = seriesConfig.getOrCreateDouble("wildcard_mobswap_boss_chance_multiplier", 1);
     }
 }

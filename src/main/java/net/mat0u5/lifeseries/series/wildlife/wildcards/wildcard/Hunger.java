@@ -230,7 +230,6 @@ public class Hunger extends Wildcard {
         if (saturation < 0) saturation = 0;
         if (saturation > nutrition) saturation = nutrition;
         itemStack.set(DataComponentTypes.FOOD, new FoodComponent(nutrition, saturation, false, 1.6f, Optional.empty(), foodEffects));
-        return;
          //?} else {
         /*if (itemStack.getDefaultComponents().contains(DataComponentTypes.CONSUMABLE)) {
             StatusEffectInstance statusEffectInstance = new StatusEffectInstance(StatusEffects.HUNGER, 3600, 7);
