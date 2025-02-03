@@ -140,7 +140,6 @@ public class DoubleLifeCommands {
         DoubleLife series = ((DoubleLife) currentSeries);
 
         series.resetAllSoulmates();
-        series.saveSoulmates();
 
         source.sendMessage(Text.of("All soulmate entries were reset."));
 

@@ -1,9 +1,10 @@
 package net.mat0u5.lifeseries.series.secretlife;
 
 import net.mat0u5.lifeseries.Main;
+import net.mat0u5.lifeseries.config.ConfigManager;
+import net.mat0u5.lifeseries.config.StringListConfig;
 import net.mat0u5.lifeseries.config.StringListManager;
 import net.mat0u5.lifeseries.series.SessionAction;
-import net.mat0u5.lifeseries.series.SessionStatus;
 import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.WrittenBookContentComponent;
@@ -48,6 +49,8 @@ public class TaskManager {
     public static List<UUID> submittedOrFailed = new ArrayList<>();
     public static boolean secretKeeperBeingUsed = false;
     public static int secretKeeperBeingUsedFor = 0;
+    public static StringListConfig usedTasksConfig;
+    public static SecretLifeLocationConfig locationsConfig;
 
     public static SessionAction actionChooseTasks = new SessionAction(
             OtherUtils.minutesToTicks(1),"§7Assign Tasks §f[00:01:00]"
@@ -64,17 +67,24 @@ public class TaskManager {
     public static Random rnd = new Random();
 
     public static void initialize() {
+        usedTasksConfig = new StringListConfig("./config/lifeseries/main", "DO_NOT_MODIFY_secretlife_used_tasks.properties");
+        locationsConfig = new SecretLifeLocationConfig();
+        locationsConfig.loadLocations();
         StringListManager configEasyTasks = new StringListManager("./config/lifeseries/secretlife","easy-tasks.json");
         StringListManager configHardTasks = new StringListManager("./config/lifeseries/secretlife","hard-tasks.json");
         StringListManager configRedTasks = new StringListManager("./config/lifeseries/secretlife","red-tasks.json");
         easyTasks = configEasyTasks.loadStrings();
         hardTasks = configHardTasks.loadStrings();
         redTasks = configRedTasks.loadStrings();
-        List<String> alreadySelected = SecretLifeDatabase.getUsedTasks();
+        List<String> alreadySelected = SecretLifeUsedTasks.getUsedTasks(usedTasksConfig);
         for (String selected : alreadySelected) {
             easyTasks.remove(selected);
             hardTasks.remove(selected);
         }
+    }
+
+    public static void deleteLocations() {
+        locationsConfig.deleteLocations();
     }
 
     public static Task getRandomTask(TaskType type) {
@@ -83,12 +93,12 @@ public class TaskManager {
         if (easyTasks.isEmpty()) {
             StringListManager configEasyTasks = new StringListManager("./config/lifeseries/secretlife","easy-tasks.json");
             easyTasks = configEasyTasks.loadStrings();
-            SecretLifeDatabase.deleteAllTasks(easyTasks);
+            SecretLifeUsedTasks.deleteAllTasks(usedTasksConfig, easyTasks);
         }
         if (hardTasks.isEmpty()) {
             StringListManager configHardTasks = new StringListManager("./config/lifeseries/secretlife","hard-tasks.json");
             hardTasks = configHardTasks.loadStrings();
-            SecretLifeDatabase.deleteAllTasks(hardTasks);
+            SecretLifeUsedTasks.deleteAllTasks(usedTasksConfig, hardTasks);
         }
 
         if (type == TaskType.EASY && !easyTasks.isEmpty()) {
@@ -103,7 +113,7 @@ public class TaskManager {
             selectedTask = redTasks.get(rnd.nextInt(redTasks.size()));
         }
         if (type != TaskType.RED && !selectedTask.isEmpty()) {
-            SecretLifeDatabase.addUsedTask(selectedTask);
+            SecretLifeUsedTasks.addUsedTask(usedTasksConfig, selectedTask);
         }
         return new Task(selectedTask, type);
     }
@@ -497,7 +507,7 @@ public class TaskManager {
                 OtherUtils.broadcastMessage(Text.of("After that, use §b'/session start'§f to start the session."));
             }
         }
-        SecretLifeDatabase.saveLocations();
+        locationsConfig.saveLocations();
         checkSecretLifePositions();
     }
 

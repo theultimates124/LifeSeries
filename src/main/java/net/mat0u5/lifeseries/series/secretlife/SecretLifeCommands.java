@@ -171,7 +171,7 @@ public class SecretLifeCommands {
 
     public static int changeLocations(ServerCommandSource source) {
         if (checkBanned(source)) return -1;
-        SecretLifeDatabase.deleteLocations();
+        TaskManager.deleteLocations();
         TaskManager.checkSecretLifePositions();
         return 1;
     }

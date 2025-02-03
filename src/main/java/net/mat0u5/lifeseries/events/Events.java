@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.mat0u5.lifeseries.Main;
-import net.mat0u5.lifeseries.config.DatabaseManager;
 import net.mat0u5.lifeseries.config.DatapackManager;
 import net.mat0u5.lifeseries.config.UpdateChecker;
 import net.mat0u5.lifeseries.series.Series;
@@ -91,7 +90,6 @@ public class Events {
     private static void onServerStart(MinecraftServer server) {
         try {
             Main.server = server;
-            DatabaseManager.initialize();
             currentSeries.initialize();
             blacklist.reloadBlacklist();
             if (currentSeries.getSeries() == SeriesList.DOUBLE_LIFE) {

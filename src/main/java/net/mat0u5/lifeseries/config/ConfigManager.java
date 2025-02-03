@@ -7,6 +7,7 @@ import net.mat0u5.lifeseries.series.limitedlife.LimitedLifeConfig;
 import net.mat0u5.lifeseries.series.secretlife.SecretLifeConfig;
 import net.mat0u5.lifeseries.series.thirdlife.ThirdLifeConfig;
 import net.mat0u5.lifeseries.series.wildlife.WildLifeConfig;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.entity.ai.pathing.Path;
 
 import javax.swing.text.DefaultEditorKit;
@@ -144,9 +145,38 @@ public abstract class ConfigManager {
         }
     }
 
+    public void setPropertyCommented(String key, String value, String comment) {
+        if (folderPath == null || filePath == null) return;
+        properties.setProperty(key, value);
+        try (OutputStream output = new FileOutputStream(filePath)) {
+            properties.store(output, comment);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void resetProperties(String comment) {
+        properties.clear();
+        try (OutputStream output = new FileOutputStream(filePath)) {
+            properties.store(output, comment);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     /*
         Various getters
      */
+
+    public String getProperty(String key) {
+        if (folderPath == null || filePath == null) return null;
+        if (properties == null) return null;
+
+        if (properties.containsKey(key)) {
+            return properties.getProperty(key);
+        }
+        return null;
+    }
 
     public String getOrCreateProperty(String key, String defaultValue) {
         if (folderPath == null || filePath == null) return "";

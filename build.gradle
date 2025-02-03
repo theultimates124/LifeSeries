@@ -25,9 +25,6 @@ dependencies {
  modImplementation("net.fabricmc:fabric-loader:${property("loader_version")}")
  modImplementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_version")}")
 
- modImplementation("maven.modrinth:sqlib:${project.sqlib_version}")
- include("maven.modrinth:sqlib:${project.sqlib_version}")
-
  modImplementation include("eu.pb4:polymer-bundled:${project.polymer_version}")
  modImplementation include("de.tomalbrc:blockbench-import-library:${project.blockbench_import_library_version}")
 }

@@ -16,7 +16,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potions;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -60,7 +59,6 @@ public class SecretLife extends Series {
         super.initialize();
         NO_HEALING = true;
         TaskManager.initialize();
-        SecretLifeDatabase.loadLocations();
         initializeItemSpawner();
     }
 

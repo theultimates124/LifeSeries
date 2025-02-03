@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.series.doublelife;
 
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.config.ConfigManager;
+import net.mat0u5.lifeseries.config.StringListConfig;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.SessionAction;
@@ -30,7 +31,7 @@ import static net.mat0u5.lifeseries.Main.*;
 
 public class DoubleLife extends Series {
     public static final RegistryKey<DamageType> SOULMATE_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(Main.MOD_ID, "soulmate"));
-
+    StringListConfig soulmateConfig;
 
     public SessionAction actionChooseSoulmates = new SessionAction(
             OtherUtils.minutesToTicks(1), "§7Assign soulmates if necessary §f[00:01:00]"
@@ -49,6 +50,12 @@ public class DoubleLife extends Series {
 
     public Map<UUID, UUID> soulmates = new HashMap<>();
     public Map<UUID, UUID> soulmatesOrdered = new HashMap<>();
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        soulmateConfig = new StringListConfig("./config/lifeseries/main", "DO_NOT_MODIFY_doublelife_soulmates.properties");
+    }
 
     @Override
     public SeriesList getSeries() {
@@ -117,7 +124,7 @@ public class DoubleLife extends Series {
     }
 
     public void loadSoulmates() {
-        soulmates = DoubleLifeDatabase.getAllSoulmates();
+        soulmates = getAllSoulmates();
         updateOrderedSoulmates();
     }
 
@@ -132,8 +139,7 @@ public class DoubleLife extends Series {
 
     public void saveSoulmates() {
         updateOrderedSoulmates();
-        DoubleLifeDatabase.deleteDoubleLifeSoulmates();
-        DoubleLifeDatabase.setAllSoulmates(soulmatesOrdered);
+        setAllSoulmates(soulmatesOrdered);
     }
 
     public boolean isMainSoulmate(ServerPlayerEntity player) {
@@ -183,7 +189,7 @@ public class DoubleLife extends Series {
     public void resetAllSoulmates() {
         soulmates = new HashMap<>();
         soulmatesOrdered = new HashMap<>();
-        DoubleLifeDatabase.deleteDoubleLifeSoulmates();
+        soulmateConfig.resetProperties("-- DO NOT MODIFY --");
     }
 
     public void rollSoulmates() {
@@ -278,7 +284,6 @@ public class DoubleLife extends Series {
     @Override
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
         if (source.getType().msgId().equalsIgnoreCase("soulmate")) return;
-
         if (player == null) return;
         if (!hasSoulmate(player)) return;
         if (!isSoulmateOnline(player)) return;
@@ -288,7 +293,6 @@ public class DoubleLife extends Series {
         if (soulmate.isDead()) return;
 
         //? if <=1.21 {
-        
         DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager()
                 .get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE));
         soulmate.damage(damageSource, 0.0000001F);
@@ -318,7 +322,6 @@ public class DoubleLife extends Series {
         if (soulmate.isDead()) return;
 
         //? if <=1.21 {
-        
         DamageSource damageSource = new DamageSource( soulmate.getWorld().getRegistryManager()
                 .get(RegistryKeys.DAMAGE_TYPE).entryOf(SOULMATE_DAMAGE));
         soulmate.setAttacker(player);
@@ -379,5 +382,30 @@ public class DoubleLife extends Series {
         else {
             cir.setReturnValue(true);
         }
+    }
+
+    public void setAllSoulmates(Map<UUID, UUID> soulmates) {
+        List<String> list = new ArrayList<>();
+        for (Map.Entry<UUID, UUID> entry : soulmates.entrySet()) {
+            list.add(entry.getKey().toString()+"_"+entry.getValue().toString());
+        }
+        soulmateConfig.save(list);
+    }
+
+    public Map<UUID, UUID> getAllSoulmates() {
+        Map<UUID, UUID> soulmates = new HashMap<>();
+        List<String> list = soulmateConfig.load();
+        for (String str : list) {
+            try {
+                if (!str.contains("_")) continue;
+                String[] split = str.split("_");
+                if (split.length != 2) continue;
+                UUID key = UUID.fromString(split[0]);
+                UUID value = UUID.fromString(split[1]);
+                soulmates.put(key, value);
+                soulmates.put(value, key);
+            }catch(Exception e) {}
+        }
+        return soulmates;
     }
 }
