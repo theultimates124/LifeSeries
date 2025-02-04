@@ -74,6 +74,7 @@ public class LastLife extends Series {
 
     @Override
     public void onClaimKill(ServerPlayerEntity killer, ServerPlayerEntity victim) {
+        super.onClaimKill(killer, victim);
         Boogeyman boogeyman  = boogeymanManager.getBoogeyman(killer);
         if (boogeyman == null || boogeyman.cured) return;
         boogeymanManager.cure(killer);

@@ -12,7 +12,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
@@ -49,7 +48,7 @@ public class LimitedLife extends Series {
             message = "Session has not started";
         }
         else if (statusStarted()) {
-            message = getRemainingLength();
+            message = getRemainingTime();
         }
         else if (statusPaused()) {
             message = "Session has been paused";
@@ -162,6 +161,7 @@ public class LimitedLife extends Series {
 
     @Override
     public void onClaimKill(ServerPlayerEntity killer, ServerPlayerEntity victim) {
+        super.onClaimKill(killer, victim);
         Boogeyman boogeyman  = boogeymanManager.getBoogeyman(killer);
         if (boogeyman == null || boogeyman.cured) {
             addToPlayerLives(killer, KILL_NORMAL);

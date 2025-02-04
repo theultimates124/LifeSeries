@@ -6,6 +6,7 @@ import net.mat0u5.lifeseries.config.StringListConfig;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.SessionAction;
+import net.mat0u5.lifeseries.series.Stats;
 import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
@@ -34,14 +35,14 @@ public class DoubleLife extends Series {
     StringListConfig soulmateConfig;
 
     public SessionAction actionChooseSoulmates = new SessionAction(
-            OtherUtils.minutesToTicks(1), "§7Assign soulmates if necessary §f[00:01:00]"
+            OtherUtils.minutesToTicks(1), "§7Assign soulmates if necessary §f[00:01:00]", "Assign Soulmates if necessary"
     ) {
         @Override
         public void trigger() {
             rollSoulmates();
         }
     };
-    public SessionAction actionRandomTP = new SessionAction(5, "§7Random teleport distribution §f[00:00:01]") {
+    public SessionAction actionRandomTP = new SessionAction(5, "§7Random teleport distribution §f[00:00:01]", "Random teleport distribution") {
         @Override
         public void trigger() {
             distributePlayers();
@@ -170,6 +171,7 @@ public class DoubleLife extends Series {
     public void setSoulmate(ServerPlayerEntity player1, ServerPlayerEntity player2) {
         soulmates.put(player1.getUuid(), player2.getUuid());
         soulmates.put(player2.getUuid(), player1.getUuid());
+        Stats.soulmate(player1, player2);
         syncPlayers(player1, player2);
         updateOrderedSoulmates();
     }

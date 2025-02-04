@@ -34,7 +34,7 @@ public class BoogeymanManager {
         }
     };
     public SessionAction actionBoogeymanChoose = new SessionAction(
-            OtherUtils.minutesToTicks(10),"§7Choose Boogeymen §f[00:10:00]"
+            OtherUtils.minutesToTicks(10),"§7Choose Boogeymen §f[00:10:00]", "Choose Boogeymen"
     ) {
         @Override
         public void trigger() {
@@ -173,6 +173,7 @@ public class BoogeymanManager {
             boogey.sendMessage(Text.of("§7You are the Boogeyman. You must by any means necessary kill a §2dark green§7, §agreen§7 or §eyellow§7 name by direct action to be cured of the curse. " +
                     "If you fail, next session you will become a §cred name§7. All loyalties and friendships are removed while you are the Boogeyman."));
         }
+        Stats.boogeymenChosen(boogeyPlayers);
     }
 
     public void sessionEnd() {

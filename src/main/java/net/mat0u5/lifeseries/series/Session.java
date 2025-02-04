@@ -3,10 +3,9 @@ package net.mat0u5.lifeseries.series;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.WorldUitls;
-import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.ServerTickManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -14,8 +13,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.border.WorldBorder;
 
 import java.util.*;
-
-import static net.mat0u5.lifeseries.Main.server;
 
 public class Session {
     public Map<UUID, Integer> playerNaturalDeathLog = new HashMap<>();
@@ -63,12 +60,17 @@ public class Session {
         activeActions.add(endWarning1);
         activeActions.add(endWarning2);
         activeActions.add(actionInfoAction);
+        Stats.resetStats();
+        Stats.sessionStart();
+        Stats.logPlayers();
         return true;
     }
 
     public void sessionEnd() {
         status = SessionStatus.FINISHED;
         OtherUtils.broadcastMessage(Text.literal("The session has ended!").formatted(Formatting.GOLD));
+        Stats.sessionEnd();
+        Stats.sendTranscriptToAdmins();
     }
 
     public void sessionPause() {
@@ -108,7 +110,11 @@ public class Session {
         return OtherUtils.formatTime(sessionLength);
     }
 
-    public String getRemainingLength() {
+    public String getPassedTime() {
+        return OtherUtils.formatTime((int) passedTime);
+    }
+
+    public String getRemainingTime() {
         if (sessionLength == null) return "";
         return OtherUtils.formatTime(sessionLength - ((int) passedTime));
     }
@@ -221,7 +227,7 @@ public class Session {
             message = "Session has not started";
         }
         else if (statusStarted()) {
-            message = getRemainingLength();
+            message = getRemainingTime();
         }
         else if (statusPaused()) {
             message = "Session has been paused";

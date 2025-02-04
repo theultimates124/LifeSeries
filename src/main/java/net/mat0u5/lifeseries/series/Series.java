@@ -230,6 +230,7 @@ public abstract class Series extends Session {
         respawnPositions.put(player.getUuid(), info);
         dropItemsOnLastDeath(player);
         showDeathTitle(player);
+        Stats.onPlayerLostAllLives(player);
     }
 
     public void dropItemsOnLastDeath(ServerPlayerEntity player) {
@@ -301,6 +302,7 @@ public abstract class Series extends Session {
      */
 
     public void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
+        Stats.onPlayerDeath(player, source);
         boolean killedByPlayer = false;
         if (source != null) {
             if (source.getAttacker() instanceof ServerPlayerEntity) {
@@ -345,6 +347,7 @@ public abstract class Series extends Session {
     }
 
     public void onClaimKill(ServerPlayerEntity killer, ServerPlayerEntity victim) {
+        Stats.claimKill(killer, victim);
     }
 
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {

@@ -5,6 +5,7 @@ import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.config.StringListConfig;
 import net.mat0u5.lifeseries.config.StringListManager;
 import net.mat0u5.lifeseries.series.SessionAction;
+import net.mat0u5.lifeseries.series.Stats;
 import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.WrittenBookContentComponent;
@@ -53,7 +54,7 @@ public class TaskManager {
     public static SecretLifeLocationConfig locationsConfig;
 
     public static SessionAction actionChooseTasks = new SessionAction(
-            OtherUtils.minutesToTicks(1),"§7Assign Tasks §f[00:01:00]"
+            OtherUtils.minutesToTicks(1),"§7Assign Tasks §f[00:01:00]", "Assign Tasks"
     ) {
         @Override
         public void trigger() {
@@ -132,14 +133,21 @@ public class TaskManager {
 
     public static ItemStack getTaskBook(ServerPlayerEntity player, Task task) {
         ItemStack book = new ItemStack(Items.WRITTEN_BOOK);
+        List<RawFilteredPair<Text>> lines = task.getBookLines();
         WrittenBookContentComponent bookContent = new WrittenBookContentComponent(
             RawFilteredPair.of("§c"+player.getNameForScoreboard()+"'s Secret Task"),
                 "Secret Keeper",
                 0,
-                task.getBookLines(),
+                lines,
                 true
         );
+
+        List<String> linesStr = new ArrayList<>();
+        for (RawFilteredPair<Text> line : lines) {
+            linesStr.add(line.get(true).getString());
+        }
         book.set(DataComponentTypes.WRITTEN_BOOK_CONTENT, bookContent);
+        Stats.assignTask(player, task, linesStr);
 
         ItemStackUtils.setCustomComponentBoolean(book, "SecretTask", true);
         ItemStackUtils.setCustomComponentInt(book, "TaskDifficulty", task.getDifficulty());
@@ -314,6 +322,7 @@ public class TaskManager {
         SecretLife series = (SecretLife) currentSeries;
         TaskType type = getPlayersTaskType(player);
         if (!hasTaskBookCheck(player, type)) return;
+        Stats.successTask(player);
         removePlayersTaskBook(player);
         submittedOrFailed.add(player.getUuid());
         secretKeeperBeingUsed = true;
@@ -356,6 +365,7 @@ public class TaskManager {
         }
         if (type == TaskType.EASY) {
             removePlayersTaskBook(player);
+            Stats.rerollTask(player);
             secretKeeperBeingUsed = true;
             TaskType newType = TaskType.HARD;
             if (series.isOnLastLife(player, false)) {
@@ -404,6 +414,7 @@ public class TaskManager {
         SecretLife series = (SecretLife) currentSeries;
         TaskType type = getPlayersTaskType(player);
         if (!hasTaskBookCheck(player, type)) return;
+        Stats.failTask(player);
         removePlayersTaskBook(player);
         submittedOrFailed.add(player.getUuid());
         secretKeeperBeingUsed = true;

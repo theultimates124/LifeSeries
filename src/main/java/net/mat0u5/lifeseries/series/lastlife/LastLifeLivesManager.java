@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.series.lastlife;
 
 import net.mat0u5.lifeseries.series.SessionAction;
+import net.mat0u5.lifeseries.series.Stats;
 import net.mat0u5.lifeseries.utils.AnimationUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
@@ -19,7 +20,7 @@ import static net.mat0u5.lifeseries.Main.seriesConfig;
 
 public class LastLifeLivesManager {
     public SessionAction actionChooseLives = new SessionAction(
-            OtherUtils.minutesToTicks(1),"§7Assign lives if necessary §f[00:01:00]"
+            OtherUtils.minutesToTicks(1),"§7Assign lives if necessary §f[00:01:00]", "Assign lives if necessary"
     ) {
         @Override
         public void trigger() {
@@ -31,9 +32,10 @@ public class LastLifeLivesManager {
     public void receiveLifeFromOtherPlayer(Text playerName, ServerPlayerEntity target) {
         target.playSoundToPlayer(SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.MASTER, 10, 1);
         target.sendMessage(Text.literal("You received a life from ").append(playerName));
-        PlayerUtils.sendTitle(target, Text.of("You received a life"), 10, 30, 10);
+        PlayerUtils.sendTitleWithSubtitle(target, Text.of("You received a life"), Text.literal("from").append(playerName), 10, 30, 10);
         AnimationUtils.createSpiral(target, 175);
         currentSeries.reloadPlayerTeam(target);
+        Stats.givelife(playerName, target);
     }
 
     public void assignRandomLivesToUnassignedPlayers() {
@@ -113,6 +115,7 @@ public class LastLifeLivesManager {
                 Text finalText = textLives.append(Text.literal(" lives.").formatted(Formatting.GREEN));
                 PlayerUtils.sendTitle(player, finalText, 0, 60, 20);
                 if (currentSeries.hasAssignedLives(player)) continue;
+                Stats.assignRandomLives(player, livesNum);
                 currentSeries.setPlayerLives(player, livesNum);
             }
             PlayerUtils.playSoundToPlayers(lives.keySet(), SoundEvents.BLOCK_END_PORTAL_SPAWN);

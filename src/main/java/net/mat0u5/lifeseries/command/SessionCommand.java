@@ -3,7 +3,7 @@ package net.mat0u5.lifeseries.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.mat0u5.lifeseries.series.SeriesList;
-import net.mat0u5.lifeseries.series.SessionStatus;
+import net.mat0u5.lifeseries.series.Stats;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
@@ -12,7 +12,9 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.List;
 
@@ -118,8 +120,12 @@ public class SessionCommand {
             source.sendError(Text.of("The session time has not been set yet."));
             return -1;
         }
-
-        source.sendMessage(Text.of("The session ends in " + currentSession.getRemainingLength()));
+        if (!currentSession.statusFinished()) {
+            source.sendMessage(Text.of("The session ends in " + currentSession.getRemainingTime()));
+        }
+        else {
+            source.sendMessage(Text.literal("The session ends in ").append(Text.literal(currentSession.getRemainingTime()).styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, Stats.getStats())))));
+        }
         return 1;
     }
 

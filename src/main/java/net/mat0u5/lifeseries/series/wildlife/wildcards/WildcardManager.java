@@ -36,7 +36,7 @@ public class WildcardManager {
             }
         }
     };
-    public static SessionAction startWildcards = new SessionAction(OtherUtils.secondsToTicks(150),"§7Activate Wildcard §f[00:02:30]") {
+    public static SessionAction startWildcards = new SessionAction(OtherUtils.secondsToTicks(150),"§7Activate Wildcard §f[00:02:30]", "Activate Wildcard") {
         @Override
         public void trigger() {
             if (activeWildcards.isEmpty()) {

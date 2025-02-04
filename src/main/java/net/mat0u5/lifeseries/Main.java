@@ -6,10 +6,7 @@ import net.fabricmc.api.ModInitializer;
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.config.MainConfig;
 import net.mat0u5.lifeseries.config.UpdateChecker;
-import net.mat0u5.lifeseries.series.Blacklist;
-import net.mat0u5.lifeseries.series.Series;
-import net.mat0u5.lifeseries.series.SeriesList;
-import net.mat0u5.lifeseries.series.Session;
+import net.mat0u5.lifeseries.series.*;
 import net.mat0u5.lifeseries.series.secretlife.SecretLife;
 import net.mat0u5.lifeseries.series.secretlife.TaskManager;
 import net.mat0u5.lifeseries.series.unassigned.UnassignedSeries;
@@ -29,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "dev-1.2.2.27";
+	public static final String MOD_VERSION = "dev-1.2.2.28";
 	public static final String MOD_ID = "lifeseries";
 	public static final String GITHUB_API_URL = "https://api.github.com/repos/Mat0u5/LifeSeries/releases/latest";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -111,6 +108,7 @@ public class Main implements ModInitializer {
 		for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
 			currentSeries.onPlayerJoin(player);
 		}
+		Stats.resetStats();
 	}
 
 	public static boolean isDevVersion() {

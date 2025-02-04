@@ -6,8 +6,11 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
+import net.minecraft.util.DateTimeFormatters;
 import net.minecraft.util.Identifier;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -161,5 +164,11 @@ public class OtherUtils {
             name += index;
         }
         return SoundEvent.of(Identifier.of("minecraft", name));
+    }
+
+    public static String getTimeAndDate() {
+        LocalDateTime time = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return time.format(formatter);
     }
 }
