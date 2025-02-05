@@ -213,9 +213,9 @@ public abstract class Series extends Session {
     }
 
     public boolean isOnAtLeastLives(ServerPlayerEntity player, int check, boolean fallback) {
-        Boolean isOnLife = isOnSpecificLives(player, check);
-        if (isOnLife == null) return fallback;
-        return isOnLife;
+        Boolean isOnAtLeast = isOnAtLeastLives(player, check);
+        if (isOnAtLeast == null) return fallback;
+        return isOnAtLeast;
     }
 
 

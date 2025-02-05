@@ -5,6 +5,8 @@ import net.mat0u5.lifeseries.config.ConfigManager;
 
 import java.util.List;
 
+import static net.mat0u5.lifeseries.Main.seriesConfig;
+
 public class WildLifeConfig extends ConfigManager {
     public static final List<String> BLACKLISTED_ITEMS = List.of(
             "lectern",
@@ -67,6 +69,7 @@ public class WildLifeConfig extends ConfigManager {
         getOrCreateDouble("wildcard_sizeshifting_size_change_multiplier", 1);
 
         getOrCreateDouble("wildcard_snails_speed_multiplier", 1);
+        getOrCreateBoolean("wildcard_snails_drown_players", true);
 
         getOrCreateInt("wildcard_mobswap_start_spawn_delay", 7200);
         getOrCreateInt("wildcard_mobswap_end_spawn_delay", 2400);

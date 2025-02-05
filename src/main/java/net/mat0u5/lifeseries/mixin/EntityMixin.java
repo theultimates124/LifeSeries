@@ -19,17 +19,19 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 public abstract class EntityMixin {
     @Inject(method = "getAir", at = @At("HEAD"), cancellable = true)
     public void getAir(CallbackInfoReturnable<Integer> cir) {
-        if (currentSeries instanceof WildLife) {
-            if (!WildcardManager.isActiveWildcard(Wildcards.SNAILS)) return;
-            Entity entity = (Entity) (Object) this;
-            if (entity instanceof PlayerEntity player) {
-                if (!Snails.snails.containsKey(player.getUuid())) return;
-                Snail snail = Snails.snails.get(player.getUuid());
-                if (snail == null) return;
-                int snailAir = snail.getAir();
-                int initialAir = entity.getDataTracker().get(EntityTrackedData.AIR);
-                if (snailAir < initialAir) {
-                    cir.setReturnValue(snailAir);
+        if (Snail.SHOULD_DROWN_PLAYER) {
+            if (currentSeries instanceof WildLife) {
+                if (!WildcardManager.isActiveWildcard(Wildcards.SNAILS)) return;
+                Entity entity = (Entity) (Object) this;
+                if (entity instanceof PlayerEntity player) {
+                    if (!Snails.snails.containsKey(player.getUuid())) return;
+                    Snail snail = Snails.snails.get(player.getUuid());
+                    if (snail == null) return;
+                    int snailAir = snail.getAir();
+                    int initialAir = entity.getDataTracker().get(EntityTrackedData.AIR);
+                    if (snailAir < initialAir) {
+                        cir.setReturnValue(snailAir);
+                    }
                 }
             }
         }
