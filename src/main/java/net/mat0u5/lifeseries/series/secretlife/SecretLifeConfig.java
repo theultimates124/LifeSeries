@@ -60,6 +60,8 @@ public class SecretLifeConfig extends ConfigManager {
         getOrCreateInt("task_health_red_fail", -5);
 
 
+        getOrCreateBoolean("spawner_recipe", true);
+        getOrCreateBoolean("spawn_egg_allow_on_spawner", true);
         getOrCreateInt("max_player_health", 60);
         getOrCreateInt("default_lives", 3);
         getOrCreateBoolean("custom_enchanter_algorithm", false);

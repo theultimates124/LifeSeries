@@ -60,6 +60,8 @@ public class LastLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
+        getOrCreateBoolean("spawner_recipe", false);
+        getOrCreateBoolean("spawn_egg_allow_on_spawner", false);
         getOrCreateInt("max_player_health", 20);
         getOrCreateInt("random_lives_min", 2);
         getOrCreateInt("random_lives_max", 6);

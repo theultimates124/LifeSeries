@@ -60,6 +60,8 @@ public class DoubleLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
+        getOrCreateBoolean("spawner_recipe", false);
+        getOrCreateBoolean("spawn_egg_allow_on_spawner", false);
         getOrCreateInt("max_player_health", 20);
         getOrCreateInt("default_lives", 3);
         getOrCreateBoolean("custom_enchanter_algorithm", true);

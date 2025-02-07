@@ -154,7 +154,7 @@ public class WildcardManager {
 
     public static void tickSessionOn() {
         for (Wildcard wildcard : activeWildcards.values()) {
-            wildcard.tick();
+            wildcard.tickSessionOn();
         }
     }
 

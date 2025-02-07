@@ -62,6 +62,8 @@ public class WildLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
+        getOrCreateBoolean("spawner_recipe", true);
+        getOrCreateBoolean("spawn_egg_allow_on_spawner", true);
         getOrCreateInt("wildcard_hunger_randomize_interval", 36000);
 
         getOrCreateDouble("wildcard_sizeshifting_min_size", 0.25);

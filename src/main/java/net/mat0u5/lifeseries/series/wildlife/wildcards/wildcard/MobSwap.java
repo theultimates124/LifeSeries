@@ -125,9 +125,8 @@ public class MobSwap extends Wildcard {
     }
 
     @Override
-    public void tick() {
+    public void tickSessionOn() {
         if (server == null) return;
-        if (!currentSeries.statusStarted()) return;
 
         int currentDiv0 = (int) (((float) currentSession.passedTime - activatedAt) / 40.0);
         if (lastDiv0 != currentDiv0) {

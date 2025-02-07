@@ -35,7 +35,6 @@ public abstract class ConfigManager {
 
     protected void defaultSessionProperties() {
         getOrCreateDouble("spawn_egg_drop_chance", 0.05);
-        getOrCreateBoolean("spawn_egg_allow_on_spawner", false);
         getOrCreateBoolean("creative_ignore_blacklist", true);
         getOrCreateBoolean("auto_set_worldborder", true);
         getOrCreateBoolean("auto_keep_inventory", true);

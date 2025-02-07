@@ -72,6 +72,12 @@ public class Blacklist {
         List<Item> newList = new ArrayList<>();
         List<Identifier> newListIdentifier = new ArrayList<>();
 
+        if (seriesConfig != null) {
+            if (!seriesConfig.getOrCreateBoolean("spawner_recipe", false)) {
+                newListIdentifier.add(Identifier.of("lifeseries", "spawner_recipe"));
+            }
+        }
+
         for (String itemId : loadItemBlacklist()) {
             if (!itemId.startsWith("minecraft:")) itemId = "minecraft:" + itemId;
 

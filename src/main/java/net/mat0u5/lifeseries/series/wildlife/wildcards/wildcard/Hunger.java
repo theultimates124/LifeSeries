@@ -91,8 +91,7 @@ public class Hunger extends Wildcard {
     }
 
     @Override
-    public void tick() {
-        if (!currentSeries.statusStarted()) return;
+    public void tickSessionOn() {
         if (currentSession.sessionLength - currentSession.passedTime > 6000) {
             int currentVersion = (int) Math.floor((double) currentSession.passedTime / (double) SWITCH_DELAY);
             if (lastVersion != currentVersion) {

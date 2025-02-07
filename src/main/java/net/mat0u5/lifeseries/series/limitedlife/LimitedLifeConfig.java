@@ -60,6 +60,8 @@ public class LimitedLifeConfig extends ConfigManager {
     @Override
     public void defaultProperties() {
         defaultSessionProperties();
+        getOrCreateBoolean("spawner_recipe", false);
+        getOrCreateBoolean("spawn_egg_allow_on_spawner", false);
         getOrCreateInt("max_player_health", 20);
         getOrCreateInt("time_default", 86400);
         getOrCreateInt("time_yellow", 57600);

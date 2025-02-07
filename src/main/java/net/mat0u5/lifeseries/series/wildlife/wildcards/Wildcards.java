@@ -14,7 +14,7 @@ public enum Wildcards {
     TRIVIA_BOT,
     MOB_SWAP,
     SUPERPOWERS,
-    EVERYTING;
+    CALLBACK;
 
     public static Wildcards getFromString(String wildcard) {
         if (wildcard.equalsIgnoreCase("size_shifting")) return SIZE_SHIFTING;
@@ -24,6 +24,7 @@ public enum Wildcards {
         if (wildcard.equalsIgnoreCase("trivia_bot")) return TRIVIA_BOT;
         if (wildcard.equalsIgnoreCase("mob_swap")) return MOB_SWAP;
         if (wildcard.equalsIgnoreCase("superpowers")) return SUPERPOWERS;
+        if (wildcard.equalsIgnoreCase("callback")) return CALLBACK;
         return NULL;
     }
 
@@ -35,6 +36,7 @@ public enum Wildcards {
         if (wildcard == Wildcards.TRIVIA_BOT) return null;
         if (wildcard == Wildcards.MOB_SWAP) return new MobSwap();
         if (wildcard == Wildcards.SUPERPOWERS) return null;
+        if (wildcard == Wildcards.CALLBACK) return null;
         return null;
     }
 
@@ -46,20 +48,19 @@ public enum Wildcards {
         if (wildcard == Wildcards.TRIVIA_BOT) return "trivia_bot";
         if (wildcard == Wildcards.MOB_SWAP) return "mob_swap";
         if (wildcard == Wildcards.SUPERPOWERS) return "superpowers";
+        if (wildcard == Wildcards.CALLBACK) return "callback";
         return "null";
     }
 
     public static List<String> getWildcards() {
-        return List.of("size_shifting","hunger","snails","time_dilation","trivia_bot","mob_swap","superpowers");
+        return List.of("size_shifting","hunger","snails","time_dilation","trivia_bot","mob_swap","superpowers","callback");
     }
 
     public static List<String> getNonActiveWildcards() {
         List<String> result = new ArrayList<>(getWildcards());
         for (Wildcards wildcard : WildcardManager.activeWildcards.keySet()) {
             String name = getStringName(wildcard);
-            if (result.contains(name)) {
-                result.remove(name);
-            }
+            result.remove(name);
         }
         return result;
     }

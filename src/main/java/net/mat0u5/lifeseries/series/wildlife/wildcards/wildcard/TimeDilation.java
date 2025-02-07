@@ -22,8 +22,7 @@ public class TimeDilation extends Wildcard {
     }
 
     @Override
-    public void tick() {
-        if (!currentSeries.statusStarted()) return;
+    public void tickSessionOn() {
         int currentDiv = (int) ((currentSession.passedTime) / updateRate);
         if (lastDiv != currentDiv) {
             lastDiv = currentDiv;

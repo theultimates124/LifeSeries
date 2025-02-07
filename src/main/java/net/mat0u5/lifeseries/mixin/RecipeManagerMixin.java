@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.blacklist;
+import static net.mat0u5.lifeseries.Main.seriesConfig;
 
 //? if <=1.21 {
 import net.minecraft.recipe.RecipeManager;
@@ -29,7 +30,6 @@ public class RecipeManagerMixin {
         if (blacklist.loadedListItemIdentifier.isEmpty()) return;
 
         List<Identifier> toRemove = new ArrayList<>();
-
 
         for (Identifier identifier : map.keySet()) {
             if (blacklist.loadedListItemIdentifier.contains(identifier)) {

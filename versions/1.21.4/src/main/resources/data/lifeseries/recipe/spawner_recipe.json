@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "BDB",
+    "BBB"
+  ],
+  "key": {
+    "B": "minecraft:iron_bars",
+    "D": "minecraft:diamond"
+  },
+  "result": {
+    "id": "minecraft:spawner"
+  }
+}

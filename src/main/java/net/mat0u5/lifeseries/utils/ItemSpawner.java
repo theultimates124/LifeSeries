@@ -1,6 +1,5 @@
-package net.mat0u5.lifeseries.series;
+package net.mat0u5.lifeseries.utils;
 
-import net.mat0u5.lifeseries.utils.ItemStackUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
