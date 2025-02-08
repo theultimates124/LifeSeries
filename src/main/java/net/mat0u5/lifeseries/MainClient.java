@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class MainClient implements ClientModInitializer {
-
+    public static float MIN_MSPT = 25.0F;
     @Override
     public void onInitializeClient() {
         Main.isClient = true;

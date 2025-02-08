@@ -265,7 +265,7 @@ public class MobSwap extends Wildcard {
                 //? if <=1.21 {
                 Entity newMob = getRandomMob(progress, dangerThresholdMin, dangerThresholdMax).create(world);
                  //?} else {
-                /*Entity newMob = getRandomMob(progress, dangerThresholdMin, dangerThresholdMax).create(world, SpawnReason.NATURAL);
+                /*Entity newMob = getRandomMob(progress, dangerThresholdMin, dangerThresholdMax).create(world, SpawnReason.COMMAND);
                 *///?}
                 if (newMob != null) {
                     newMob.refreshPositionAndAngles(entity.getX(), entity.getY(), entity.getZ(), entity.getYaw(), entity.getPitch());

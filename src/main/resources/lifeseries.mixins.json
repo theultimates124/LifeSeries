@@ -1,26 +1,29 @@
 {
-	"required": true,
-	"package": "net.mat0u5.lifeseries.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"ItemEntityMixin",
-		"PlayerInventoryMixin",
-		"ServerPlayNetworkHandlerMixin",
-		"MobEntityMixin",
-		"SpawnEggItemMixin",
-		"LivingEntityMixin",
-		"PlayerEntityMixin",
-		"EnchantmentHelperMixin",
-		"ServerPlayerEntityMixin",
-		"AnvilScreenHandlerMixin",
-		"ForgingScreenHandlerAccessor",
-		"RecipeManagerMixin",
-		"EntityMixin",
-		"SpawnGroupMixin",
-		"SpawnHelperMixin",
-		"ItemMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "package": "net.mat0u5.lifeseries.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AnvilScreenHandlerMixin",
+    "EnchantmentHelperMixin",
+    "EntityMixin",
+    "ForgingScreenHandlerAccessor",
+    "ItemEntityMixin",
+    "ItemMixin",
+    "LivingEntityMixin",
+    "MobEntityMixin",
+    "PlayerEntityMixin",
+    "PlayerInventoryMixin",
+    "RecipeManagerMixin",
+    "ServerPlayerEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
+    "SpawnEggItemMixin",
+    "SpawnGroupMixin",
+    "SpawnHelperMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "MinecraftClientMixin"
+  ]
 }
