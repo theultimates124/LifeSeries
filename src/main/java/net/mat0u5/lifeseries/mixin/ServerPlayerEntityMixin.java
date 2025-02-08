@@ -21,7 +21,7 @@ import java.util.UUID;
 import static net.mat0u5.lifeseries.Main.blacklist;
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
-@Mixin(ServerPlayerEntity.class)
+@Mixin(value = ServerPlayerEntity.class, priority = 1)
 public class ServerPlayerEntityMixin {
     @Inject(method = "getRespawnTarget", at = @At("HEAD"), cancellable = true)
     private void getRespawnTarget(boolean alive, TeleportTarget.PostDimensionTransition postDimensionTransition, CallbackInfoReturnable<TeleportTarget> cir) {
@@ -45,9 +45,6 @@ public class ServerPlayerEntityMixin {
     @Inject(method = "openHandledScreen", at = @At("HEAD"))
     private void onInventoryOpen(@Nullable NamedScreenHandlerFactory factory, CallbackInfoReturnable<OptionalInt> cir) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-        if (currentSeries instanceof WildLife) {
-            TaskScheduler.scheduleTask(1, () -> player.currentScreenHandler.getStacks().forEach(Hunger::handleItemStack));
-        }
         if (blacklist != null) {
             TaskScheduler.scheduleTask(1, () -> player.currentScreenHandler.getStacks().forEach((itemStack) -> blacklist.processItemStack(player, itemStack)));
         }

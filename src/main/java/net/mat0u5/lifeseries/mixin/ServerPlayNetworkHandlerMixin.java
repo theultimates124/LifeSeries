@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
-@Mixin(ServerPlayNetworkHandler.class)
+@Mixin(value = ServerPlayNetworkHandler.class, priority = 1)
 public class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "handleDecoratedMessage(Lnet/minecraft/network/message/SignedMessage;)V",

@@ -18,7 +18,7 @@ import com.google.gson.JsonElement;
 import net.minecraft.util.Identifier;
 import java.util.ArrayList;
 import java.util.Map;
-@Mixin(RecipeManager.class)
+@Mixin(value = RecipeManager.class, priority = 1)
 public class RecipeManagerMixin {
 
     @Inject(method = "apply", at = @At("HEAD"))

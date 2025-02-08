@@ -10,6 +10,8 @@ import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.AmbientEntity;
@@ -180,6 +182,8 @@ public class LifeSeriesCommand {
     public static int test2(ServerCommandSource source) {
         ServerPlayerEntity player = source.getPlayer();
         if (player == null) return -1;
+        ComponentChanges changes = player.getMainHandStack().getComponentChanges();
+        ComponentMap map = player.getMainHandStack().getComponents();
         return 1;
     }
     public static int test3(ServerCommandSource source) {

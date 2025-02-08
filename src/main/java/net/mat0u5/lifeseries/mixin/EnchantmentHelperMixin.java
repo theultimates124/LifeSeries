@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 import static net.mat0u5.lifeseries.Main.*;
 
-@Mixin(EnchantmentHelper.class)
+@Mixin(value = EnchantmentHelper.class, priority = 1)
 public class EnchantmentHelperMixin {
     @Inject(method = "getPossibleEntries", at = @At("HEAD"), cancellable = true)
     private static void getPossibleEntries(int level, ItemStack stack, Stream<RegistryEntry<Enchantment>> possibleEnchantments, CallbackInfoReturnable<List<EnchantmentLevelEntry>> cir) {

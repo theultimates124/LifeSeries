@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static net.mat0u5.lifeseries.Main.seriesConfig;
 
-@Mixin(SpawnEggItem.class)
+@Mixin(value = SpawnEggItem.class, priority = 1)
 public abstract class SpawnEggItemMixin {
 
     @Inject(method = "useOnBlock", at = @At("HEAD"), cancellable = true)

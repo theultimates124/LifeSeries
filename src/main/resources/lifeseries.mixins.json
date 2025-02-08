@@ -15,10 +15,10 @@
 		"AnvilScreenHandlerMixin",
 		"ForgingScreenHandlerAccessor",
 		"RecipeManagerMixin",
-		"ItemStackMixin",
 		"EntityMixin",
 		"SpawnGroupMixin",
-		"SpawnHelperMixin"
+		"SpawnHelperMixin",
+		"ItemMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

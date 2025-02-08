@@ -15,17 +15,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static net.mat0u5.lifeseries.Main.blacklist;
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
-@Mixin(net.minecraft.entity.player.PlayerInventory.class)
+@Mixin(value = net.minecraft.entity.player.PlayerInventory.class, priority = 1)
 public abstract class PlayerInventoryMixin {
     @Inject(method = "markDirty", at = @At("HEAD"))
     private void onInventoryUpdated(CallbackInfo ci) {
         PlayerInventory inventory = (PlayerInventory) (Object) this;
         PlayerEntity player = inventory.player;
-        if (blacklist != null) {
-            blacklist.onInventoryUpdated(player,inventory,ci);
-        }
-        if (currentSeries instanceof WildLife wildLife) {
-            WildcardManager.onInventoryUpdated(player,inventory,ci);
+        if (player instanceof ServerPlayerEntity serverPlayer) {
+            if (blacklist != null) {
+                blacklist.onInventoryUpdated(serverPlayer,inventory,ci);
+            }
+            if (currentSeries instanceof WildLife) {
+                if (!WildcardManager.isActiveWildcard(Wildcards.HUNGER)) {
+                    Hunger.resetInventory(serverPlayer);
+                }
+            }
         }
     }
 }

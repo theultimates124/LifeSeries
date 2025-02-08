@@ -1,5 +1,8 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.mat0u5.lifeseries.mixin.ItemMixin;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
@@ -7,12 +10,15 @@ import net.mat0u5.lifeseries.utils.ItemStackUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
-import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.*;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -82,7 +88,8 @@ public class Hunger extends Wildcard {
             StatusEffects.REGENERATION,
             StatusEffects.RESISTANCE,
             StatusEffects.WITHER,
-            StatusEffects.ABSORPTION
+            StatusEffects.ABSORPTION,
+            StatusEffects.SATURATION
     );
 
     @Override
@@ -91,12 +98,12 @@ public class Hunger extends Wildcard {
     }
 
     @Override
-    public void tickSessionOn() {
-        if (currentSession.sessionLength - currentSession.passedTime > 6000) {
+    public void tick() {
+        if (currentSession.sessionLength == null || currentSession.sessionLength - currentSession.passedTime > 6000) {
             int currentVersion = (int) Math.floor((double) currentSession.passedTime / (double) SWITCH_DELAY);
             if (lastVersion != currentVersion) {
                 lastVersion = currentVersion;
-                TaskScheduler.scheduleTask(2, this::newFoodRules);
+                newFoodRules();
             }
         }
     }
@@ -105,7 +112,7 @@ public class Hunger extends Wildcard {
     public void deactivate() {
         shuffledBefore = false;
         super.deactivate();
-        TaskScheduler.scheduleTask(2, Hunger::updateInventories);
+        TaskScheduler.scheduleTask(10, Hunger::resetInventories);
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             player.removeStatusEffect(StatusEffects.HUNGER);
         }
@@ -114,6 +121,7 @@ public class Hunger extends Wildcard {
     public void activate() {
         shuffleVersion = rnd.nextInt(0,100);
         shuffledBefore = false;
+        lastVersion = -1;
         super.activate();
     }
 
@@ -123,37 +131,38 @@ public class Hunger extends Wildcard {
             PlayerUtils.sendTitleWithSubtitleToPlayers(PlayerUtils.getAllPlayers(), Text.of(""), Text.of("§7Food is about to be randomised..."), 0, 140, 0);
             TaskScheduler.scheduleTask(40, WildcardManager::showDots);
             TaskScheduler.scheduleTask(140, () -> {
-                updateInventories(true);
+                updateInventories();
                 PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_ELDER_GUARDIAN_CURSE, 0.2f, 1);
             });
         }
         else {
-            updateInventories(true);
+            TaskScheduler.scheduleTask(10, Hunger::updateInventories);
         }
         shuffledBefore = true;
         shuffleVersion++;
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             addHunger(player);
         }
+        OtherUtils.executeCommand("reload");
     }
 
     public static void updateInventories() {
-        updateInventories(false);
-    }
-
-    private static void updateInventories(boolean force) {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
-            updateInventory(player, force);
+            updateInventory(player);
         }
     }
 
     public static void updateInventory(ServerPlayerEntity player) {
-        updateInventory(player, false);
-    }
+        PlayerInventory inventory = player.getInventory();
+        for (int i = 0; i < inventory.size(); i++) {
+            ItemStack stack = inventory.getStack(i);
+            if (stack.isEmpty()) continue;
 
-    private static void updateInventory(ServerPlayerEntity player, boolean force) {
-        for (int i = 0; i < player.getInventory().size(); i++) {
-            Hunger.handleItemStack(player.getInventory().getStack(i), force);
+            stack.applyComponentsFrom(stack.getDefaultComponents());
+            ComponentChanges changes = stack.getComponentChanges();
+            inventory.setStack(i, new ItemStack(stack.getItem(), stack.getCount()));
+            ItemStack newStack = inventory.getStack(i);
+            newStack.applyChanges(changes);
         }
         player.currentScreenHandler.sendContentUpdates();
         player.playerScreenHandler.onContentChanged(player.getInventory());
@@ -168,48 +177,51 @@ public class Hunger extends Wildcard {
         if (!player.hasStatusEffect(StatusEffects.HUNGER) && WildcardManager.isActiveWildcard(Wildcards.HUNGER)){
             addHunger(player);
         }
-        Hunger.handleItemStack(player.getMainHandStack());
-        Hunger.handleItemStack(player.getOffHandStack());
+        Hunger.resetItemStackIfNecessary(player.getMainHandStack());
+        Hunger.resetItemStackIfNecessary(player.getOffHandStack());
         player.currentScreenHandler.sendContentUpdates();
         player.playerScreenHandler.onContentChanged(player.getInventory());
     }
 
-    public static void handleItemStack(ItemStack itemStack) {
-        handleItemStack(itemStack, false);
+    public static void resetInventories() {
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            resetInventory(player);
+        }
     }
 
-    private static void handleItemStack(ItemStack itemStack, boolean force) {
+    public static void resetInventory(ServerPlayerEntity player) {
+        PlayerInventory inventory = player.getInventory();
+        for (int i = 0; i < inventory.size(); i++) {
+            ItemStack stack = inventory.getStack(i);
+            resetItemStack(stack);
+        }
+        player.currentScreenHandler.sendContentUpdates();
+        player.playerScreenHandler.onContentChanged(player.getInventory());
+    }
+
+    public static void resetItemStackIfNecessary(ItemStack itemStack) {
+        if (WildcardManager.isActiveWildcard(Wildcards.HUNGER)) return;
+        resetItemStack(itemStack);
+    }
+
+    private static void resetItemStack(ItemStack itemStack) {
         if (itemStack.isEmpty()) return;
-        if (WildcardManager.isActiveWildcard(Wildcards.HUNGER) || force) {
-            if (ItemStackUtils.hasCustomComponentEntry(itemStack, "hunger_wildcard") && !force) {
-                return;
-            }
-            applyFoodComponents(itemStack);
-            ItemStackUtils.setCustomComponentBoolean(itemStack, "hunger_wildcard", true);
-        }
-        else {
-            if (!ItemStackUtils.hasCustomComponentEntry(itemStack, "hunger_wildcard")) {
-                return;
-            }
-            ItemStackUtils.removeCustomComponentEntry(itemStack, "hunger_wildcard");
-            itemStack.set(DataComponentTypes.FOOD, itemStack.getDefaultComponents().get(DataComponentTypes.FOOD));
-            //? if >=1.21.2 {
-            /*itemStack.set(DataComponentTypes.CONSUMABLE, itemStack.getDefaultComponents().get(DataComponentTypes.CONSUMABLE));
-             *///?}
-
-        }
+        itemStack.set(DataComponentTypes.FOOD, itemStack.getDefaultComponents().get(DataComponentTypes.FOOD));
+        //? if >=1.21.2 {
+        /*itemStack.set(DataComponentTypes.CONSUMABLE, itemStack.getDefaultComponents().get(DataComponentTypes.CONSUMABLE));
+         *///?}
     }
 
-    public static void applyFoodComponents(ItemStack itemStack) {
-        //? if <=1.21 {
-        
-        if (itemStack.getDefaultComponents().contains(DataComponentTypes.FOOD)) {
+
+    //? if <=1.21 {
+    public static void applyFoodComponents(Item item, ComponentMapImpl components) {
+        if (components.contains(DataComponentTypes.FOOD)) {
             StatusEffectInstance statusEffectInstance = new StatusEffectInstance(StatusEffects.HUNGER, 3600, 7);
             FoodComponent.StatusEffectEntry statusEffect = new FoodComponent.StatusEffectEntry(statusEffectInstance, 1);
-            itemStack.set(DataComponentTypes.FOOD, new FoodComponent(0, 0, false, 1.6f, Optional.empty(), List.of(statusEffect)));
+            components.set(DataComponentTypes.FOOD, new FoodComponent(0, 0, false, 1.6f, Optional.empty(), List.of(statusEffect)));
             return;
         }
-        int hash = getHash(itemStack);
+        int hash = getHash(item);
         List<FoodComponent.StatusEffectEntry> foodEffects = new ArrayList<>();
         if ((hash % 13) % 3 != 0) {
             int amplifier = hash % 5; // 0 -> 4
@@ -228,18 +240,20 @@ public class Hunger extends Wildcard {
         if (nutrition < 0) nutrition = 0;
         if (saturation < 0) saturation = 0;
         if (saturation > nutrition) saturation = nutrition;
-        itemStack.set(DataComponentTypes.FOOD, new FoodComponent(nutrition, saturation, false, 1.6f, Optional.empty(), foodEffects));
-         //?} else {
-        /*if (itemStack.getDefaultComponents().contains(DataComponentTypes.CONSUMABLE)) {
+        components.set(DataComponentTypes.FOOD, new FoodComponent(nutrition, saturation, false, 1.6f, Optional.empty(), foodEffects));
+    }
+     //?} else {
+    /*public static void applyFoodComponents(Item item, MergedComponentMap components) {
+        if (components.contains(DataComponentTypes.CONSUMABLE)) {
             StatusEffectInstance statusEffectInstance = new StatusEffectInstance(StatusEffects.HUNGER, 3600, 7);
             ApplyEffectsConsumeEffect statusEffect = new ApplyEffectsConsumeEffect(statusEffectInstance, 1);
-            itemStack.set(DataComponentTypes.CONSUMABLE,
+            components.set(DataComponentTypes.CONSUMABLE,
                     new ConsumableComponent(ConsumableComponent.DEFAULT_CONSUME_SECONDS, UseAction.EAT, SoundEvents.ENTITY_GENERIC_EAT, true, List.of(statusEffect))
             );
-            itemStack.set(DataComponentTypes.FOOD, new FoodComponent(0, 0, false));
+            components.set(DataComponentTypes.FOOD, new FoodComponent(0, 0, false));
             return;
         }
-        int hash = getHash(itemStack);
+        int hash = getHash(item);
         List<ConsumeEffect> foodEffects = new ArrayList<>();
         if ((hash % 13) % 3 != 0) {
             int amplifier = hash % 5; // 0 -> 4
@@ -259,16 +273,16 @@ public class Hunger extends Wildcard {
         if (saturation < 0) saturation = 0;
         if (saturation > nutrition) saturation = nutrition;
 
-        itemStack.set(DataComponentTypes.CONSUMABLE,
+        components.set(DataComponentTypes.CONSUMABLE,
                 new ConsumableComponent(ConsumableComponent.DEFAULT_CONSUME_SECONDS, UseAction.EAT, SoundEvents.ENTITY_GENERIC_EAT, true, foodEffects)
         );
-        itemStack.set(DataComponentTypes.FOOD, new FoodComponent(nutrition, saturation, false));
-        *///?}
+        components.set(DataComponentTypes.FOOD, new FoodComponent(nutrition, saturation, false));
 
     }
+    *///?}
 
-    private static int getHash(ItemStack itemStack) {
-        String itemId = Registries.ITEM.getId(itemStack.getItem()).toString();
+    private static int getHash(Item item) {
+        String itemId = Registries.ITEM.getId(item).toString();
         return Math.abs((itemId.hashCode() + shuffleVersion) * 31);
     }
 }

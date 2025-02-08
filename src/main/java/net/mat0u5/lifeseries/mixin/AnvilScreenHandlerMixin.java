@@ -17,7 +17,7 @@ import java.util.Optional;
 
 import static net.mat0u5.lifeseries.Main.blacklist;
 
-@Mixin(AnvilScreenHandler.class)
+@Mixin(value = AnvilScreenHandler.class, priority = 1)
 public abstract class AnvilScreenHandlerMixin {
 
     @Inject(method = "updateResult", at = @At("TAIL"))

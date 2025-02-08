@@ -134,21 +134,23 @@ public class Events {
     }
 
     public static ActionResult onBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
-        try {
-            if (currentSeries instanceof SecretLife &&
-                    player instanceof ServerPlayerEntity serverPlayer &&
-                    world instanceof ServerWorld serverWorld) {
-                TaskManager.onBlockUse(
-                        serverPlayer,
-                        serverWorld,
-                        hitResult);
+        if (player instanceof ServerPlayerEntity serverPlayer &&
+                world instanceof ServerWorld serverWorld) {
+            try {
+                if (currentSeries instanceof SecretLife) {
+                    TaskManager.onBlockUse(
+                            serverPlayer,
+                            serverWorld,
+                            hitResult);
+                }
+                if (blacklist == null) return ActionResult.PASS;
+                return blacklist.onBlockUse(serverPlayer,serverWorld,hand,hitResult);
+            } catch(Exception e) {
+                Main.LOGGER.error(e.getMessage());
+                return ActionResult.PASS;
             }
-            if (blacklist == null) return ActionResult.PASS;
-            return blacklist.onBlockUse(player,world,hand,hitResult);
-        } catch(Exception e) {
-            Main.LOGGER.error(e.getMessage());
-            return ActionResult.PASS;
         }
+        return ActionResult.PASS;
     }
 
     public static ActionResult onBlockAttack(ServerPlayerEntity player, World world, BlockPos pos) {

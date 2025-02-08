@@ -65,10 +65,15 @@ public class WildcardManager {
         }
         if (!isActiveWildcard(Wildcards.HUNGER)) {
             player.removeStatusEffect(StatusEffects.HUNGER);
+            TaskScheduler.scheduleTask(20, () -> {
+                Hunger.resetInventory(player);
+            });
         }
-        TaskScheduler.scheduleTask(1, () -> {
-            Hunger.updateInventory(player);
-        });
+        else {
+            TaskScheduler.scheduleTask(20, () -> {
+                Hunger.updateInventory(player);
+            });
+        }
     }
 
     public static void activateWildcards() {
@@ -181,17 +186,6 @@ public class WildcardManager {
         if (activeWildcards.get(Wildcards.SIZE_SHIFTING) instanceof SizeShifting sizeShifting) {
             sizeShifting.onJump(player);
         }
-    }
-
-
-    public static void onInventoryUpdated(PlayerEntity player, PlayerInventory inventory, CallbackInfo ci) {
-        TaskScheduler.scheduleTask(1, () -> {
-            for (int i = 0; i < inventory.size(); i++) {
-                Hunger.handleItemStack(inventory.getStack(i));
-            }
-            player.currentScreenHandler.sendContentUpdates();
-            player.playerScreenHandler.onContentChanged(player.getInventory());
-        });
     }
 
     public static void onUseItem(ServerPlayerEntity player) {

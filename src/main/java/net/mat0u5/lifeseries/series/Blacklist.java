@@ -176,7 +176,7 @@ public class Blacklist {
     }
 
 
-    public ActionResult onBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
+    public ActionResult onBlockUse(ServerPlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
         if (player.isCreative() && seriesConfig.getOrCreateBoolean("creative_ignore_blacklist", true)) return ActionResult.PASS;
         processItemStack(player, player.getStackInHand(hand));
         BlockPos blockPos = hitResult.getBlockPos();
@@ -201,11 +201,11 @@ public class Blacklist {
         return ActionResult.PASS;
     }
 
-    public void onCollision(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
+    public void onCollision(ServerPlayerEntity player, ItemStack stack, CallbackInfo ci) {
         processItemStack(player, stack);
     }
 
-    public void onInventoryUpdated(PlayerEntity player, PlayerInventory inventory, CallbackInfo ci) {
+    public void onInventoryUpdated(ServerPlayerEntity player, PlayerInventory inventory, CallbackInfo ci) {
         if (Main.server == null) return;
         if (player.isCreative() && seriesConfig.getOrCreateBoolean("creative_ignore_blacklist", true)) return;
         for (int i = 0; i < inventory.size(); i++) {
@@ -234,7 +234,7 @@ public class Blacklist {
         return false;
     }
 
-    public void processItemStack(PlayerEntity player, ItemStack itemStack) {
+    public void processItemStack(ServerPlayerEntity player, ItemStack itemStack) {
         if (itemStack.isEmpty()) return;
         if (itemStack.getItem() == Items.AIR) return;
         if (isBlacklistedItem(itemStack) && !ItemStackUtils.hasCustomComponentEntry(itemStack, "IgnoreBlacklist")) {

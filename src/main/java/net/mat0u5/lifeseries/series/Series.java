@@ -360,12 +360,19 @@ public abstract class Series extends Session {
     }
 
     public void onMobDeath(LivingEntity entity, DamageSource damageSource) {
-        double chance = seriesConfig.getOrCreateDouble("spawn_egg_drop_chance", 0.05);
-        if (chance <= 0) return;
         if (entity.getEntityWorld().isClient() || !(damageSource.getAttacker() instanceof ServerPlayerEntity)) {
             return;
         }
+        modifyMobDrops(entity, damageSource);
+    }
 
+    public void modifyMobDrops(LivingEntity entity, DamageSource damageSource) {
+        spawnEggChance(entity);
+    }
+
+    private void spawnEggChance(LivingEntity entity) {
+        double chance = seriesConfig.getOrCreateDouble("spawn_egg_drop_chance", 0.05);
+        if (chance <= 0) return;
         if (entity instanceof EnderDragonEntity) return;
         if (entity instanceof WitherEntity) return;
         if (entity instanceof WardenEntity) return;

@@ -12,8 +12,15 @@ import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PermissionManager;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.boss.WitherEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.mob.WardenEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 
 import java.util.List;
@@ -135,5 +142,21 @@ public class WildLife extends Series {
         MobSwap.MIN_DELAY = seriesConfig.getOrCreateInt("wildcard_mobswap_end_spawn_delay", 2400);
         MobSwap.SPAWN_MOBS = seriesConfig.getOrCreateInt("wildcard_mobswap_spawn_mobs", 250);
         MobSwap.BOSS_CHANCE_MULTIPLIER = seriesConfig.getOrCreateDouble("wildcard_mobswap_boss_chance_multiplier", 1);
+    }
+
+    @Override
+    public void modifyMobDrops(LivingEntity entity, DamageSource damageSource) {
+        super.modifyMobDrops(entity, damageSource);
+        if (damageSource.getSource() instanceof PlayerEntity) {
+            if (entity instanceof WardenEntity || entity instanceof WitherEntity) {
+
+                //? if <= 1.21 {
+                entity.dropStack(Items.TOTEM_OF_UNDYING.getDefaultStack());
+                 //?} else {
+                /*entity.dropStack((ServerWorld) entity.getWorld(), Items.TOTEM_OF_UNDYING.getDefaultStack());
+                *///?}
+
+            }
+        }
     }
 }
