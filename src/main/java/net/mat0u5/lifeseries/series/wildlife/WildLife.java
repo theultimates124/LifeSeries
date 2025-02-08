@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.series.wildlife;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.entity.snail.Snail;
+import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.Boogeyman;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
@@ -9,6 +10,7 @@ import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.MobSwap;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PermissionManager;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
@@ -29,7 +31,6 @@ import static net.mat0u5.lifeseries.Main.seriesConfig;
 
 public class WildLife extends Series {
 
-
     @Override
     public SeriesList getSeries() {
         return SeriesList.WILD_LIFE;
@@ -43,6 +44,9 @@ public class WildLife extends Series {
     @Override
     public void onPlayerJoin(ServerPlayerEntity player) {
         super.onPlayerJoin(player);
+
+        NetworkHandlerServer.sendHandshake(player);
+        NetworkHandlerServer.sendUpdatePacketTo(player);
 
         if (!hasAssignedLives(player)) {
             int lives = seriesConfig.getOrCreateInt("default_lives", 6);
@@ -135,8 +139,11 @@ public class WildLife extends Series {
         SizeShifting.MAX_SIZE = seriesConfig.getOrCreateDouble("wildcard_sizeshifting_max_size", 3);
         SizeShifting.SIZE_CHANGE_MULTIPLIER = seriesConfig.getOrCreateDouble("wildcard_sizeshifting_size_change_multiplier", 1);
 
+
         Snail.GLOBAL_SPEED_MULTIPLIER = seriesConfig.getOrCreateDouble("wildcard_snails_speed_multiplier", 1);
         Snail.SHOULD_DROWN_PLAYER = seriesConfig.getOrCreateBoolean("wildcard_snails_drown_players", true);
+
+        TimeDilation.MIN_PLAYER_MSPT = (float) (1000.0 / seriesConfig.getOrCreateDouble("wildcard_timedilation_max_player_tps", 40));
 
         MobSwap.MAX_DELAY = seriesConfig.getOrCreateInt("wildcard_mobswap_start_spawn_delay", 7200);
         MobSwap.MIN_DELAY = seriesConfig.getOrCreateInt("wildcard_mobswap_end_spawn_delay", 2400);

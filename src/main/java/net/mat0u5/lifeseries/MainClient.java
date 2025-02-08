@@ -5,11 +5,11 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.mat0u5.lifeseries.network.NetworkHandlerClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class MainClient implements ClientModInitializer {
-    public static float MIN_MSPT = 25.0F;
     @Override
     public void onInitializeClient() {
         Main.isClient = true;
@@ -19,5 +19,6 @@ public class MainClient implements ClientModInitializer {
         });
 
         //PolymerResourcePackUtils.markAsRequired();
+        NetworkHandlerClient.registerClientReceiver();
     }
 }

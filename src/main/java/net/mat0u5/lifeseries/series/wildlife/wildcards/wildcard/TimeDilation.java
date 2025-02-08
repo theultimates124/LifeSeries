@@ -12,6 +12,7 @@ public class TimeDilation extends Wildcard {
     public static float MIN_TICK_RATE = 1;
     public static float NORMAL_TICK_RATE = 20;
     public static float MAX_TICK_RATE = 100;
+    public static float MIN_PLAYER_MSPT = 25.0F;
     public static int updateRate = 100;
     public static int lastDiv = -1;
     public static int activatedAt = -1;

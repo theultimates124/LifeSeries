@@ -70,6 +70,8 @@ public class WildLifeConfig extends ConfigManager {
         getOrCreateDouble("wildcard_sizeshifting_max_size", 3);
         getOrCreateDouble("wildcard_sizeshifting_size_change_multiplier", 1);
 
+        getOrCreateDouble("wildcard_timedilation_max_player_tps", 40);
+
         getOrCreateDouble("wildcard_snails_speed_multiplier", 1);
         getOrCreateBoolean("wildcard_snails_drown_players", true);
 

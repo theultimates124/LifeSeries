@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.mixin;
 
 import net.mat0u5.lifeseries.MainClient;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.world.tick.TickManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +17,7 @@ public abstract class MinecraftClientMixin {
         if (client.world != null) {
             TickManager tickManager = client.world.getTickManager();
             if (tickManager.shouldTick()) {
-                float mspt = Math.max(MainClient.MIN_MSPT, tickManager.getMillisPerTick());
+                float mspt = Math.max(TimeDilation.MIN_PLAYER_MSPT, tickManager.getMillisPerTick());
                 cir.setReturnValue(mspt);
                 return;
             }

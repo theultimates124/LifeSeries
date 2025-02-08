@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.config.DatapackManager;
 import net.mat0u5.lifeseries.config.UpdateChecker;
+import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
@@ -101,6 +102,7 @@ public class Events {
 
     private static void onServerTickEnd(MinecraftServer server) {
         try {
+            NetworkHandlerServer.tick();
             if (server.getTickManager().isFrozen()) return;
             if (Main.currentSession != null) {
                 Main.currentSession.tick(server);

@@ -3,6 +3,7 @@ package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.mat0u5.lifeseries.mixin.ItemMixin;
+import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
@@ -41,7 +42,7 @@ import net.minecraft.item.consume.UseAction;
 public class Hunger extends Wildcard {
     private static Random rnd = new Random();
     public static int SWITCH_DELAY = 36000;
-    private static int shuffleVersion = 0;
+    public static int shuffleVersion = 0;
     private static boolean shuffledBefore = false;
     private static int lastVersion = -1;
 
@@ -144,6 +145,7 @@ public class Hunger extends Wildcard {
             addHunger(player);
         }
         OtherUtils.executeCommand("reload");
+        NetworkHandlerServer.sendUpdatePackets();
     }
 
     public static void updateInventories() {
