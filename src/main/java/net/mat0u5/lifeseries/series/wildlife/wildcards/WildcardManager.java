@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards;
 
+import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
@@ -56,7 +57,7 @@ public class WildcardManager {
         //activeWildcards.put(Wildcards.HUNGER, new Hunger());
         //activeWildcards.put(Wildcards.TIME_DILATION, new TimeDilation());
         //activeWildcards.put(Wildcards.SNAILS, new Snails());
-        activeWildcards.put(Wildcards.MOB_SWAP, new MobSwap());
+       // activeWildcards.put(Wildcards.MOB_SWAP, new MobSwap());
     }
 
     public static void resetWildcardsOnPlayerJoin(ServerPlayerEntity player) {
@@ -65,15 +66,10 @@ public class WildcardManager {
         }
         if (!isActiveWildcard(Wildcards.HUNGER)) {
             player.removeStatusEffect(StatusEffects.HUNGER);
-            TaskScheduler.scheduleTask(20, () -> {
-                Hunger.resetInventory(player);
-            });
         }
-        else {
-            TaskScheduler.scheduleTask(20, () -> {
-                Hunger.updateInventory(player);
-            });
-        }
+        TaskScheduler.scheduleTask(20, () -> {
+            Hunger.updateInventory(player);
+        });
     }
 
     public static void activateWildcards() {
@@ -92,6 +88,9 @@ public class WildcardManager {
             else {
                 showCryptTitle("A wildcard is active!", 0.5f);
             }
+        });
+        TaskScheduler.scheduleTask(92, () -> {
+            NetworkHandlerServer.sendUpdatePackets();
         });
     }
 
@@ -147,6 +146,7 @@ public class WildcardManager {
 
     public static void tick() {
         for (Wildcard wildcard : activeWildcards.values()) {
+            if (!wildcard.active) continue;
             wildcard.tick();
         }
         if (!isActiveWildcard(Wildcards.SIZE_SHIFTING)) {
@@ -159,6 +159,7 @@ public class WildcardManager {
 
     public static void tickSessionOn() {
         for (Wildcard wildcard : activeWildcards.values()) {
+            if (!wildcard.active) continue;
             wildcard.tickSessionOn();
         }
     }
@@ -175,6 +176,7 @@ public class WildcardManager {
             wildcard.deactivate();
         }
         activeWildcards.clear();
+        NetworkHandlerServer.sendUpdatePackets();
     }
 
     public static boolean isActiveWildcard(Wildcards wildcard) {

@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.utils;
 
 import net.mat0u5.lifeseries.Main;
+import net.mat0u5.lifeseries.events.Events;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -193,5 +194,13 @@ public class OtherUtils {
         int build = parts.length > 3 ? Integer.parseInt(parts[3]) : 0;
 
         return (major * 100000) + (minor * 10000) + (patch * 1000) + build;
+    }
+
+    public static void reloadServerNoUpdate() {
+        Events.skipNextTickReload = true;
+        reloadServer();
+    }
+    public static void reloadServer() {
+        OtherUtils.executeCommand("reload");
     }
 }

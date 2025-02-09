@@ -43,17 +43,17 @@ public class TimeDilation extends Wildcard {
 
     @Override
     public void deactivate() {
-        super.deactivate();
         setWorldSpeed(NORMAL_TICK_RATE);
         lastDiv = -1;
+        super.deactivate();
     }
 
     @Override
     public void activate() {
-        super.activate();
         activatedAt = (int) currentSession.passedTime;
         lastDiv = -1;
         setWorldSpeed(MIN_TICK_RATE);
+        super.activate();
     }
 
     public static void setWorldSpeed(float rate) {

@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.config;
 
 import net.mat0u5.lifeseries.Main;
+import net.mat0u5.lifeseries.events.Events;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
@@ -35,11 +36,7 @@ public class DatapackManager {
 
     public void onServerStarted(MinecraftServer server) {
         disableAllDatapacks();
-        TaskScheduler.scheduleTask(50, this::reloadServer);
+        TaskScheduler.scheduleTask(50, OtherUtils::reloadServerNoUpdate);
         TaskScheduler.scheduleTask(100, () -> deleteAllDatapacks(server));
-    }
-
-    private void reloadServer() {
-        OtherUtils.executeCommand("reload");
     }
 }

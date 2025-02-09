@@ -3,12 +3,19 @@ package net.mat0u5.lifeseries.network;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.MainClient;
+import net.mat0u5.lifeseries.client.ClientHandler;
 import net.mat0u5.lifeseries.network.packets.HandshakePayload;
 import net.mat0u5.lifeseries.network.packets.NumberPayload;
+import net.mat0u5.lifeseries.network.packets.StringPayload;
+import net.mat0u5.lifeseries.series.SeriesList;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.client.MinecraftClient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NetworkHandlerClient {
     public static void registerClientReceiver() {
@@ -18,10 +25,34 @@ public class NetworkHandlerClient {
                 handleNumberPacket(payload.name(),payload.number());
             });
         });
+        ClientPlayNetworking.registerGlobalReceiver(StringPayload.ID, (payload, context) -> {
+            MinecraftClient client = context.client();
+            client.execute(() -> {
+                handleStringPacket(payload.name(),payload.value());
+            });
+        });
         ClientPlayNetworking.registerGlobalReceiver(HandshakePayload.ID, (payload, context) -> {
             MinecraftClient client = context.client();
             client.execute(NetworkHandlerClient::respondHandshake);
         });
+    }
+    
+    public static void handleStringPacket(String name, String value) {
+        if (name.equalsIgnoreCase("currentSeries")) {
+            Main.LOGGER.info("[PACKET_CLIENT] Updated current series to "+ value);
+            MainClient.clientCurrentSeries = SeriesList.getSeriesFromStringName(value);
+            if (Main.isClient()) {
+                ClientHandler.checkSecretLifeClient();
+            }
+        }
+        if (name.equalsIgnoreCase("activeWildcards")) {
+            List<Wildcards> newList = new ArrayList<>();
+            for (String wildcardStr : value.split("_")) {
+                newList.add(Wildcards.getFromString(wildcardStr));
+            }
+            Main.LOGGER.info("[PACKET_CLIENT] Updated current series to "+ newList);
+            MainClient.clientActiveWildcards = newList;
+        }
     }
 
     public static void handleNumberPacket(String name, double number) {

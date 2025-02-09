@@ -142,18 +142,18 @@ public class MobSwap extends Wildcard {
 
     @Override
     public void activate() {
-        super.activate();
         activatedAt = (int) currentSession.passedTime;
         lastDiv = 0;
         mobsLeftDiv = 0;
         bossChance = 0;
         swaps = -1;
+        super.activate();
     }
 
     @Override
     public void deactivate() {
-        super.deactivate();
         killMobSwapMobs();
+        super.deactivate();
     }
 
     public int getDiv() {

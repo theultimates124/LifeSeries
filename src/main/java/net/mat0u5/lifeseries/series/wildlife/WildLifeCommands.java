@@ -2,10 +2,12 @@ package net.mat0u5.lifeseries.series.wildlife;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
@@ -81,6 +83,7 @@ public class WildLifeCommands {
 
         source.sendMessage(Text.of("Deactivated " + wildcardName + "."));
         WildcardManager.fadedWildcard();
+        NetworkHandlerServer.sendUpdatePackets();
         return 1;
     }
 

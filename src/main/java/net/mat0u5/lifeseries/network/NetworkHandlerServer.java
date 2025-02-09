@@ -1,13 +1,15 @@
 package net.mat0u5.lifeseries.network;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.network.packets.HandshakePayload;
 import net.mat0u5.lifeseries.network.packets.NumberPayload;
 import net.mat0u5.lifeseries.network.packets.StringPayload;
+import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
 import net.mat0u5.lifeseries.utils.OtherUtils;
@@ -60,12 +62,18 @@ public class NetworkHandlerServer {
         ServerPlayNetworking.send(player, payload);
         awaitingHandshake.put(player.getUuid(), 290);
         handshakeSuccessful.remove(player.getUuid());
-        Main.LOGGER.info("[PACKET_SERVER] Sending handshake: {"+modVersionStr+", "+modVersion+"}");
+        Main.LOGGER.info("[PACKET_SERVER] Sending handshake to "+player.getNameForScoreboard()+": {"+modVersionStr+", "+modVersion+"}");
+    }
+
+    public static void sendStringPacket(ServerPlayerEntity player, String name, String value) {
+        StringPayload payload = new StringPayload(name, value);
+        Main.LOGGER.info("[PACKET_SERVER] Sending string packet to "+player.getNameForScoreboard()+": {"+name+": "+value+"}");
+        ServerPlayNetworking.send(player, payload);
     }
 
     public static void sendNumberPacket(ServerPlayerEntity player, String name, double number) {
         NumberPayload payload = new NumberPayload(name, number);
-        Main.LOGGER.info("[PACKET_SERVER] Sending number packet to client: {"+name+": "+number+"}");
+        Main.LOGGER.info("[PACKET_SERVER] Sending number packet to "+player.getNameForScoreboard()+": {"+name+": "+number+"}");
         ServerPlayNetworking.send(player, payload);
     }
 
@@ -73,7 +81,14 @@ public class NetworkHandlerServer {
         if (currentSeries instanceof WildLife) {
             sendNumberPacket(player, "hunger_version", Hunger.shuffleVersion);
             sendNumberPacket(player, "player_min_mspt", TimeDilation.MIN_PLAYER_MSPT);
+
+            List<String> activeWildcards = new ArrayList<>();
+            for (Wildcards wildcard : WildcardManager.activeWildcards.keySet()) {
+                activeWildcards.add(Wildcards.getStringName(wildcard));
+            }
+            sendStringPacket(player, "activeWildcards", String.join("_", activeWildcards));
         }
+        sendStringPacket(player, "currentSeries", SeriesList.getStringNameFromSeries(currentSeries.getSeries()));
     }
 
     public static void sendUpdatePackets() {

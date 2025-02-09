@@ -12,13 +12,11 @@ import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.config.DatapackManager;
 import net.mat0u5.lifeseries.config.UpdateChecker;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
-import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.mat0u5.lifeseries.series.secretlife.SecretLife;
 import net.mat0u5.lifeseries.series.secretlife.TaskManager;
 import net.mat0u5.lifeseries.utils.OtherUtils;
-import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,7 +24,6 @@ import net.minecraft.resource.LifecycledResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -37,6 +34,7 @@ import static net.mat0u5.lifeseries.Main.blacklist;
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
 public class Events {
+    public static boolean skipNextTickReload = false;
 
     public static void register() {
         ServerLifecycleEvents.SERVER_STARTING.register(Events::onServerStarting);
@@ -103,6 +101,7 @@ public class Events {
 
     private static void onServerTickEnd(MinecraftServer server) {
         try {
+            skipNextTickReload = false;
             if (!Main.isLogicalSide()) return;
             NetworkHandlerServer.tick();
             if (server.getTickManager().isFrozen()) return;

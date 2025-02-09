@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.MainClient.clientActiveWildcards;
-import static net.mat0u5.lifeseries.MainClient.clientActiveSeries;
+import static net.mat0u5.lifeseries.MainClient.clientCurrentSeries;
 
 @Mixin(value = Item.class, priority = 1)
 public abstract class ItemMixin {
@@ -27,8 +27,11 @@ public abstract class ItemMixin {
     @Inject(method = "getComponents", at = @At("HEAD"), cancellable = true)
     public void getComponents(CallbackInfoReturnable<ComponentMap> cir) {
         boolean isLogicalSide = Main.isLogicalSide();
-        if ((currentSeries instanceof WildLife && isLogicalSide) || (clientActiveSeries == SeriesList.WILD_LIFE && !isLogicalSide)) {
+        if ((currentSeries instanceof WildLife && isLogicalSide) || (clientCurrentSeries == SeriesList.WILD_LIFE && !isLogicalSide)) {
             if ((WildcardManager.isActiveWildcard(Wildcards.HUNGER) && isLogicalSide) || (clientActiveWildcards.contains(Wildcards.HUNGER) && !isLogicalSide)) {
+                if (Main.isClient()) {
+                    Main.LOGGER.warn("getComponents");
+                }
                 Item item = (Item) (Object) this;
                 //? if <= 1.21 {
                 ComponentMapImpl components = new ComponentMapImpl(normalComponents());
@@ -36,7 +39,6 @@ public abstract class ItemMixin {
                 /*MergedComponentMap components = new MergedComponentMap(normalComponents());
                 *///?}
                 Hunger.applyFoodComponents(item, components);
-                //components.set(DataComponentTypes.CUSTOM_NAME, Text.of("testName"));
                 cir.setReturnValue(components);
             }
         }

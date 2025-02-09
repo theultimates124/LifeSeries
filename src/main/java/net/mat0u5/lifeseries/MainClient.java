@@ -15,7 +15,7 @@ import java.util.List;
 
 public class MainClient implements ClientModInitializer {
 
-    public static SeriesList clientActiveSeries = SeriesList.UNASSIGNED;
+    public static SeriesList clientCurrentSeries = SeriesList.UNASSIGNED;
     public static List<Wildcards> clientActiveWildcards = new ArrayList<>();
     @Override
     public void onInitializeClient() {

@@ -8,6 +8,8 @@ import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.component.ComponentChanges;
@@ -157,7 +159,7 @@ public class LifeSeriesCommand {
 
     public static int reload(ServerCommandSource source) {
         source.sendMessage(Text.of("Reloading!"));
-        OtherUtils.executeCommand("reload");
+        OtherUtils.reloadServer();
         return 1;
     }
 
@@ -171,29 +173,20 @@ public class LifeSeriesCommand {
     public static int test(ServerCommandSource source) {
         ServerPlayerEntity player = source.getPlayer();
         if (player == null) return -1;
-        source.sendMessage(Text.of("Test Command"));
-        Snail snail = MobRegistry.SNAIL.spawn(player.getServerWorld(), player.getBlockPos(), SpawnReason.COMMAND);
-        if (snail != null) {
-            snail.setBoundPlayer(player);
-        }
+        source.sendMessage(Text.of("Test Command 1"));
         return 1;
     }
 
     public static int test2(ServerCommandSource source) {
         ServerPlayerEntity player = source.getPlayer();
         if (player == null) return -1;
-        ComponentChanges changes = player.getMainHandStack().getComponentChanges();
-        ComponentMap map = player.getMainHandStack().getComponents();
+        source.sendMessage(Text.of("Test Command 2"));
         return 1;
     }
     public static int test3(ServerCommandSource source) {
         ServerPlayerEntity player = source.getPlayer();
         if (player == null) return -1;
-        source.sendMessage(Text.of("Test Command"));
-        PathFinder snail = MobRegistry.PATH_FINDER.spawn(player.getServerWorld(), player.getBlockPos(), SpawnReason.COMMAND);
-        if (snail != null) {
-            snail.setPersistent();
-        }
+        source.sendMessage(Text.of("Test Command 3"));
         return 1;
     }
 }

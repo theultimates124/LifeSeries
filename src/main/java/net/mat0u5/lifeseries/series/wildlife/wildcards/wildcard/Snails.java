@@ -33,18 +33,18 @@ public class Snails extends Wildcard {
 
     @Override
     public void activate() {
-        super.activate();
         snails.clear();
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             spawnSnailFor(player);
         }
+        super.activate();
     }
 
     @Override
     public void deactivate() {
-        super.deactivate();
         snails.clear();
         killAllSnails();
+        super.deactivate();
     }
 
     @Override

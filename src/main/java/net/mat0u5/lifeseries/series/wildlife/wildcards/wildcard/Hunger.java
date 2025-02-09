@@ -1,7 +1,6 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.mat0u5.lifeseries.events.Events;
 import net.mat0u5.lifeseries.mixin.ItemMixin;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
@@ -53,6 +52,7 @@ public class Hunger extends Wildcard {
             StatusEffects.MINING_FATIGUE,
             StatusEffects.STRENGTH,
             StatusEffects.INSTANT_HEALTH,
+            StatusEffects.INSTANT_DAMAGE,
             StatusEffects.JUMP_BOOST,
             StatusEffects.NAUSEA,
             StatusEffects.REGENERATION,
@@ -86,10 +86,17 @@ public class Hunger extends Wildcard {
     private static final List<RegistryEntry<StatusEffect>> levelLimit = List.of(
             StatusEffects.STRENGTH,
             StatusEffects.INSTANT_HEALTH,
+            StatusEffects.INSTANT_DAMAGE,
             StatusEffects.REGENERATION,
             StatusEffects.RESISTANCE,
             StatusEffects.WITHER,
             StatusEffects.ABSORPTION,
+            StatusEffects.SATURATION
+    );
+
+    private static final List<RegistryEntry<StatusEffect>> durationLimit = List.of(
+            StatusEffects.INSTANT_HEALTH,
+            StatusEffects.INSTANT_DAMAGE,
             StatusEffects.SATURATION
     );
 
@@ -101,7 +108,7 @@ public class Hunger extends Wildcard {
     @Override
     public void tick() {
         if (currentSession.sessionLength == null || currentSession.sessionLength - currentSession.passedTime > 6000) {
-            int currentVersion = (int) Math.floor((double) currentSession.passedTime / (double) SWITCH_DELAY);
+            int currentVersion = (int) Math.floor(currentSession.passedTime / (double) SWITCH_DELAY);
             if (lastVersion != currentVersion) {
                 lastVersion = currentVersion;
                 newFoodRules();
@@ -112,11 +119,12 @@ public class Hunger extends Wildcard {
     @Override
     public void deactivate() {
         shuffledBefore = false;
-        super.deactivate();
-        TaskScheduler.scheduleTask(10, Hunger::resetInventories);
+        TaskScheduler.scheduleTask(1, OtherUtils::reloadServerNoUpdate);
+        TaskScheduler.scheduleTask(10, Hunger::updateInventories);
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             player.removeStatusEffect(StatusEffects.HUNGER);
         }
+        super.deactivate();
     }
     @Override
     public void activate() {
@@ -144,7 +152,7 @@ public class Hunger extends Wildcard {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             addHunger(player);
         }
-        OtherUtils.executeCommand("reload");
+        TaskScheduler.scheduleTask(1, OtherUtils::reloadServerNoUpdate);
         NetworkHandlerServer.sendUpdatePackets();
     }
 
@@ -166,6 +174,7 @@ public class Hunger extends Wildcard {
             ItemStack newStack = inventory.getStack(i);
             newStack.applyChanges(changes);
         }
+        player.getInventory().updateItems();
         player.currentScreenHandler.sendContentUpdates();
         player.playerScreenHandler.onContentChanged(player.getInventory());
     }
@@ -179,41 +188,7 @@ public class Hunger extends Wildcard {
         if (!player.hasStatusEffect(StatusEffects.HUNGER) && WildcardManager.isActiveWildcard(Wildcards.HUNGER)){
             addHunger(player);
         }
-        Hunger.resetItemStackIfNecessary(player.getMainHandStack());
-        Hunger.resetItemStackIfNecessary(player.getOffHandStack());
-        player.currentScreenHandler.sendContentUpdates();
-        player.playerScreenHandler.onContentChanged(player.getInventory());
     }
-
-    public static void resetInventories() {
-        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
-            resetInventory(player);
-        }
-    }
-
-    public static void resetInventory(ServerPlayerEntity player) {
-        PlayerInventory inventory = player.getInventory();
-        for (int i = 0; i < inventory.size(); i++) {
-            ItemStack stack = inventory.getStack(i);
-            resetItemStack(stack);
-        }
-        player.currentScreenHandler.sendContentUpdates();
-        player.playerScreenHandler.onContentChanged(player.getInventory());
-    }
-
-    public static void resetItemStackIfNecessary(ItemStack itemStack) {
-        if (WildcardManager.isActiveWildcard(Wildcards.HUNGER)) return;
-        resetItemStack(itemStack);
-    }
-
-    private static void resetItemStack(ItemStack itemStack) {
-        if (itemStack.isEmpty()) return;
-        itemStack.set(DataComponentTypes.FOOD, itemStack.getDefaultComponents().get(DataComponentTypes.FOOD));
-        //? if >=1.21.2 {
-        /*itemStack.set(DataComponentTypes.CONSUMABLE, itemStack.getDefaultComponents().get(DataComponentTypes.CONSUMABLE));
-         *///?}
-    }
-
 
     //? if <=1.21 {
     public static void applyFoodComponents(Item item, ComponentMapImpl components) {
@@ -231,6 +206,9 @@ public class Hunger extends Wildcard {
             RegistryEntry<StatusEffect> registryEntryEffect = effects.get(hash % effects.size());
             if (levelLimit.contains(registryEntryEffect)) {
                 amplifier = 0;
+            }
+            if (durationLimit.contains(registryEntryEffect)) {
+                duration = 1;
             }
             StatusEffectInstance statusEffectInstance = new StatusEffectInstance(registryEntryEffect, duration, amplifier);
             FoodComponent.StatusEffectEntry statusEffect = new FoodComponent.StatusEffectEntry(statusEffectInstance, 1);
@@ -263,6 +241,9 @@ public class Hunger extends Wildcard {
             RegistryEntry<StatusEffect> registryEntryEffect = effects.get(hash % effects.size());
             if (levelLimit.contains(registryEntryEffect)) {
                 amplifier = 0;
+            }
+            if (durationLimit.contains(registryEntryEffect)) {
+                duration = 1;
             }
             StatusEffectInstance statusEffectInstance = new StatusEffectInstance(registryEntryEffect, duration, amplifier);
             ApplyEffectsConsumeEffect statusEffect = new ApplyEffectsConsumeEffect(statusEffectInstance, 1);

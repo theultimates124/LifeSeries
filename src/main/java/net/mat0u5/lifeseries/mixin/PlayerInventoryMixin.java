@@ -29,7 +29,7 @@ public abstract class PlayerInventoryMixin {
             }
             if (currentSeries instanceof WildLife) {
                 if (!WildcardManager.isActiveWildcard(Wildcards.HUNGER)) {
-                    Hunger.resetInventory(serverPlayer);
+                    Hunger.updateInventory(serverPlayer);
                 }
             }
         }

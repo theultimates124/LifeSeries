@@ -22,6 +22,16 @@ public enum SeriesList {
         return "unassigned";
     }
 
+    public static SeriesList getSeriesFromStringName(String name) {
+        if (name.equalsIgnoreCase("thirdlife")) return THIRD_LIFE;
+        if (name.equalsIgnoreCase("lastlife")) return LAST_LIFE;
+        if (name.equalsIgnoreCase("doublelife")) return DOUBLE_LIFE;
+        if (name.equalsIgnoreCase("limitedlife")) return LIMITED_LIFE;
+        if (name.equalsIgnoreCase("secretlife")) return SECRET_LIFE;
+        if (name.equalsIgnoreCase("wildlife")) return WILD_LIFE;
+        return UNASSIGNED;
+    }
+
     public static List<SeriesList> getAllImplemented() {
         return List.of(THIRD_LIFE,LAST_LIFE,DOUBLE_LIFE,LIMITED_LIFE,SECRET_LIFE,WILD_LIFE);
     }
