@@ -7,12 +7,15 @@ import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Snails;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
@@ -65,7 +68,47 @@ public class WildLifeCommands {
                     )
                 )
         );
+        dispatcher.register(
+            literal("snailname")
+                .then(literal("set")
+                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                    .then(argument("player", EntityArgumentType.player())
+                        .then(argument("name", StringArgumentType.greedyString())
+                            .executes(context -> setSnailName(context.getSource(), EntityArgumentType.getPlayer(context, "player"), StringArgumentType.getString(context, "name")))
+                        )
+                    )
+                )
+                .then(literal("reset")
+                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                    .then(argument("player", EntityArgumentType.player())
+                        .executes(context -> resetSnailName(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+                    )
+                )
+                .then(literal("get")
+                    .then(argument("player", EntityArgumentType.player())
+                        .executes(context -> getSnailName(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+                    )
+                )
+        );
     }
+
+    public static int setSnailName(ServerCommandSource source, ServerPlayerEntity player, String name) {
+        Snails.setSnailName(player, name);
+        source.sendMessage(Text.of("Set " + player.getNameForScoreboard()+"'s snail name to §o" + name));
+        return 1;
+    }
+
+    public static int resetSnailName(ServerCommandSource source, ServerPlayerEntity player) {
+        Snails.resetSnailName(player);
+        source.sendMessage(Text.of("Reset " + player.getNameForScoreboard()+"'s snail name to §o"+player.getNameForScoreboard()+"'s Snail"));
+        return 1;
+    }
+
+    public static int getSnailName(ServerCommandSource source, ServerPlayerEntity player) {
+        source.sendMessage(Text.of(player.getNameForScoreboard()+"'s snail is called §o"+Snails.getSnailName(player)));
+        return 1;
+    }
+
     public static int deactivateWildcard(ServerCommandSource source, String wildcardName) {
         if (checkBanned(source)) return -1;
         Wildcards wildcard = Wildcards.getFromString(wildcardName);

@@ -100,7 +100,12 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public void setBoundPlayer(ServerPlayerEntity player) {
         if (player == null) return;
         boundPlayerUUID = player.getUuid();
-        snailName = Text.of(player.getNameForScoreboard()+"'s Snail");
+        updateSnailName();
+    }
+
+    public void updateSnailName() {
+        if (getBoundPlayer() == null) return;
+        snailName = Text.of(Snails.getSnailName(getBoundPlayer()));
     }
 
     @Override
@@ -193,9 +198,14 @@ public class Snail extends HostileEntity implements AnimatedEntity {
             despawn();
         }
 
+        if (age % 20 == 0) {
+            updateSnailName();
+        }
+
         if (age % 2 == 0) {
             updateAnimations();
         }
+
         if (age % 100 == 0) {
             if (!Snails.snails.containsValue(this) || !WildcardManager.isActiveWildcard(Wildcards.SNAILS)) {
                 despawn();

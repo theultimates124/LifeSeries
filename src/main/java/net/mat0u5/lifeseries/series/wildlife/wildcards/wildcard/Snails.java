@@ -1,29 +1,26 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard;
 
+import net.mat0u5.lifeseries.config.StringListConfig;
 import net.mat0u5.lifeseries.entity.pathfinder.PathFinder;
 import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
-import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.mob.AmbientEntity;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static net.mat0u5.lifeseries.Main.server;
 
 public class Snails extends Wildcard {
+    public static StringListConfig snailNameConfig;
 
     public static HashMap<UUID, Snail> snails = new HashMap<>();
+    public static HashMap<UUID, String> snailNames = new HashMap<>();
     int ticks = 0;
 
     @Override
@@ -37,6 +34,7 @@ public class Snails extends Wildcard {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             spawnSnailFor(player);
         }
+        loadSnailNames();
         super.activate();
     }
 
@@ -87,5 +85,59 @@ public class Snails extends Wildcard {
             }
         }
         toKill.forEach(Entity::discard);
+    }
+
+    public static void reloadSnailNames() {
+        for (Snail snail : snails.values()) {
+            if (snail == null) return;
+            snail.updateSnailName();
+        }
+    }
+
+    public static void setSnailName(ServerPlayerEntity player, String name) {
+        snailNames.put(player.getUuid(), name);
+        reloadSnailNames();
+        saveSnailNames();
+    }
+
+    public static void resetSnailName(ServerPlayerEntity player) {
+        snailNames.remove(player.getUuid());
+        reloadSnailNames();
+        saveSnailNames();
+    }
+
+    public static String getSnailName(ServerPlayerEntity player) {
+        if (snailNames.containsKey(player.getUuid())) {
+            return snailNames.get(player.getUuid());
+        }
+        return player.getNameForScoreboard()+"'s Snail";
+    }
+
+    public static void saveSnailNames() {
+        if (snailNameConfig == null) loadConfig();
+        List<String> names = new ArrayList<>();
+        for (Map.Entry<UUID, String> entry : snailNames.entrySet()) {
+            names.add(entry.getKey().toString()+"_"+entry.getValue().replaceAll("_",""));
+        }
+        snailNameConfig.save(names);
+    }
+
+    public static void loadSnailNames() {
+        if (snailNameConfig == null) loadConfig();
+        HashMap<UUID, String> newNames = new HashMap<>();
+        for (String entry : snailNameConfig.load()) {
+            if (!entry.contains("_")) continue;
+            String[] split = entry.split("_");
+            if (split.length != 2) continue;
+            try {
+                UUID uuid = UUID.fromString(split[0]);
+                newNames.put(uuid, split[1]);
+            } catch(Exception ignored) {}
+        }
+        snailNames = newNames;
+    }
+
+    public static void loadConfig() {
+        snailNameConfig = new StringListConfig("./config/lifeseries/main", "DO_NOT_MODIFY_wildlife_snailnames.properties");
     }
 }

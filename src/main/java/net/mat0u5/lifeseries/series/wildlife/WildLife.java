@@ -7,10 +7,7 @@ import net.mat0u5.lifeseries.series.Boogeyman;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.MobSwap;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.*;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PermissionManager;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
@@ -129,6 +126,8 @@ public class WildLife extends Series {
     @Override
     public void initialize() {
         super.initialize();
+        Snails.loadConfig();
+        Snails.loadSnailNames();
     }
 
     @Override
@@ -149,6 +148,9 @@ public class WildLife extends Series {
         MobSwap.MIN_DELAY = seriesConfig.getOrCreateInt("wildcard_mobswap_end_spawn_delay", 2400);
         MobSwap.SPAWN_MOBS = seriesConfig.getOrCreateInt("wildcard_mobswap_spawn_mobs", 250);
         MobSwap.BOSS_CHANCE_MULTIPLIER = seriesConfig.getOrCreateDouble("wildcard_mobswap_boss_chance_multiplier", 1);
+        Snails.loadConfig();
+        Snails.loadSnailNames();
+        Snails.reloadSnailNames();
     }
 
     @Override
