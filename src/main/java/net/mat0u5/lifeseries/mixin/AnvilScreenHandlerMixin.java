@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.mixin;
 
+import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.utils.ItemStackUtils;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -22,6 +23,7 @@ public abstract class AnvilScreenHandlerMixin {
 
     @Inject(method = "updateResult", at = @At("TAIL"))
     private void modifyAnvilResultName(CallbackInfo ci) {
+        if (!Main.isLogicalSide()) return;
         if (blacklist == null) return;
         // Access the parent class's "output" inventory
         ForgingScreenHandlerAccessor accessor = (ForgingScreenHandlerAccessor) (Object) this;

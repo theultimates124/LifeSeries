@@ -1,17 +1,12 @@
 package net.mat0u5.lifeseries.utils;
 
 import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.client.ClientHandler;
+import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.secretlife.SecretLife;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.common.ResourcePackRemoveS2CPacket;
@@ -19,14 +14,10 @@ import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourcePackProfile;
-import net.minecraft.resource.ResourceType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -90,20 +81,23 @@ public class PlayerUtils {
     }
 
     public static List<ServerPlayerEntity> getAllPlayers() {
+        if (server == null) return new ArrayList<>();
         return server.getPlayerManager().getPlayerList();
     }
 
-    public static void applyResorucepack(UUID uuid) {
-        if (server == null) return;
-        ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            ClientHandler.applyResourcepack(player);
+    public static void applyResourcepack(UUID uuid) {
+        if (Main.isClient()) {
+            ClientHandler.applyResourcepack(uuid);
             return;
         }
-        applyServerResourcepack(player);
+        if (NetworkHandlerServer.handshakeSuccessful.contains(uuid)) return;
+        applyServerResourcepack(uuid);
     }
-    public static void applyServerResourcepack(ServerPlayerEntity player) {
-        //applySingleResourcepack(player, Series.RESOURCEPACK_MAIN_URL, Series.RESOURCEPACK_MAIN_SHA, "Life Series Main Resourcepack.");
+    public static void applyServerResourcepack(UUID uuid) {
+        if (server == null) return;
+        ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
+        if (player == null) return;
+        applySingleResourcepack(player, Series.RESOURCEPACK_MAIN_URL, Series.RESOURCEPACK_MAIN_SHA, "Life Series Main Resourcepack.");
         if (currentSeries instanceof SecretLife) {
             applySingleResourcepack(player, SecretLife.RESOURCEPACK_SECRETLIFE_URL, SecretLife.RESOURCEPACK_SECRETLIFE_SHA, "Secret Life Resourcepack.");
         }

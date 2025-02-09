@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.mixin;
 
+import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
@@ -19,6 +20,7 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 public abstract class PlayerInventoryMixin {
     @Inject(method = "markDirty", at = @At("HEAD"))
     private void onInventoryUpdated(CallbackInfo ci) {
+        if (!Main.isLogicalSide()) return;
         PlayerInventory inventory = (PlayerInventory) (Object) this;
         PlayerEntity player = inventory.player;
         if (player instanceof ServerPlayerEntity serverPlayer) {

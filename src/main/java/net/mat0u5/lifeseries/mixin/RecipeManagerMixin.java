@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.mixin;
 
+import net.mat0u5.lifeseries.Main;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.profiler.Profiler;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,6 +24,7 @@ public class RecipeManagerMixin {
 
     @Inject(method = "apply", at = @At("HEAD"))
     private void applyMixin(Map<Identifier, JsonElement> map, ResourceManager resourceManager, Profiler profiler, CallbackInfo info) {
+        if (!Main.isLogicalSide()) return;
         if (blacklist == null) return;
         if (blacklist.loadedListItemIdentifier == null)  {
             blacklist.getItemBlacklist();

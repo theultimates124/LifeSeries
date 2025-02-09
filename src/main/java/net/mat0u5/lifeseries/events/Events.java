@@ -62,6 +62,7 @@ public class Events {
 
     private static void onReload(MinecraftServer server, LifecycledResourceManager resourceManager) {
         try {
+            if (!Main.isLogicalSide()) return;
             Main.reload();
         } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
@@ -102,6 +103,7 @@ public class Events {
 
     private static void onServerTickEnd(MinecraftServer server) {
         try {
+            if (!Main.isLogicalSide()) return;
             NetworkHandlerServer.tick();
             if (server.getTickManager().isFrozen()) return;
             if (Main.currentSession != null) {
@@ -115,6 +117,7 @@ public class Events {
 
     public static void onEntityDeath(LivingEntity entity, DamageSource source) {
         try {
+            if (!Main.isLogicalSide()) return;
             if (entity instanceof ServerPlayerEntity) {
                 Events.onPlayerDeath((ServerPlayerEntity) entity, source);
                 return;
@@ -125,19 +128,21 @@ public class Events {
 
     public static void onMobDeath(LivingEntity entity, DamageSource source) {
         try {
+            if (!Main.isLogicalSide()) return;
             currentSeries.onMobDeath(entity, source);
         } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
 
     public static void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
         try {
+            if (!Main.isLogicalSide()) return;
             currentSeries.onPlayerDeath(player, source);
         } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
 
     public static ActionResult onBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
         if (player instanceof ServerPlayerEntity serverPlayer &&
-                world instanceof ServerWorld serverWorld) {
+                world instanceof ServerWorld serverWorld && Main.isLogicalSide()) {
             try {
                 if (currentSeries instanceof SecretLife) {
                     TaskManager.onBlockUse(
@@ -157,6 +162,7 @@ public class Events {
 
     public static ActionResult onBlockAttack(ServerPlayerEntity player, World world, BlockPos pos) {
         try {
+            if (!Main.isLogicalSide()) return ActionResult.PASS;
             if (blacklist == null) return ActionResult.PASS;
             if (world.isClient()) return ActionResult.PASS;
             return blacklist.onBlockAttack(player,world,pos);

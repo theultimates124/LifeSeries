@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.network.packets.HandshakePayload;
 import net.mat0u5.lifeseries.network.packets.NumberPayload;
+import net.mat0u5.lifeseries.network.packets.StringPayload;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
@@ -13,27 +14,27 @@ import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.network.DisconnectionInfo;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.KickCommand;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
 
 public class NetworkHandlerServer {
     public static HashMap<UUID, Integer> awaitingHandshake = new HashMap<>();
+    public static List<UUID> handshakeSuccessful = new ArrayList<>();
 
     public static void registerPackets() {
         PayloadTypeRegistry.playS2C().register(NumberPayload.ID, NumberPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(StringPayload.ID, StringPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(HandshakePayload.ID, HandshakePayload.CODEC);
 
         PayloadTypeRegistry.playC2S().register(NumberPayload.ID, NumberPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(StringPayload.ID, StringPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(HandshakePayload.ID, HandshakePayload.CODEC);
     }
     public static void registerServerReceiver() {
@@ -49,6 +50,7 @@ public class NetworkHandlerServer {
     public static void handleHandshakeResponse(ServerPlayerEntity player, String modVersionStr, int modVersion) {
         Main.LOGGER.info("[PACKET_SERVER] Received handshake (from "+player.getNameForScoreboard()+"): {"+modVersionStr+", "+modVersion+"}");
         awaitingHandshake.remove(player.getUuid());
+        handshakeSuccessful.add(player.getUuid());
     }
 
     public static void sendHandshake(ServerPlayerEntity player) {
@@ -57,6 +59,7 @@ public class NetworkHandlerServer {
         HandshakePayload payload = new HandshakePayload(modVersionStr, modVersion);
         ServerPlayNetworking.send(player, payload);
         awaitingHandshake.put(player.getUuid(), 290);
+        handshakeSuccessful.remove(player.getUuid());
         Main.LOGGER.info("[PACKET_SERVER] Sending handshake: {"+modVersionStr+", "+modVersion+"}");
     }
 

@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.mixin;
 
+import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.utils.OtherUtils;
@@ -22,6 +23,7 @@ public class ServerPlayNetworkHandlerMixin {
     @Inject(method = "handleDecoratedMessage(Lnet/minecraft/network/message/SignedMessage;)V",
             at = @At("HEAD"), cancellable = true)
     private void onHandleDecoratedMessage(SignedMessage message, CallbackInfo ci) {
+        if (!Main.isLogicalSide()) return;
         ServerPlayNetworkHandler handler = (ServerPlayNetworkHandler) (Object) this;
         ServerPlayerEntity player = handler.player;
         Text originalText = message.getContent();
@@ -41,6 +43,7 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onPlayerInteractItem", at = @At("HEAD"))
     private void onPlayerAction(PlayerInteractItemC2SPacket packet, CallbackInfo ci) {
+        if (!Main.isLogicalSide()) return;
         ServerPlayNetworkHandler handler = (ServerPlayNetworkHandler) (Object) this;
         ServerPlayerEntity player = handler.player;
         if (currentSeries instanceof WildLife) {

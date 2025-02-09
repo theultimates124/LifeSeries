@@ -39,6 +39,16 @@ public class OtherUtils {
         Main.LOGGER.info(string);
     }
 
+    public static void logConsole(String string) {
+        Main.LOGGER.info(string);
+    }
+
+    public static void logIfClient(String string) {
+        if (Main.isClient()) {
+            Main.LOGGER.info(string);
+        }
+    }
+
     public static void broadcastMessage(Text message, int cooldownTicks) {
         if (cooldown.containsKey(message)) return;
         cooldown.put(message, cooldownTicks);

@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.mixin;
 
+import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
@@ -23,17 +24,21 @@ public abstract class PlayerEntityMixin {
     private void onApplyDamage(DamageSource source, float amount, CallbackInfo info) {
      //?} else
     /*private void onApplyDamage(ServerWorld world, DamageSource source, float amount, CallbackInfo info) {*/
+        if (!Main.isLogicalSide()) return;
         PlayerEntity player = (PlayerEntity) (Object) this;
-        if (player instanceof  ServerPlayerEntity serverPlayer) {
+        if (player instanceof ServerPlayerEntity serverPlayer) {
             currentSeries.onPlayerDamage(serverPlayer, source, amount);
         }
     }
 
     @Inject(method = "canFoodHeal", at = @At("HEAD"), cancellable = true)
     private void canFoodHeal(CallbackInfoReturnable<Boolean> cir) {
+        if (!Main.isLogicalSide()) return;
         if (currentSeries instanceof DoubleLife doubleLife)  {
             PlayerEntity player = (PlayerEntity) (Object) this;
-            doubleLife.canFoodHeal(player, cir);
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                doubleLife.canFoodHeal(serverPlayer, cir);
+            }
         }
     }
 
@@ -41,6 +46,7 @@ public abstract class PlayerEntityMixin {
     
     @Inject(method = "jump", at = @At("TAIL"))
     public void onJump(CallbackInfo ci) {
+        if (!Main.isLogicalSide()) return;
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (currentSeries instanceof WildLife wildLife) {
             if (player instanceof ServerPlayerEntity serverPlayer) {

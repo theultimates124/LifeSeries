@@ -1,8 +1,11 @@
 package net.mat0u5.lifeseries;
 
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.loader.api.FabricLoader;
+import net.mat0u5.lifeseries.client.ClientHandler;
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.config.MainConfig;
 import net.mat0u5.lifeseries.config.UpdateChecker;
@@ -27,12 +30,11 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "dev-1.2.2.33";
+	public static final String MOD_VERSION = "dev-1.2.2.34";
 	public static final String MOD_ID = "lifeseries";
 	public static final String GITHUB_API_URL = "https://api.github.com/repos/Mat0u5/LifeSeries/releases/latest";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static ConfigManager config;
-	public static boolean isClient = false;
+	private static ConfigManager config;
 
 	@Nullable
 	public static MinecraftServer server;
@@ -49,6 +51,7 @@ public class Main implements ModInitializer {
 		ConfigManager.moveOldMainFileIfExists();
 
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
+		PolymerResourcePackUtils.markAsRequired();
 
 		config = new MainConfig();
 		String series = config.getOrCreateProperty("currentSeries", "unassigned");
@@ -61,6 +64,15 @@ public class Main implements ModInitializer {
 
 		NetworkHandlerServer.registerPackets();
 		NetworkHandlerServer.registerServerReceiver();
+	}
+
+	public static boolean isClient() {
+		return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
+	}
+
+	public static boolean isLogicalSide() {
+		if (!isClient()) return true;
+		return ClientHandler.isRunningIntegratedServer();
 	}
 
 	public static void parseSeries(String series) {
@@ -91,6 +103,7 @@ public class Main implements ModInitializer {
 	}
 
 	public static void reload() {
+		if (!isLogicalSide()) return;
 		if (currentSeries.getSeries() == SeriesList.SECRET_LIFE) {
 			TaskManager.initialize();
 		}

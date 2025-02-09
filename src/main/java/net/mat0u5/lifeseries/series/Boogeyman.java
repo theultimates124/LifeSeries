@@ -2,7 +2,6 @@ package net.mat0u5.lifeseries.series;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import static net.mat0u5.lifeseries.Main.server;

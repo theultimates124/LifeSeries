@@ -1,5 +1,7 @@
 package net.mat0u5.lifeseries.mixin;
 
+import net.mat0u5.lifeseries.Main;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.MobEntity;
@@ -15,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MobEntityMixin {
     @Inject(method = "initialize", at = @At("HEAD"))
     private void initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, CallbackInfoReturnable<EntityData> cir) {
+        if (!Main.isLogicalSide()) return;
         if (spawnReason == SpawnReason.NATURAL) return;
         if (spawnReason == SpawnReason.CHUNK_GENERATION) return;
         MobEntity mobEntity = ((MobEntity) (Object) this);

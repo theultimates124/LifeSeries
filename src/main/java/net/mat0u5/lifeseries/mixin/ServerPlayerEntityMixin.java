@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.mixin;
 
+import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
@@ -25,6 +26,7 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 public class ServerPlayerEntityMixin {
     @Inject(method = "getRespawnTarget", at = @At("HEAD"), cancellable = true)
     private void getRespawnTarget(boolean alive, TeleportTarget.PostDimensionTransition postDimensionTransition, CallbackInfoReturnable<TeleportTarget> cir) {
+        if (!Main.isLogicalSide()) return;
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         UUID uuid = player.getUuid();
         TaskScheduler.scheduleTask(1, () -> {
@@ -44,6 +46,7 @@ public class ServerPlayerEntityMixin {
 
     @Inject(method = "openHandledScreen", at = @At("HEAD"))
     private void onInventoryOpen(@Nullable NamedScreenHandlerFactory factory, CallbackInfoReturnable<OptionalInt> cir) {
+        if (!Main.isLogicalSide()) return;
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         if (blacklist != null) {
             TaskScheduler.scheduleTask(1, () -> player.currentScreenHandler.getStacks().forEach((itemStack) -> blacklist.processItemStack(player, itemStack)));

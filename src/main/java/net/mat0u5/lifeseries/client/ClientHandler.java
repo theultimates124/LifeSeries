@@ -3,19 +3,22 @@ package net.mat0u5.lifeseries.client;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.mat0u5.lifeseries.series.secretlife.SecretLife;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import java.util.UUID;
+
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
 @Environment(EnvType.CLIENT)
 public class ClientHandler {
-    public static void applyResourcepack(ServerPlayerEntity player) {
+    public static void applyResourcepack(UUID uuid) {
         if (MinecraftClient.getInstance() != null) {
             if (MinecraftClient.getInstance().player != null) {
-                if (MinecraftClient.getInstance().player.getUuid().equals(player.getUuid())) {
+                if (MinecraftClient.getInstance().player.getUuid().equals(uuid)) {
                     if (currentSeries instanceof SecretLife) {
                         enableClientResourcePack("lifeseries:secretlife");
                     }
@@ -24,7 +27,7 @@ public class ClientHandler {
                     }
                 }
                 else {
-                    PlayerUtils.applyServerResourcepack(player);
+                    PlayerUtils.applyServerResourcepack(uuid);
                 }
             }
         }
@@ -56,5 +59,11 @@ public class ClientHandler {
                 }
             }
         }
+    }
+
+    public static boolean isRunningIntegratedServer() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client == null) return false;
+        return client.isIntegratedServerRunning();
     }
 }

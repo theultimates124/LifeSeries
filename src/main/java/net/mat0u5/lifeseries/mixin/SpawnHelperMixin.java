@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.mixin;
 
+import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
@@ -20,6 +21,7 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 public class SpawnHelperMixin {
     @Inject(method = "isAcceptableSpawnPosition", at = @At("HEAD"), cancellable = true)
     private static void isAcceptableSpawnPosition(ServerWorld world, Chunk chunk, BlockPos.Mutable pos, double squaredDistance, CallbackInfoReturnable<Boolean> cir) {
+        if (!Main.isLogicalSide()) return;
         if (currentSeries instanceof WildLife) {
             if (!WildcardManager.isActiveWildcard(Wildcards.MOB_SWAP)) return;
             MobSwap.isAcceptableSpawnPosition(world, chunk, pos, squaredDistance, cir);

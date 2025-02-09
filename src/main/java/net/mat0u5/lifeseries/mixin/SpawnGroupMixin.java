@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.mixin;
 
+import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
@@ -14,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
-
 @Mixin(value = SpawnGroup.class, priority = 1)
 public class SpawnGroupMixin {
     @Shadow
@@ -23,6 +23,7 @@ public class SpawnGroupMixin {
 
     @Inject(method = "getCapacity", at = @At("HEAD"), cancellable = true)
     private void getCapacity(CallbackInfoReturnable<Integer> cir) {
+        if (!Main.isLogicalSide()) return;
         SpawnGroup group = (SpawnGroup)(Object)this;
         if (group.getName().equalsIgnoreCase("monster") || group.getName().equalsIgnoreCase("creature")) {
             if (currentSeries instanceof WildLife) {
@@ -35,6 +36,7 @@ public class SpawnGroupMixin {
 
     @Inject(method = "isRare", at = @At("HEAD"), cancellable = true)
     private void isRare(CallbackInfoReturnable<Boolean> cir) {
+        if (!Main.isLogicalSide()) return;
         SpawnGroup group = (SpawnGroup)(Object)this;
         if (group.getName().equalsIgnoreCase("creature")) {
             if (currentSeries instanceof WildLife) {

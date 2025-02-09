@@ -1,7 +1,5 @@
 package net.mat0u5.lifeseries.config;
 
-import net.mat0u5.lifeseries.utils.OtherUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 

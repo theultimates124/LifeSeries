@@ -19,21 +19,18 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.TeleportTarget;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
 
 import static net.mat0u5.lifeseries.Main.*;
 
 public abstract class Series extends Session {
-    public static final String RESOURCEPACK_MAIN_URL = "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-main-d0371a5550078676058b12888489b6b9209f6e31/RP.zip";
-    public static final String RESOURCEPACK_MAIN_SHA ="5be356bbaddf78e57487e6e8a1aec7a15b368b93";
+    public static final String RESOURCEPACK_MAIN_URL = "https://github.com/Mat0u5/LifeSeries-Resources/releases/download/release-main-af45fc947c22c9ee91ec021d998318a5f2d5bdaf/RP.zip";
+    public static final String RESOURCEPACK_MAIN_SHA ="38a74dc7c112e1e9c009e71f544b1b050a01560e";
     public boolean NO_HEALING = false;
 
     public abstract SeriesList getSeries();
@@ -407,7 +404,7 @@ public abstract class Series extends Session {
         }
         reloadPlayerTeam(player);
         TaskScheduler.scheduleTask(2, () -> {
-            PlayerUtils.applyResorucepack(player.getUuid());
+            PlayerUtils.applyResourcepack(player.getUuid());
         });
 
         if (statusNotStarted() && PermissionManager.isAdmin(player)) {
