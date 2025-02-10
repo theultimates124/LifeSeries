@@ -612,6 +612,10 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         return player;
     }
 
+    /*
+        Override vanilla things
+     */
+
     @Override
     public Vec3d applyFluidMovingSpeed(double gravity, boolean falling, Vec3d motion) {
         return motion;
@@ -690,6 +694,10 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public boolean isImmuneToExplosion(Explosion explosion) {
         return true;
     }
+
+    /*
+        Sounds
+     */
 
     private int propellerSoundCooldown = 0;
     private int walkSoundCooldown = 0;

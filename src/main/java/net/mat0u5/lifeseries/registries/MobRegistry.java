@@ -3,24 +3,21 @@ package net.mat0u5.lifeseries.registries;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polymer.core.api.item.PolymerSpawnEggItem;
-import it.unimi.dsi.fastutil.Function;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityType;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.entity.pathfinder.PathFinder;
 import net.mat0u5.lifeseries.entity.snail.Snail;
+import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -44,6 +41,15 @@ public class MobRegistry {
                     .dimensions(EntityDimensions.changing(0.5f, 0.6f))
                     .trackRangeChunks(10)
                     .defaultAttributes(PathFinder::createAttributes)
+    );
+    public static final EntityType<TriviaBot> TRIVIA_BOT = register(
+            TriviaBot.ID,
+            FabricEntityTypeBuilder.createMob()
+                    .entityFactory(TriviaBot::new)
+                    .spawnGroup(SpawnGroup.AMBIENT)
+                    .dimensions(EntityDimensions.changing(0.85f, 1.8f))
+                    .trackRangeChunks(10)
+                    .defaultAttributes(TriviaBot::createAttributes)
     );
 
     private static <T extends Entity> EntityType<T> register(Identifier id, FabricEntityTypeBuilder<T> builder) {
@@ -76,6 +82,13 @@ public class MobRegistry {
             FabricEntityType.Builder.createMob(PathFinder::new, SpawnGroup.AMBIENT, x -> x
                             .defaultAttributes(PathFinder::createAttributes))
                     .dimensions(0.5f, 0.6f)
+                    .maxTrackingRange(10)
+    );
+    public static final EntityType<TriviaBot> TRIVIA_BOT = register(
+            TriviaBot.ID,
+            FabricEntityType.Builder.createMob(TriviaBot::new, SpawnGroup.AMBIENT, x -> x
+                            .defaultAttributes(TriviaBot::createAttributes))
+                        .dimensions(0.85f, 1.8f)
                     .maxTrackingRange(10)
     );
 

@@ -3,7 +3,7 @@
 	"id": "lifeseries",
 	"version": "${version}+${minecraftVersion}",
 	"name": "Life Series",
-	"description": "A recreation of Grian's Life Series in fabric.",
+	"description": "A one-to-one recreation of Grian's Life Series in fabric.",
 	"authors": [
 		"Mat0u5"
 	],
@@ -12,7 +12,7 @@
 		"sources": "https://github.com/Mat0u5/LifeSeries"
 	},
 	"license": "MIT",
-	"icon": "assets/lifeseries/icon.png",
+	"icon": "assets/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [

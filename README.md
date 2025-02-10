@@ -10,16 +10,16 @@
 
 
 # Life Series Mod
-This server-side mod aims to recreate [Grian](https://www.youtube.com/c/Grian)'s Life Series in minecraft fabric, with as many QOL features as possible. 
+This server-side mod is a one-to-one recreation of [Grian](https://www.youtube.com/c/Grian)'s Life Series in minecraft fabric, with as many QOL features as possible. 
 This includes automated lives tracking, automated team colors, automated session timer, automatic Boogeyman selection and kill tracking, and much more.<br>
 Join the [Discord](https://discord.gg/QWJxfb4zQZ) or make an issue if you want to submit any bugs / give suggestions.
 ## Features
 
 Currently, the first five seasons of the Life Series are implemented. The latest season, Wild Life, is much more complicated, but it is planned to be released.
 
-| Third Life | Last Life | Double Life | Limited Life | Secret Life | | Wild Life  |
-|------------|-----------|-------------|--------------|-------------|-|------------|
-| Completed  | Completed | Completed   | Completed    | Completed | | Next up :/ |
+| Third Life | Last Life | Double Life | Limited Life | Secret Life | | Wild Life   |
+|------------|-----------|-------------|--------------|-------------|-|-------------|
+| Completed  | Completed | Completed   | Completed    | Completed | | In Progress |
 -----
 ## Usage
 ### Selecting a series

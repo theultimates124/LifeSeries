@@ -3,30 +3,17 @@ package net.mat0u5.lifeseries.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.mat0u5.lifeseries.Main;
-import net.mat0u5.lifeseries.entity.pathfinder.PathFinder;
-import net.mat0u5.lifeseries.entity.snail.Snail;
-import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.series.SeriesList;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TriviaBots;
 import net.mat0u5.lifeseries.utils.OtherUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.mob.AmbientEntity;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-
-import java.nio.file.Path;
 
 import static net.mat0u5.lifeseries.Main.*;
 import static net.mat0u5.lifeseries.utils.PermissionManager.isAdmin;
@@ -174,6 +161,7 @@ public class LifeSeriesCommand {
         ServerPlayerEntity player = source.getPlayer();
         if (player == null) return -1;
         source.sendMessage(Text.of("Test Command 1"));
+        TriviaBots.spawnBotFor(player);
         return 1;
     }
 

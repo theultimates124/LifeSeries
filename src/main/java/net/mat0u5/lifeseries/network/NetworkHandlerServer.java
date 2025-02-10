@@ -60,7 +60,7 @@ public class NetworkHandlerServer {
         int modVersion = OtherUtils.getModVersionInt(modVersionStr);
         HandshakePayload payload = new HandshakePayload(modVersionStr, modVersion);
         ServerPlayNetworking.send(player, payload);
-        awaitingHandshake.put(player.getUuid(), 290);
+        awaitingHandshake.put(player.getUuid(), 150);
         handshakeSuccessful.remove(player.getUuid());
         Main.LOGGER.info("[PACKET_SERVER] Sending handshake to "+player.getNameForScoreboard()+": {"+modVersionStr+", "+modVersion+"}");
     }
