@@ -7,24 +7,26 @@ import de.tomalbrc.bil.core.holder.entity.EntityHolder;
 import de.tomalbrc.bil.core.holder.entity.living.LivingEntityHolder;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.file.loader.BbModelLoader;
+import eu.pb4.polymer.core.api.client.PolymerClientUtils;
+import eu.pb4.polymer.core.api.other.PolymerScreenHandlerUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.entity.AnimationHandler;
-import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.entity.triviabot.goal.TriviaBotGlideGoal;
 import net.mat0u5.lifeseries.entity.triviabot.goal.TriviaBotTeleportGoal;
 import net.mat0u5.lifeseries.utils.AnimationUtils;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.control.MoveControl;
-import net.minecraft.entity.ai.pathing.BirdNavigation;
 import net.minecraft.entity.ai.pathing.MobNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
@@ -34,6 +36,8 @@ import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -52,7 +56,7 @@ import static net.mat0u5.lifeseries.Main.server;
 
 public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     public static final Identifier ID = Identifier.of(Main.MOD_ID, "triviabot");
-    public static final Model MODEL = BbModelLoader.load(Snail.ID);
+    public static final Model MODEL = BbModelLoader.load(ID);
     public static final ChunkTicketType<ChunkPos> BOT_TICKET = ChunkTicketType.create("triviabot", Comparator.comparingLong(ChunkPos::toLong), 100);
 
     public static final float MOVEMENT_SPEED = 0.45f;
@@ -168,6 +172,13 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
         chunkLoading();
         clearStatusEffects();
         playSounds();
+    }
+
+    @Override
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        OtherUtils.log("Right click test");
+        //TODO send a packet to the player that opened it, with the question info
+        return ActionResult.PASS;
     }
 
     public void handleHighVelocity() {

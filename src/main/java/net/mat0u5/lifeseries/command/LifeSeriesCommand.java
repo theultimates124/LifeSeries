@@ -169,6 +169,7 @@ public class LifeSeriesCommand {
         ServerPlayerEntity player = source.getPlayer();
         if (player == null) return -1;
         source.sendMessage(Text.of("Test Command 2"));
+        TriviaBots.killAllBots();
         return 1;
     }
     public static int test3(ServerCommandSource source) {
