@@ -168,7 +168,10 @@ public class Hunger extends Wildcard {
             ItemStack stack = inventory.getStack(i);
             if (stack.isEmpty()) continue;
 
-            stack.applyComponentsFrom(stack.getDefaultComponents());
+            stack.set(DataComponentTypes.FOOD, stack.getDefaultComponents().get(DataComponentTypes.FOOD));
+            //? if >= 1.21.2 {
+            /*/^stack.set(DataComponentTypes.CONSUMABLE, stack.getDefaultComponents().get(DataComponentTypes.CONSUMABLE));^/
+
             ComponentChanges changes = stack.getComponentChanges();
             inventory.setStack(i, new ItemStack(stack.getItem(), stack.getCount()));
             ItemStack newStack = inventory.getStack(i);
@@ -223,7 +226,7 @@ public class Hunger extends Wildcard {
         components.set(DataComponentTypes.FOOD, new FoodComponent(nutrition, saturation, false, 1.6f, Optional.empty(), foodEffects));
     }
      //?} else {
-    /*public static void applyFoodComponents(Item item, MergedComponentMap components) {
+    /^public static void applyFoodComponents(Item item, MergedComponentMap components) {
         if (components.contains(DataComponentTypes.CONSUMABLE)) {
             StatusEffectInstance statusEffectInstance = new StatusEffectInstance(StatusEffects.HUNGER, 3600, 7);
             ApplyEffectsConsumeEffect statusEffect = new ApplyEffectsConsumeEffect(statusEffectInstance, 1);
@@ -262,10 +265,11 @@ public class Hunger extends Wildcard {
         components.set(DataComponentTypes.FOOD, new FoodComponent(nutrition, saturation, false));
 
     }
-    *///?}
+    ^///?}
 
     private static int getHash(Item item) {
         String itemId = Registries.ITEM.getId(item).toString();
         return Math.abs((itemId.hashCode() + shuffleVersion) * 31);
     }
 }
+*/
