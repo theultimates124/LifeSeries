@@ -41,15 +41,17 @@ public class EnchantmentHelperMixin {
             Enchantment enchantment = (Enchantment)enchantmentx.value();
             Optional<RegistryKey<Enchantment>> enchantRegistryKey = enchantmentx.getKey();
             boolean isRegistryPresent = enchantRegistryKey.isPresent();
-            for (int j = enchantment.getMaxLevel(); j >= enchantment.getMinLevel(); j--) {
-                if (level >= enchantment.getMinPower(j) && level <= enchantment.getMaxPower(j)) {
-                    if (isRegistryPresent && blacklist.getClampedEnchants().contains(enchantRegistryKey.get())) {
-                        list.add(new EnchantmentLevelEntry(enchantmentx, 1));
+            if (isRegistryPresent && !blacklist.getBannedEnchants().contains(enchantRegistryKey.get())) {
+                for (int j = enchantment.getMaxLevel(); j >= enchantment.getMinLevel(); j--) {
+                    if (level >= enchantment.getMinPower(j) && level <= enchantment.getMaxPower(j)) {
+                        if (isRegistryPresent && blacklist.getClampedEnchants().contains(enchantRegistryKey.get())) {
+                            list.add(new EnchantmentLevelEntry(enchantmentx, 1));
+                        }
+                        else {
+                            list.add(new EnchantmentLevelEntry(enchantmentx, j));
+                        }
+                        break;
                     }
-                    else {
-                        list.add(new EnchantmentLevelEntry(enchantmentx, j));
-                    }
-                    break;
                 }
             }
         });
@@ -62,7 +64,7 @@ public class EnchantmentHelperMixin {
         possibleEnchantments.filter(enchantment -> ((Enchantment)enchantment.value()).isPrimaryItem(stack) || bl).forEach(enchantmentx -> {
             Enchantment enchantment = (Enchantment)enchantmentx.value();
             Optional<RegistryKey<Enchantment>> enchantRegistryKey = enchantmentx.getKey();
-            if (enchantRegistryKey.isPresent()) {
+            if (enchantRegistryKey.isPresent() && !blacklist.getBannedEnchants().contains(enchantRegistryKey.get())) {
                 if (blacklist.getClampedEnchants().contains(enchantRegistryKey.get())) {
                     list.add(new EnchantmentLevelEntry(enchantmentx, 1));
                 }

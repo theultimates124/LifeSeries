@@ -42,6 +42,7 @@ public class Blacklist {
     private List<Item> loadedListItem;
     private List<Block> loadedListBlock;
     private List<RegistryKey<Enchantment>> loadedListEnchants;
+    private List<RegistryKey<Enchantment>> loadedBannedEnchants;
 
     public List<String> loadItemBlacklist() {
         if (seriesConfig == null) return new ArrayList<>();
@@ -62,6 +63,14 @@ public class Blacklist {
     public List<String> loadClampedEnchants() {
         if (seriesConfig == null) return new ArrayList<>();
         String raw = seriesConfig.getOrCreateProperty("blacklist_clamped_enchants", "[]");
+        raw = raw.replaceAll("\\[","").replaceAll("]","").replaceAll(" ", "");
+        if (raw.isEmpty()) return new ArrayList<>();
+        return new ArrayList<>(Arrays.asList(raw.split(",")));
+    }
+
+    public List<String> loadBlacklistedEnchants() {
+        if (seriesConfig == null) return new ArrayList<>();
+        String raw = seriesConfig.getOrCreateProperty("blacklist_banned_enchants", "[]");
         raw = raw.replaceAll("\\[","").replaceAll("]","").replaceAll(" ", "");
         if (raw.isEmpty()) return new ArrayList<>();
         return new ArrayList<>(Arrays.asList(raw.split(",")));
@@ -165,14 +174,51 @@ public class Blacklist {
         return newList;
     }
 
+    public List<RegistryKey<Enchantment>> getBannedEnchants() {
+        if (server == null) return new ArrayList<>();
+
+        if (loadedBannedEnchants != null) return loadedBannedEnchants;
+        List<RegistryKey<Enchantment>> newList = new ArrayList<>();
+
+        Registry<Enchantment> enchantmentRegistry = server.getRegistryManager()
+
+                //? if <=1.21 {
+                .get(RegistryKey.ofRegistry(Identifier.of("minecraft", "enchantment")));
+        //?} else
+        /*.getOrThrow(RegistryKey.ofRegistry(Identifier.of("minecraft", "enchantment")));*/
+
+
+        for (String enchantmentId : loadBlacklistedEnchants()) {
+            if (!enchantmentId.startsWith("minecraft:")) enchantmentId = "minecraft:" + enchantmentId;
+
+            try {
+                Identifier id = Identifier.of(enchantmentId);
+                Enchantment enchantment = enchantmentRegistry.get(id);
+
+                if (enchantment != null) {
+                    newList.add(enchantmentRegistry.getKey(enchantment).orElseThrow());
+                } else {
+                    OtherUtils.throwError("[CONFIG] Invalid enchantment: " + enchantmentId);
+                }
+            } catch (Exception e) {
+                OtherUtils.throwError("[CONFIG] Error parsing enchantment ID: " + enchantmentId);
+            }
+        }
+
+        loadedBannedEnchants = newList;
+        return newList;
+    }
+
     public void reloadBlacklist() {
         if (Main.server == null) return;
         loadedListItem = null;
         loadedListBlock = null;
         loadedListEnchants = null;
+        loadedBannedEnchants = null;
         getItemBlacklist();
         getBlockBlacklist();
         getClampedEnchants();
+        getBannedEnchants();
     }
 
 
@@ -244,8 +290,24 @@ public class Blacklist {
         }
         ItemEnchantmentsComponent enchants = itemStack.getComponents().get(DataComponentTypes.ENCHANTMENTS);
         ItemEnchantmentsComponent enchantsStored = itemStack.getComponents().get(DataComponentTypes.STORED_ENCHANTMENTS);
-        if (enchants != null) clampEnchantments(enchants);
-        if (enchantsStored != null) clampEnchantments(enchantsStored);
+        if (enchants != null) clampAndBlacklistEnchantments(enchants);
+        if (enchantsStored != null) clampAndBlacklistEnchantments(enchantsStored);
+    }
+
+    public void clampAndBlacklistEnchantments(ItemEnchantmentsComponent enchants) {
+        blacklistEnchantments(enchants);
+        clampEnchantments(enchants);
+    }
+
+    public void blacklistEnchantments(ItemEnchantmentsComponent enchants) {
+        List<RegistryKey<Enchantment>> clamp = getBannedEnchants();
+        for (it.unimi.dsi.fastutil.objects.Object2IntMap.Entry<RegistryEntry<Enchantment>> enchant : enchants.getEnchantmentEntries()) {
+            Optional<RegistryKey<Enchantment>> enchantRegistry = enchant.getKey().getKey();
+            if (enchantRegistry.isEmpty()) continue;
+            if (clamp.contains(enchantRegistry.get())) {
+                enchant.setValue(0);
+            }
+        }
     }
 
     public void clampEnchantments(ItemEnchantmentsComponent enchants) {
@@ -257,19 +319,5 @@ public class Blacklist {
                 enchant.setValue(1);
             }
         }
-    }
-
-    public List<EnchantmentLevelEntry> clampEnchantmentList(List<EnchantmentLevelEntry> list) {
-        List<RegistryKey<Enchantment>> clamp = getClampedEnchants();
-        List<EnchantmentLevelEntry> result = new ArrayList<>();
-        for (EnchantmentLevelEntry enchantment : list) {
-            RegistryEntry<Enchantment> enchRegistryEntry = enchantment.enchantment;
-            Optional<RegistryKey<Enchantment>> enchantRegistryKey = enchRegistryEntry.getKey();
-            if (enchantRegistryKey.isEmpty()) continue;
-            if (clamp.contains(enchantRegistryKey.get())) {
-                result.add(new EnchantmentLevelEntry(enchRegistryEntry, 1));
-            }
-        }
-        return result;
     }
 }

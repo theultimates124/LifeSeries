@@ -35,11 +35,13 @@ public abstract class ConfigManager {
 
     protected void defaultSessionProperties() {
         getOrCreateDouble("spawn_egg_drop_chance", 0.05);
+        getOrCreateBoolean("spawn_egg_drop_only_natural", true);
         getOrCreateBoolean("creative_ignore_blacklist", true);
         getOrCreateBoolean("auto_set_worldborder", true);
         getOrCreateBoolean("auto_keep_inventory", true);
         getOrCreateBoolean("players_drop_items_on_last_death", false);
         getOrCreateBoolean("show_death_title_on_last_death", true);
+        getOrCreateProperty("blacklist_banned_enchants","[]");
     }
 
     public static void moveOldMainFileIfExists() {

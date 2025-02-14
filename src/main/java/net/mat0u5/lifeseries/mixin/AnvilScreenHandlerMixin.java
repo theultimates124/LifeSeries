@@ -34,7 +34,7 @@ public abstract class AnvilScreenHandlerMixin {
         ItemStack resultStack = outputInventory.getStack(0);
 
         if (resultStack.hasEnchantments()) {
-            blacklist.clampEnchantments(resultStack.getEnchantments());
+            blacklist.clampAndBlacklistEnchantments(resultStack.getEnchantments());
             if (ItemStackUtils.hasCustomComponentEntry(resultStack, "NoMending")) {
                 for (it.unimi.dsi.fastutil.objects.Object2IntMap.Entry<RegistryEntry<Enchantment>> enchant : resultStack.getEnchantments().getEnchantmentEntries()) {
                     Optional<RegistryKey<Enchantment>> enchantRegistry = enchant.getKey().getKey();

@@ -369,12 +369,13 @@ public abstract class Series extends Session {
 
     private void spawnEggChance(LivingEntity entity) {
         double chance = seriesConfig.getOrCreateDouble("spawn_egg_drop_chance", 0.05);
+        boolean onlyNatural = seriesConfig.getOrCreateBoolean("spawn_egg_drop_only_natural", true);
         if (chance <= 0) return;
         if (entity instanceof EnderDragonEntity) return;
         if (entity instanceof WitherEntity) return;
         if (entity instanceof WardenEntity) return;
         if (entity instanceof ElderGuardianEntity) return;
-        if (entity.getCommandTags().contains("notNatural")) return;
+        if (entity.getCommandTags().contains("notNatural") && onlyNatural) return;
 
         EntityType<?> entityType = entity.getType();
         SpawnEggItem spawnEgg = SpawnEggItem.forEntity(entityType);
