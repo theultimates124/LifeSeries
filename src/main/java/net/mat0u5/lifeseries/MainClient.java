@@ -17,6 +17,7 @@ public class MainClient implements ClientModInitializer {
 
     public static SeriesList clientCurrentSeries = SeriesList.UNASSIGNED;
     public static List<Wildcards> clientActiveWildcards = new ArrayList<>();
+    public static long TIME_DILATION_TIMESTAMP = 0;
     @Override
     public void onInitializeClient() {
         FabricLoader.getInstance().getModContainer(Main.MOD_ID).ifPresent(container -> {

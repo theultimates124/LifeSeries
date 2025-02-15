@@ -47,10 +47,14 @@ public class NetworkHandlerClient {
         }
         if (name.equalsIgnoreCase("activeWildcards")) {
             List<Wildcards> newList = new ArrayList<>();
-            for (String wildcardStr : value.split("_")) {
+            for (String wildcardStr : value.split("__")) {
                 newList.add(Wildcards.getFromString(wildcardStr));
             }
-            Main.LOGGER.info("[PACKET_CLIENT] Updated current series to "+ newList);
+            Main.LOGGER.info("[PACKET_CLIENT] Updated current wildcards to "+ newList);
+
+            if (!MainClient.clientActiveWildcards.contains(Wildcards.TIME_DILATION) && newList.contains(Wildcards.TIME_DILATION)) {
+                MainClient.TIME_DILATION_TIMESTAMP = System.currentTimeMillis();
+            }
             MainClient.clientActiveWildcards = newList;
         }
     }

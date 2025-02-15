@@ -120,12 +120,12 @@ public class WildLifeCommands {
             source.sendError(Text.of("That Wildcard is not active."));
             return -1;
         }
+        WildcardManager.fadedWildcard();
         Wildcard wildcardInstance = WildcardManager.activeWildcards.get(wildcard);
         wildcardInstance.deactivate();
         WildcardManager.activeWildcards.remove(wildcard);
 
         source.sendMessage(Text.of("Deactivated " + wildcardName + "."));
-        WildcardManager.fadedWildcard();
         NetworkHandlerServer.sendUpdatePackets();
         return 1;
     }

@@ -100,6 +100,17 @@ public class Hunger extends Wildcard {
             StatusEffects.SATURATION
     );
 
+    public static final List<Item> commonItems = Arrays.asList(
+            Items.DIRT, Items.STONE, Items.COBBLESTONE, Items.GRAVEL, Items.SAND,
+            Items.NETHERRACK, Items.OAK_LOG, Items.SPRUCE_LOG, Items.BIRCH_LOG, Items.JUNGLE_LOG,
+            Items.ACACIA_LOG, Items.DARK_OAK_LOG, Items.OAK_LEAVES, Items.SPRUCE_LEAVES, Items.BIRCH_LEAVES,
+            Items.JUNGLE_LEAVES, Items.ACACIA_LEAVES, Items.DARK_OAK_LEAVES, Items.GRASS_BLOCK,
+            Items.COARSE_DIRT, Items.SNOW_BLOCK, Items.DEEPSLATE, Items.CALCITE, Items.TUFF,
+            Items.ANDESITE, Items.DIORITE, Items.GRANITE, Items.BASALT, Items.BLACKSTONE, Items.END_STONE,
+            Items.SOUL_SAND, Items.SOUL_SOIL, Items.CRIMSON_NYLIUM, Items.WARPED_NYLIUM, Items.CACTUS, Items.SEA_PICKLE,
+            Items.KELP, Items.DRIED_KELP_BLOCK, Items.CRIMSON_STEM, Items.WARPED_STEM
+    );
+
     @Override
     public Wildcards getType() {
         return Wildcards.HUNGER;
@@ -128,10 +139,15 @@ public class Hunger extends Wildcard {
     }
     @Override
     public void activate() {
-        shuffleVersion = rnd.nextInt(0,100);
-        shuffledBefore = false;
-        lastVersion = -1;
-        super.activate();
+        TaskScheduler.scheduleTask(100, () -> {
+            shuffleVersion = rnd.nextInt(0,100);
+            shuffledBefore = false;
+            lastVersion = -1;
+            for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+                addHunger(player);
+            }
+            super.activate();
+        });
     }
 
     public void newFoodRules() {
@@ -208,7 +224,7 @@ public class Hunger extends Wildcard {
             int amplifier = hash % 5; // 0 -> 4
             int duration = ((3 + hash) % 18) * 20; // 1 -> 20 seconds
             RegistryEntry<StatusEffect> registryEntryEffect = effects.get(hash % effects.size());
-            if (levelLimit.contains(registryEntryEffect)) {
+            if (levelLimit.contains(registryEntryEffect) || commonItems.contains(item)) {
                 amplifier = 0;
             }
             if (durationLimit.contains(registryEntryEffect)) {
@@ -224,6 +240,10 @@ public class Hunger extends Wildcard {
         if (nutrition < 0) nutrition = 0;
         if (saturation < 0) saturation = 0;
         if (saturation > nutrition) saturation = nutrition;
+        if (commonItems.contains(item)) {
+            nutrition = 0;
+            saturation = 0;
+        }
         components.set(DataComponentTypes.FOOD, new FoodComponent(nutrition, saturation, false, 1.6f, Optional.empty(), foodEffects));
     }
     //?} else {
@@ -243,7 +263,7 @@ public class Hunger extends Wildcard {
             int amplifier = hash % 5; // 0 -> 4
             int duration = ((3 + hash) % 18) * 20; // 1 -> 20 seconds
             RegistryEntry<StatusEffect> registryEntryEffect = effects.get(hash % effects.size());
-            if (levelLimit.contains(registryEntryEffect)) {
+            if (levelLimit.contains(registryEntryEffect) || commonItems.contains(item)) {
                 amplifier = 0;
             }
             if (durationLimit.contains(registryEntryEffect)) {
@@ -259,7 +279,10 @@ public class Hunger extends Wildcard {
         if (nutrition < 0) nutrition = 0;
         if (saturation < 0) saturation = 0;
         if (saturation > nutrition) saturation = nutrition;
-
+        if (commonItems.contains(item)) {
+            nutrition = 0;
+            saturation = 0;
+        }
         components.set(DataComponentTypes.CONSUMABLE,
                 new ConsumableComponent(ConsumableComponent.DEFAULT_CONSUME_SECONDS, UseAction.EAT, SoundEvents.ENTITY_GENERIC_EAT, true, foodEffects)
         );

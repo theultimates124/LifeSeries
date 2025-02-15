@@ -600,15 +600,13 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public ServerPlayerEntity getBoundPlayer() {
         if (server == null) return null;
         ServerPlayerEntity player = server.getPlayerManager().getPlayer(boundPlayerUUID);
-        if (player == null) {
+        if (player == null || player.isSpectator() && player.isDead()) {
             nullPlayerChecks++;
             return null;
         }
         nullPlayerChecks = 0;
         if (player.isSpectator()) return null;
         if (player.isDead()) return null;
-        //if (player.isCreative()) return null;
-        //if (!currentSeries.isAlive(player)) return null;
         return player;
     }
 

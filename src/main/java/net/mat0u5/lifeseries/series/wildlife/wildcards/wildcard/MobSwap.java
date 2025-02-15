@@ -183,7 +183,7 @@ public class MobSwap extends Wildcard {
             }
             if (SPAWN_MOBS != 0) {
                 int totalMobsLeft = mobsLeftDiv * SPAWN_MOBS;
-                bossChance = (5.0 / totalMobsLeft) * BOSS_CHANCE_MULTIPLIER;
+                bossChance = (2.0 / totalMobsLeft) * BOSS_CHANCE_MULTIPLIER;
             }
         }
 

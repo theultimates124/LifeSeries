@@ -86,7 +86,7 @@ public class NetworkHandlerServer {
             for (Wildcards wildcard : WildcardManager.activeWildcards.keySet()) {
                 activeWildcards.add(Wildcards.getStringName(wildcard));
             }
-            sendStringPacket(player, "activeWildcards", String.join("_", activeWildcards));
+            sendStringPacket(player, "activeWildcards", String.join("__", activeWildcards));
         }
         sendStringPacket(player, "currentSeries", SeriesList.getStringNameFromSeries(currentSeries.getSeries()));
     }

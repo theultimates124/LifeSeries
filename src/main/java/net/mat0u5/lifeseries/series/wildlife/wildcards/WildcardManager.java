@@ -3,10 +3,7 @@ package net.mat0u5.lifeseries.series.wildlife.wildcards;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.MobSwap;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Snails;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.*;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
@@ -57,7 +54,8 @@ public class WildcardManager {
         //activeWildcards.put(Wildcards.HUNGER, new Hunger());
         //activeWildcards.put(Wildcards.TIME_DILATION, new TimeDilation());
         //activeWildcards.put(Wildcards.SNAILS, new Snails());
-       // activeWildcards.put(Wildcards.MOB_SWAP, new MobSwap());
+        //activeWildcards.put(Wildcards.MOB_SWAP, new MobSwap());
+        activeWildcards.put(Wildcards.TRIVIA_BOT, new TriviaBots());
     }
 
     public static void resetWildcardsOnPlayerJoin(ServerPlayerEntity player) {
@@ -82,19 +80,19 @@ public class WildcardManager {
                 if (wildcard.active) continue;
                 wildcard.activate();
             }
-            if (!isActiveWildcard(Wildcards.TIME_DILATION)) {
-                showCryptTitle("A wildcard is active!", 4);
-            }
-            else {
-                showCryptTitle("A wildcard is active!", 0.5f);
-            }
+            showCryptTitle("A wildcard is active!");
         });
-        TaskScheduler.scheduleTask(92, () -> {
-            NetworkHandlerServer.sendUpdatePackets();
-        });
+        TaskScheduler.scheduleTask(92, NetworkHandlerServer::sendUpdatePackets);
     }
 
     public static void fadedWildcard() {
+        if (activeWildcards.containsKey(Wildcards.TIME_DILATION)) {
+            TaskScheduler.scheduleTask(5, () -> {
+                OtherUtils.broadcastMessage(Text.of("§7A Wildcard has faded..."));
+                PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.BLOCK_BEACON_DEACTIVATE);
+            });
+            return;
+        }
         OtherUtils.broadcastMessage(Text.of("§7A Wildcard has faded..."));
         PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.BLOCK_BEACON_DEACTIVATE);
     }
@@ -113,7 +111,7 @@ public class WildcardManager {
         });
     }
 
-    public static void showCryptTitle(String text, float speed) {
+    public static void showCryptTitle(String text) {
         PlayerUtils.playSoundToPlayers(PlayerUtils.getAllPlayers(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE, 0.2f, 1);
         String colorCrypt = "§r§6§l§k";
         String colorNormal = "§r§6§l";
@@ -124,7 +122,7 @@ public class WildcardManager {
 
         float pos = 0;
         for (int i = 0; i < text.length(); i++) {
-            pos += speed;
+            pos += 4;
             if (!cryptedText.contains("<")) return;
             String[] split = cryptedText.split("<");
             int timesRemaining = split.length;
@@ -133,14 +131,7 @@ public class WildcardManager {
             cryptedText = String.join("<", split).replaceAll("<>", colorNormal);
 
             String finalCryptedText = cryptedText.replaceAll("<",colorCrypt);
-            TaskScheduler.scheduleTask((int) pos, () -> {
-                if (speed < 1) {
-                    PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal(finalCryptedText),0,2,1);
-                }
-                else {
-                    PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal(finalCryptedText),0,30,20);
-                }
-            });
+            TaskScheduler.scheduleTask((int) pos, () -> PlayerUtils.sendTitleToPlayers(PlayerUtils.getAllPlayers(), Text.literal(finalCryptedText),0,30,20));
         }
     }
 

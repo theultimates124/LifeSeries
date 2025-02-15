@@ -80,6 +80,8 @@ public class WildLifeConfig extends ConfigManager {
         getOrCreateInt("wildcard_mobswap_spawn_mobs", 250);
         getOrCreateDouble("wildcard_mobswap_boss_chance_multiplier", 1);
 
+        getOrCreateBoolean("wildcard_triviabot_can_enter_boats", true);
+
         getOrCreateInt("max_player_health", 20);
         getOrCreateInt("default_lives", 6);
         getOrCreateBoolean("custom_enchanter_algorithm", true);

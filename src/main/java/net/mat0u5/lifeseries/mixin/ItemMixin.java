@@ -29,9 +29,6 @@ public abstract class ItemMixin {
         boolean isLogicalSide = Main.isLogicalSide();
         if ((currentSeries instanceof WildLife && isLogicalSide) || (clientCurrentSeries == SeriesList.WILD_LIFE && !isLogicalSide)) {
             if ((WildcardManager.isActiveWildcard(Wildcards.HUNGER) && isLogicalSide) || (clientActiveWildcards.contains(Wildcards.HUNGER) && !isLogicalSide)) {
-                if (Main.isClient()) {
-                    Main.LOGGER.warn("getComponents");
-                }
                 Item item = (Item) (Object) this;
                 //? if <= 1.21 {
                 ComponentMapImpl components = new ComponentMapImpl(normalComponents());

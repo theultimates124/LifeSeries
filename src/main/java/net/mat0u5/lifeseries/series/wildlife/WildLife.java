@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.series.wildlife;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.entity.snail.Snail;
+import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.Boogeyman;
 import net.mat0u5.lifeseries.series.Series;
@@ -119,8 +120,8 @@ public class WildLife extends Series {
 
     @Override
     public void sessionEnd() {
-        super.sessionEnd();
         WildcardManager.onSessionEnd();
+        super.sessionEnd();
     }
 
     @Override
@@ -148,6 +149,9 @@ public class WildLife extends Series {
         MobSwap.MIN_DELAY = seriesConfig.getOrCreateInt("wildcard_mobswap_end_spawn_delay", 2400);
         MobSwap.SPAWN_MOBS = seriesConfig.getOrCreateInt("wildcard_mobswap_spawn_mobs", 250);
         MobSwap.BOSS_CHANCE_MULTIPLIER = seriesConfig.getOrCreateDouble("wildcard_mobswap_boss_chance_multiplier", 1);
+
+        TriviaBot.CAN_START_RIDING = seriesConfig.getOrCreateBoolean("wildcard_triviabot_can_enter_boats", true);
+
         Snails.loadConfig();
         Snails.loadSnailNames();
         Snails.reloadSnailNames();

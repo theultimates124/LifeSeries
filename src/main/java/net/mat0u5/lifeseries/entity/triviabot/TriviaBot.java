@@ -63,6 +63,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     public static final float MOVEMENT_SPEED = 0.45f;
     public static final int MAX_DISTANCE = 100;
     public static final int TP_MIN_RANGE = 30;
+    public static boolean CAN_START_RIDING = true;
 
     public boolean gliding = false;
     public boolean interactedWith = false;
@@ -132,15 +133,13 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     public ServerPlayerEntity getBoundPlayer() {
         if (server == null) return null;
         ServerPlayerEntity player = server.getPlayerManager().getPlayer(boundPlayerUUID);
-        if (player == null) {
+        if (player == null || player.isSpectator() && player.isDead()) {
             nullPlayerChecks++;
             return null;
         }
         nullPlayerChecks = 0;
         if (player.isSpectator()) return null;
         if (player.isDead()) return null;
-        //if (player.isCreative()) return null;
-        //if (!currentSeries.isAlive(player)) return null;
         return player;
     }
 
@@ -430,7 +429,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
     @Override
     protected boolean canStartRiding(Entity entity) {
-        return false;
+        return CAN_START_RIDING;
     }
 
     @Override
