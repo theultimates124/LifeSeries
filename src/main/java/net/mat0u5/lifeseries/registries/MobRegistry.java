@@ -51,7 +51,7 @@ public class MobRegistry {
             FabricEntityTypeBuilder.createMob()
                     .entityFactory(TriviaBot::new)
                     .spawnGroup(SpawnGroup.AMBIENT)
-                    .dimensions(EntityDimensions.changing(0.85f, 1.8f))
+                    .dimensions(EntityDimensions.changing(0.65f, 1.8f))
                     .trackRangeChunks(10)
                     .defaultAttributes(TriviaBot::createAttributes)
     );
@@ -92,7 +92,7 @@ public class MobRegistry {
             TriviaBot.ID,
             FabricEntityType.Builder.createMob(TriviaBot::new, SpawnGroup.AMBIENT, x -> x
                             .defaultAttributes(TriviaBot::createAttributes))
-                        .dimensions(0.85f, 1.8f)
+                        .dimensions(0.65f, 1.8f)
                     .maxTrackingRange(10)
     );
 
@@ -118,6 +118,7 @@ public class MobRegistry {
 
     public static void registerMobs() {
         addSpawnEgg(SNAIL, Items.HORSE_SPAWN_EGG);
+        addSpawnEgg(TRIVIA_BOT, Items.STRIDER_SPAWN_EGG);
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(Main.MOD_ID, "spawn-eggs"), ITEM_GROUP);
     }
 

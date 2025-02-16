@@ -15,6 +15,7 @@ import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Snails;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TriviaBots;
 import net.mat0u5.lifeseries.utils.AnimationUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.block.BlockState;
@@ -72,6 +73,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public boolean landing;
     public boolean mining;
     public boolean setNavigation = false;
+    public boolean fromTrivia = false;
     @Nullable
     public PathFinder groundPathFinder;
     @Nullable
@@ -87,7 +89,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public static final int MAX_DISTANCE = 150; // Distance over this teleports the snail to the player
     public static final int JUMP_COOLDOWN_SHORT = 10;
     public static final int JUMP_COOLDOWN_LONG = 30;
-    public static final int JUMP_RANGE_SQUARED = 20;
+    public static final int JUMP_RANGE_SQUARED = 14;
 
     public Snail(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
@@ -95,6 +97,11 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         EntityAttachment.ofTicking(holder, this);
         setInvulnerable(true);
         setPersistent();
+    }
+
+    public int getJumpRangeSquared() {
+        if (isNerfed()) return 9;
+        return JUMP_RANGE_SQUARED;
     }
 
     public void setBoundPlayer(ServerPlayerEntity player) {
@@ -110,6 +117,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
     @Override
     protected Text getDefaultName() {
+        if (fromTrivia) return Text.of("VHSnail");
         if (snailName == null) return this.getType().getName();
         if (snailName.getString().isEmpty()) return this.getType().getName();
         return snailName;
@@ -194,7 +202,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public void tick() {
         super.tick();
 
-        if (nullPlayerChecks > 1000) {
+        if (nullPlayerChecks > 1000 && !fromTrivia) {
             despawn();
         }
 
@@ -207,8 +215,18 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         }
 
         if (age % 100 == 0) {
-            if (!Snails.snails.containsValue(this) || !WildcardManager.isActiveWildcard(Wildcards.SNAILS)) {
-                despawn();
+            if (!fromTrivia) {
+                if (!Snails.snails.containsValue(this) || !WildcardManager.isActiveWildcard(Wildcards.SNAILS)) {
+                    despawn();
+                }
+            }
+            else {
+                if (!WildcardManager.isActiveWildcard(Wildcards.TRIVIA_BOT)) {
+                    despawn();
+                }
+                else if (age >= 36000) {
+                    despawn();
+                }
             }
         }
         ServerPlayerEntity boundPlayer = getBoundPlayer();
@@ -228,7 +246,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
                 updateNavigationTarget();
             }
         }
-        if (getAir() == 0 && SHOULD_DROWN_PLAYER) {
+        if (getAir() == 0 && SHOULD_DROWN_PLAYER && !fromTrivia) {
             damageFromDrowning();
         }
 
@@ -237,6 +255,14 @@ public class Snail extends HostileEntity implements AnimatedEntity {
         chunkLoading();
         playSounds();
         clearStatusEffects();
+    }
+
+    public boolean isNerfed() {
+        return fromTrivia;
+    }
+
+    public void setFromTrivia() {
+        fromTrivia = true;
     }
 
     public void chunkLoading() {
@@ -258,6 +284,9 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     }
 
     public void despawn() {
+        if (boundPlayerUUID != null) {
+            TriviaBots.bots.remove(boundPlayerUUID);
+        }
         killPathFinders();
         //? if <= 1.21 {
         this.kill();
@@ -575,12 +604,18 @@ public class Snail extends HostileEntity implements AnimatedEntity {
             }
             if (speedMultiplier != lastSpeedMultiplier) {
                 lastSpeedMultiplier = speedMultiplier;
+                double movementSpeed = MOVEMENT_SPEED * speedMultiplier * GLOBAL_SPEED_MULTIPLIER;
+                double flyingSpeed = FLYING_SPEED * speedMultiplier * GLOBAL_SPEED_MULTIPLIER;
+                if (isNerfed()) {
+                    movementSpeed *= 0.7;
+                    flyingSpeed *= 0.7;
+                }
                 //? if <= 1.21 {
-                Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)).setBaseValue(MOVEMENT_SPEED * speedMultiplier * GLOBAL_SPEED_MULTIPLIER);
-                Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.GENERIC_FLYING_SPEED)).setBaseValue(FLYING_SPEED * speedMultiplier * GLOBAL_SPEED_MULTIPLIER);
+                Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)).setBaseValue(movementSpeed);
+                Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.GENERIC_FLYING_SPEED)).setBaseValue(flyingSpeed);
                 //?} else {
-                /*Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED)).setBaseValue(MOVEMENT_SPEED * speedMultiplier * GLOBAL_SPEED_MULTIPLIER);
-                Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.FLYING_SPEED)).setBaseValue(FLYING_SPEED * speedMultiplier * GLOBAL_SPEED_MULTIPLIER);
+                /*Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED)).setBaseValue(movementSpeed);
+                Objects.requireNonNull(this.getAttributeInstance(EntityAttributes.FLYING_SPEED)).setBaseValue(flyingSpeed);
                 *///?}
             }
         }

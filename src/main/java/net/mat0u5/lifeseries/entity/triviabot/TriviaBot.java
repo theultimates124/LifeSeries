@@ -7,22 +7,22 @@ import de.tomalbrc.bil.core.holder.entity.EntityHolder;
 import de.tomalbrc.bil.core.holder.entity.living.LivingEntityHolder;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.file.loader.BbModelLoader;
-import eu.pb4.polymer.core.api.client.PolymerClientUtils;
-import eu.pb4.polymer.core.api.other.PolymerScreenHandlerUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.entity.AnimationHandler;
+import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.entity.triviabot.goal.TriviaBotGlideGoal;
 import net.mat0u5.lifeseries.entity.triviabot.goal.TriviaBotTeleportGoal;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
-import net.mat0u5.lifeseries.network.packets.NumberPayload;
-import net.mat0u5.lifeseries.network.packets.TriviaQuestionPayload;
+import net.mat0u5.lifeseries.registries.MobRegistry;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TriviaBots;
 import net.mat0u5.lifeseries.utils.AnimationUtils;
-import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.pathing.MobNavigation;
 import net.minecraft.entity.ai.pathing.Path;
@@ -34,6 +34,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
@@ -43,7 +44,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
@@ -73,6 +73,8 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     public int difficulty = 0;
     public boolean submittedAnswer = false;
     public Boolean answeredRight = null;
+    public boolean ranOutOfTime = false;
+    public int snailTransformation = 0;
 
     public int nullPlayerChecks = 0;
     private long chunkTicketExpiryTicks = 0L;
@@ -162,6 +164,11 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     @Override
     public void tick() {
         super.tick();
+        if (age % 100 == 0) {
+            if (!TriviaBots.bots.containsValue(this) || !WildcardManager.isActiveWildcard(Wildcards.TRIVIA_BOT)) {
+                despawn();
+            }
+        }
 
         if (submittedAnswer && answeredRight != null) {
             if (answeredRight) {
@@ -183,11 +190,19 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
         }
         else {
             handleHighVelocity();
-            ServerPlayerEntity boundPlayer = getBoundPlayer();
-            if (boundPlayer != null) {
-                if (age % 5 == 0) {
-                    updateNavigationTarget();
+            if (!interactedWith) {
+                ServerPlayerEntity boundPlayer = getBoundPlayer();
+                if (boundPlayer != null) {
+                    if (age % 5 == 0) {
+                        updateNavigationTarget();
+                    }
                 }
+            }
+            if (interactedWith && getRemainingTime() <= 0) {
+                ranOutOfTime = true;
+            }
+            if (snailTransformation > 33) {
+                transformIntoSnail();
             }
         }
 
@@ -234,6 +249,9 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     }
 
     public void despawn() {
+        if (boundPlayerUUID != null) {
+            TriviaBots.bots.remove(boundPlayerUUID);
+        }
         //? if <= 1.21 {
         this.kill();
         //?} else {
@@ -242,16 +260,36 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
         this.discard();
     }
 
-    @Override
-    public SoundCategory getSoundCategory() {
-        return SoundCategory.PLAYERS;
+    public void transformIntoSnail() {
+        if (getBoundPlayer() != null) {
+            Snail triviaSnail = MobRegistry.SNAIL.spawn((ServerWorld) getWorld(), this.getBlockPos(), SpawnReason.COMMAND);
+            if (triviaSnail != null) {
+                triviaSnail.setBoundPlayer(getBoundPlayer());
+                triviaSnail.setFromTrivia();
+                triviaSnail.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE.value(), 0.5f, 2);
+                ServerWorld world = (ServerWorld) triviaSnail.getWorld();
+                world.spawnParticles(
+                        ParticleTypes.EXPLOSION,
+                        this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(),
+                        10, 0.5, 0.5, 0.5, 0.5
+                );
+            }
+        }
+        despawn();
     }
 
     private int analyzing = -1;
     public void updateAnimations() {
         AnimationHandler.updateHurtVariant(this, holder);
         Animator animator = holder.getAnimator();
-        if (analyzing > 0) {
+        if (ranOutOfTime) {
+            if (snailTransformation == 0) {
+                pauseAllAnimations("snail_transform");
+                animator.playAnimation("snail_transform", 8);
+            }
+            snailTransformation++;
+        }
+        else if (analyzing > 0) {
             analyzing--;
             pauseAllAnimations("analyzing");
         }
@@ -424,7 +462,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     }
 
     /*
-        Quiz stuff
+        Trivia stuff
      */
 
 
@@ -438,7 +476,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
         if (!interactedWith) {
             interactedAt = System.currentTimeMillis();
-            timeToComplete = 120;
+            timeToComplete = 20;
             difficulty = 1;
         }
 
@@ -469,6 +507,11 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     /*
         Override vanilla things
      */
+
+    @Override
+    public SoundCategory getSoundCategory() {
+        return SoundCategory.PLAYERS;
+    }
     
     @Override
     public Vec3d applyFluidMovingSpeed(double gravity, boolean falling, Vec3d motion) {

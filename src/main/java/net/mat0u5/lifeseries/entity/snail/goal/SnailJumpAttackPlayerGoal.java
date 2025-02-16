@@ -34,7 +34,7 @@ public final class SnailJumpAttackPlayerGoal extends Goal {
         }
 
         double distanceToTarget = mob.squaredDistanceTo(boundPlayer);
-        if (distanceToTarget > Snail.JUMP_RANGE_SQUARED) {
+        if (distanceToTarget > mob.getJumpRangeSquared()) {
             return false;
         }
 
@@ -52,7 +52,7 @@ public final class SnailJumpAttackPlayerGoal extends Goal {
             return false;
         }
 
-        if (mob.squaredDistanceTo(boundPlayer) > Snail.JUMP_RANGE_SQUARED) {
+        if (mob.squaredDistanceTo(boundPlayer) > mob.getJumpRangeSquared()) {
             return false;
         }
 
@@ -120,9 +120,9 @@ public final class SnailJumpAttackPlayerGoal extends Goal {
 
         Vec3d attackVector = mobVelocity;
         if (relativeTargetPos.lengthSquared() > 0.0001) {
-            attackVector = relativeTargetPos.normalize().multiply(1);
+            attackVector = relativeTargetPos.normalize().multiply(mob.isNerfed() ? 0.8 : 1);
         }
-        double addY = 0.5 + mob.squaredDistanceTo(boundPlayer) / Snail.JUMP_RANGE_SQUARED;
+        double addY = 0.5 + mob.squaredDistanceTo(boundPlayer) / mob.getJumpRangeSquared();
         mob.setVelocity(attackVector.x, attackVector.y + addY, attackVector.z);
     }
 }

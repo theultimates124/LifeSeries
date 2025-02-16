@@ -79,7 +79,12 @@ public class Snails extends Wildcard {
         List<Entity> toKill = new ArrayList<>();
         for (ServerWorld world : server.getWorlds()) {
             for (Entity entity : world.iterateEntities()) {
-                if (entity instanceof Snail || entity instanceof PathFinder) {
+                if (entity instanceof Snail snail) {
+                    if (!snail.fromTrivia) {
+                        toKill.add(entity);
+                    }
+                }
+                if (entity instanceof PathFinder pf) {
                     toKill.add(entity);
                 }
             }

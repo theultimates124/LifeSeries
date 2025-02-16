@@ -33,7 +33,7 @@ public enum Wildcards {
         if (wildcard == Wildcards.HUNGER) return new Hunger();
         if (wildcard == Wildcards.SNAILS) return new Snails();
         if (wildcard == Wildcards.TIME_DILATION) return new TimeDilation();
-        if (wildcard == Wildcards.TRIVIA_BOT) return null;
+        if (wildcard == Wildcards.TRIVIA_BOT) return new TriviaBots();
         if (wildcard == Wildcards.MOB_SWAP) return new MobSwap();
         if (wildcard == Wildcards.SUPERPOWERS) return null;
         if (wildcard == Wildcards.CALLBACK) return null;

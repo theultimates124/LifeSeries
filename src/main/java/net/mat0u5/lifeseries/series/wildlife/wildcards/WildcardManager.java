@@ -100,14 +100,17 @@ public class WildcardManager {
     public static void showDots() {
         List<ServerPlayerEntity> players = PlayerUtils.getAllPlayers();
         PlayerUtils.playSoundToPlayers(players, SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO.value(), 0.4f, 1);
-        PlayerUtils.sendTitleToPlayers(players, Text.literal("§a."),0,40,0);
+        //PlayerUtils.sendTitleToPlayers(players, Text.literal("§a."),0,40,0);
+        PlayerUtils.sendTitleToPlayers(players, Text.literal("§a§l,"),0,40,0);
         TaskScheduler.scheduleTask(30, () -> {
             PlayerUtils.playSoundToPlayers(players, SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO.value(), 0.4f, 1);
-            PlayerUtils.sendTitleToPlayers(players, Text.literal("§a. §e."),0,40,0);
+            //PlayerUtils.sendTitleToPlayers(players, Text.literal("§a. §e."),0,40,0);
+            PlayerUtils.sendTitleToPlayers(players, Text.literal("§a§l, §e§l,"),0,40,0);
         });
         TaskScheduler.scheduleTask(60, () -> {
             PlayerUtils.playSoundToPlayers(players, SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO.value(), 0.4f, 1);
-            PlayerUtils.sendTitleToPlayers(players, Text.literal("§a. §e. §c."),0,40,0);
+            //PlayerUtils.sendTitleToPlayers(players, Text.literal("§a. §e. §c."),0,40,0);
+            PlayerUtils.sendTitleToPlayers(players, Text.literal("§a§l, §e§l, §c§l,"),0,40,0);
         });
     }
 
