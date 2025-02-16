@@ -36,12 +36,21 @@ public class TriviaBots extends Wildcard {
         super.deactivate();
     }
 
+    public static void handleAnswer(ServerPlayerEntity player, int answer) {
+        if (bots.containsKey(player.getUuid())) {
+            bots.get(player.getUuid()).handleAnswer(answer);
+        }
+    }
+
     public static void spawnBotFor(ServerPlayerEntity player) {
-        TriviaBot bot = MobRegistry.TRIVIA_BOT.spawn(player.getServerWorld(), player.getBlockPos().add(0,20,0), SpawnReason.COMMAND);
+        if (bots.containsKey(player.getUuid())) {
+            bots.get(player.getUuid()).despawn();
+        }
+        TriviaBot bot = MobRegistry.TRIVIA_BOT.spawn(player.getServerWorld(), player.getBlockPos().add(0,50,0), SpawnReason.COMMAND);
         if (bot != null) {
             bot.setBoundPlayer(player);
             bots.put(player.getUuid(), bot);
-            bot.teleportNearPlayer(20);
+            bot.teleportAbovePlayer(10, 50);
         }
     }
 

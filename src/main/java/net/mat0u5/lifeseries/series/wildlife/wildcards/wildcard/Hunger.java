@@ -101,14 +101,16 @@ public class Hunger extends Wildcard {
     );
 
     public static final List<Item> commonItems = Arrays.asList(
-            Items.DIRT, Items.STONE, Items.COBBLESTONE, Items.GRAVEL, Items.SAND,
-            Items.NETHERRACK, Items.OAK_LOG, Items.SPRUCE_LOG, Items.BIRCH_LOG, Items.JUNGLE_LOG,
-            Items.ACACIA_LOG, Items.DARK_OAK_LOG, Items.OAK_LEAVES, Items.SPRUCE_LEAVES, Items.BIRCH_LEAVES,
-            Items.JUNGLE_LEAVES, Items.ACACIA_LEAVES, Items.DARK_OAK_LEAVES, Items.GRASS_BLOCK,
-            Items.COARSE_DIRT, Items.SNOW_BLOCK, Items.DEEPSLATE, Items.CALCITE, Items.TUFF,
+            Items.DIRT, Items.STONE, Items.COBBLESTONE, Items.GRAVEL, Items.SAND, Items.NETHERRACK,
+            Items.OAK_LOG, Items.SPRUCE_LOG, Items.BIRCH_LOG, Items.JUNGLE_LOG, Items.ACACIA_LOG, Items.DARK_OAK_LOG, Items.MANGROVE_LOG, Items.CHERRY_LOG, Items.CRIMSON_STEM, Items.WARPED_STEM,
+            Items.OAK_LEAVES, Items.SPRUCE_LEAVES, Items.BIRCH_LEAVES, Items.JUNGLE_LEAVES, Items.ACACIA_LEAVES, Items.DARK_OAK_LEAVES, Items.MANGROVE_LEAVES, Items.CHERRY_LEAVES, Items.NETHER_WART_BLOCK, Items.WARPED_WART_BLOCK,
+            Items.OAK_PLANKS, Items.SPRUCE_PLANKS, Items.BIRCH_PLANKS, Items.JUNGLE_PLANKS, Items.ACACIA_PLANKS, Items.DARK_OAK_PLANKS, Items.MANGROVE_PLANKS, Items.CHERRY_PLANKS, Items.CRIMSON_HYPHAE, Items.WARPED_HYPHAE,
+            Items.OAK_BUTTON, Items.SPRUCE_BUTTON, Items.BIRCH_BUTTON, Items.JUNGLE_BUTTON, Items.ACACIA_BUTTON, Items.DARK_OAK_BUTTON, Items.MANGROVE_BUTTON, Items.CHERRY_BUTTON, Items.CRIMSON_BUTTON, Items.WARPED_BUTTON,
+            Items.PINK_PETALS, Items.IRON_NUGGET, Items.GOLD_NUGGET, Items.STICK, Items.STRING, Items.BONE_MEAL,
+            Items.GRASS_BLOCK, Items.COARSE_DIRT, Items.SNOW_BLOCK, Items.DEEPSLATE, Items.CALCITE, Items.TUFF,
             Items.ANDESITE, Items.DIORITE, Items.GRANITE, Items.BASALT, Items.BLACKSTONE, Items.END_STONE,
             Items.SOUL_SAND, Items.SOUL_SOIL, Items.CRIMSON_NYLIUM, Items.WARPED_NYLIUM, Items.CACTUS, Items.SEA_PICKLE,
-            Items.KELP, Items.DRIED_KELP_BLOCK, Items.CRIMSON_STEM, Items.WARPED_STEM
+            Items.KELP, Items.DRIED_KELP_BLOCK
     );
 
     @Override

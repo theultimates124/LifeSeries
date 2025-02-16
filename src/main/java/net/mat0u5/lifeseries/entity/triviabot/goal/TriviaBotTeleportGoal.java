@@ -32,7 +32,7 @@ public final class TriviaBotTeleportGoal extends Goal {
     @Override
     public void start() {
         teleportCooldown = 20;
-        mob.teleportNearPlayer(TriviaBot.TP_MIN_RANGE);
+        mob.teleportNearPlayer(2);
     }
 
     @Override

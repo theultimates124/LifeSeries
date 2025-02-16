@@ -10,10 +10,14 @@ import de.tomalbrc.bil.file.loader.BbModelLoader;
 import eu.pb4.polymer.core.api.client.PolymerClientUtils;
 import eu.pb4.polymer.core.api.other.PolymerScreenHandlerUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.entity.AnimationHandler;
 import net.mat0u5.lifeseries.entity.triviabot.goal.TriviaBotGlideGoal;
 import net.mat0u5.lifeseries.entity.triviabot.goal.TriviaBotTeleportGoal;
+import net.mat0u5.lifeseries.network.NetworkHandlerServer;
+import net.mat0u5.lifeseries.network.packets.NumberPayload;
+import net.mat0u5.lifeseries.network.packets.TriviaQuestionPayload;
 import net.mat0u5.lifeseries.utils.AnimationUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.block.BlockState;
@@ -48,10 +52,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static net.mat0u5.lifeseries.Main.server;
 
@@ -62,13 +63,17 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
     public static final float MOVEMENT_SPEED = 0.45f;
     public static final int MAX_DISTANCE = 100;
-    public static final int TP_MIN_RANGE = 30;
     public static boolean CAN_START_RIDING = true;
 
     public boolean gliding = false;
+
     public boolean interactedWith = false;
+    public long interactedAt = 0;
+    public int timeToComplete = 0;
+    public int difficulty = 0;
     public boolean submittedAnswer = false;
     public Boolean answeredRight = null;
+
     public int nullPlayerChecks = 0;
     private long chunkTicketExpiryTicks = 0L;
 
@@ -158,6 +163,34 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     public void tick() {
         super.tick();
 
+        if (submittedAnswer && answeredRight != null) {
+            if (answeredRight) {
+                if (analyzing < -80) {
+                    noClip = true;
+                    float velocity = Math.min(0.5f, 0.25f * Math.abs((analyzing+80) / (20.0f)));
+                    setVelocity(0,velocity,0);
+                    if (analyzing < -200) despawn();
+                }
+            }
+            else {
+                if (analyzing < -100) {
+                    noClip = true;
+                    float velocity = Math.min(0.5f, 0.25f * Math.abs((analyzing+100) / (20.0f)));
+                    setVelocity(0,velocity,0);
+                    if (analyzing < -200) despawn();
+                }
+            }
+        }
+        else {
+            handleHighVelocity();
+            ServerPlayerEntity boundPlayer = getBoundPlayer();
+            if (boundPlayer != null) {
+                if (age % 5 == 0) {
+                    updateNavigationTarget();
+                }
+            }
+        }
+
         if (nullPlayerChecks > 1000) {
             despawn();
         }
@@ -166,30 +199,10 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
             updateAnimations();
         }
 
-        ServerPlayerEntity boundPlayer = getBoundPlayer();
-        if (boundPlayer != null) {
-            if (age % 5 == 0) {
-                updateNavigationTarget();
-            }
-        }
 
-        handleHighVelocity();
         chunkLoading();
         clearStatusEffects();
         playSounds();
-    }
-
-    @Override
-    public ActionResult interactMob(PlayerEntity player, Hand hand) {
-        ServerPlayerEntity boundPlayer = getBoundPlayer();
-        if (boundPlayer == null) return ActionResult.PASS;
-        if (boundPlayer.getUuid() != player.getUuid()) return ActionResult.PASS;
-
-        OtherUtils.log("Right click test");
-        interactedWith = true;
-        //TODO send a packet to the player that opened it, with the question info
-
-        return ActionResult.PASS;
     }
 
     public void handleHighVelocity() {
@@ -242,16 +255,18 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
             analyzing--;
             pauseAllAnimations("analyzing");
         }
-        else if (analyzing == 0 && submittedAnswer && answeredRight != null) {
+        else if (submittedAnswer && answeredRight != null) {
+            if (analyzing == 0) {
+                if (answeredRight) {
+                    pauseAllAnimations("answer_correct");
+                    animator.playAnimation("answer_correct", 7);
+                }
+                else {
+                    pauseAllAnimations("answer_incorrect");
+                    animator.playAnimation("answer_incorrect", 6);
+                }
+            }
             analyzing--;
-            if (answeredRight) {
-                pauseAllAnimations("answer_correct");
-                animator.playAnimation("answer_correct", 7);
-            }
-            else {
-                pauseAllAnimations("answer_incorrect");
-                animator.playAnimation("answer_incorrect", 6);
-            }
         }
         else if (interactedWith) {
             pauseAllAnimations("countdown");
@@ -271,25 +286,11 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
         }
     }
 
-    public void answeredCorrect() {
-        submittedAnswer = true;
-        answeredRight = true;
-        playAnalyzingAnimation();
-
-    }
-
-    public void answeredIncorrect() {
-        submittedAnswer = true;
-        answeredRight = false;
-        playAnalyzingAnimation();
-
-    }
-
     public void playAnalyzingAnimation() {
         Animator animator = holder.getAnimator();
         pauseAllAnimations("analyzing");
         animator.playAnimation("analyzing", 5);
-        analyzing = 40;
+        analyzing = 42;
     }
 
     public void pauseAllAnimations(String except) {
@@ -311,7 +312,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
             this.playSound(SoundEvents.ENTITY_PLAYER_TELEPORT);
             AnimationUtils.spawnTeleportParticles(world, getPos());
 
-            BlockPos tpTo = getBlockPosNearTarget(world, minDistanceFromPlayer);
+            BlockPos tpTo = getBlockPosNearTarget(world, player.getBlockPos(), minDistanceFromPlayer);
             Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
             //? if <= 1.21 {
             teleport(player.getServerWorld(), tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch());
@@ -324,10 +325,34 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
         }
     }
 
-    public BlockPos getBlockPosNearTarget(ServerWorld world, double minDistanceFromTarget) {
-        if (getBoundPlayer() == null) return getBlockPos();
+    public void teleportAbovePlayer(double minDistanceFromPlayer, int distanceAbove) {
+        distanceAbove = 0; //TODO
+        ServerPlayerEntity player = getBoundPlayer();
+        if (player == null) return;
+        if (getWorld() instanceof ServerWorld world) {
+            this.playSound(SoundEvents.ENTITY_PLAYER_TELEPORT);
+            AnimationUtils.spawnTeleportParticles(world, getPos());
 
-        BlockPos targetPos = getBoundPlayer().getBlockPos();
+            BlockPos tpTo = getBlockPosNearTarget(world, player.getBlockPos().add(0, distanceAbove, 0), minDistanceFromPlayer);
+            Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
+            //? if <= 1.21 {
+            teleport(player.getServerWorld(), tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch());
+            //?} else {
+            /*teleport(player.getServerWorld(), tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch(), false);
+             *///?}
+
+            this.playSound(SoundEvents.ENTITY_PLAYER_TELEPORT);
+            AnimationUtils.spawnTeleportParticles(world, getPos());
+        }
+    }
+
+    public int getRemainingTime() {
+        int timeSinceStart = (int) Math.ceil((System.currentTimeMillis() - interactedAt) / 1000.0);
+        return timeToComplete - timeSinceStart;
+    }
+
+    public BlockPos getBlockPosNearTarget(ServerWorld world, BlockPos targetPos, double minDistanceFromTarget) {
+        if (getBoundPlayer() == null) return getBlockPos();
 
         for (int attempts = 0; attempts < 10; attempts++) {
             Vec3d offset = new Vec3d(
@@ -396,6 +421,49 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
     public void playSounds() {
         //TODO
+    }
+
+    /*
+        Quiz stuff
+     */
+
+
+    @Override
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ServerPlayerEntity boundPlayer = getBoundPlayer();
+        if (boundPlayer == null) return ActionResult.PASS;
+        if (boundPlayer.getUuid() != player.getUuid()) return ActionResult.PASS;
+        if (submittedAnswer) return ActionResult.PASS;
+        if (interactedWith && getRemainingTime() <= 0) return ActionResult.PASS;
+
+        if (!interactedWith) {
+            interactedAt = System.currentTimeMillis();
+            timeToComplete = 120;
+            difficulty = 1;
+        }
+
+        NetworkHandlerServer.sendTriviaPacket(boundPlayer, "Test test test test test test test test test test question :)", difficulty, interactedAt, timeToComplete, List.of("a b c d e f g h i j k l m n o p", "Grian", "Mumbo", "waaaaaaaaaaaaanjfebsjkfaes"));
+        interactedWith = true;
+
+        return ActionResult.PASS;
+    }
+
+    public void handleAnswer(int answer) {
+        submittedAnswer = true;
+        answeredCorrect();
+        //answeredIncorrect();
+    }
+
+    public void answeredCorrect() {
+        answeredRight = true;
+        playAnalyzingAnimation();
+
+    }
+
+    public void answeredIncorrect() {
+        answeredRight = false;
+        playAnalyzingAnimation();
+
     }
 
     /*

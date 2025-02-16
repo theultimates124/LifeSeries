@@ -6,12 +6,14 @@ import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.network.packets.HandshakePayload;
 import net.mat0u5.lifeseries.network.packets.NumberPayload;
 import net.mat0u5.lifeseries.network.packets.StringPayload;
+import net.mat0u5.lifeseries.network.packets.TriviaQuestionPayload;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TriviaBots;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.network.DisconnectionInfo;
@@ -34,10 +36,12 @@ public class NetworkHandlerServer {
         PayloadTypeRegistry.playS2C().register(NumberPayload.ID, NumberPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(StringPayload.ID, StringPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(HandshakePayload.ID, HandshakePayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(TriviaQuestionPayload.ID, TriviaQuestionPayload.CODEC);
 
         PayloadTypeRegistry.playC2S().register(NumberPayload.ID, NumberPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(StringPayload.ID, StringPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(HandshakePayload.ID, HandshakePayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(TriviaQuestionPayload.ID, TriviaQuestionPayload.CODEC);
     }
     public static void registerServerReceiver() {
         ServerPlayNetworking.registerGlobalReceiver(HandshakePayload.ID, (payload, context) -> {
@@ -47,12 +51,35 @@ public class NetworkHandlerServer {
                 handleHandshakeResponse(player, payload.modVersionStr(), payload.modVersion());
             });
         });
+        ServerPlayNetworking.registerGlobalReceiver(NumberPayload.ID, (payload, context) -> {
+            ServerPlayerEntity player = context.player();
+            MinecraftServer server = context.server();
+            server.execute(() -> {
+                handleNumberPacket(player, payload.name(), payload.number());
+            });
+        });
+    }
+    public static void handleNumberPacket(ServerPlayerEntity player, String name, double value) {
+        int intValue = (int) value;
+        if (name.equalsIgnoreCase("trivia_answer")) {
+            Main.LOGGER.info("[PACKET_SERVER] Received trivia answer (from "+player.getNameForScoreboard()+"): "+ intValue);
+            TriviaBots.handleAnswer(player, intValue);
+        }
     }
 
     public static void handleHandshakeResponse(ServerPlayerEntity player, String modVersionStr, int modVersion) {
         Main.LOGGER.info("[PACKET_SERVER] Received handshake (from "+player.getNameForScoreboard()+"): {"+modVersionStr+", "+modVersion+"}");
         awaitingHandshake.remove(player.getUuid());
         handshakeSuccessful.add(player.getUuid());
+    }
+
+    /*
+        Sending
+     */
+    public static void sendTriviaPacket(ServerPlayerEntity player, String question, int difficulty, long timestamp, int timeToComplete, List<String> answers) {
+        TriviaQuestionPayload triviaQuestionPacket = new TriviaQuestionPayload(question, difficulty, timestamp, timeToComplete, answers);
+        Main.LOGGER.info("[PACKET_SERVER] Sending trivia question packet to "+player.getNameForScoreboard()+"): {"+question+", " + difficulty+", " + timestamp+", " + timeToComplete + ", " + answers + "}");
+        ServerPlayNetworking.send(player, triviaQuestionPacket);
     }
 
     public static void sendHandshake(ServerPlayerEntity player) {

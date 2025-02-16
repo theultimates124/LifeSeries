@@ -4,9 +4,11 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.MainClient;
 import net.mat0u5.lifeseries.client.ClientHandler;
+import net.mat0u5.lifeseries.client.trivia.Trivia;
 import net.mat0u5.lifeseries.network.packets.HandshakePayload;
 import net.mat0u5.lifeseries.network.packets.NumberPayload;
 import net.mat0u5.lifeseries.network.packets.StringPayload;
+import net.mat0u5.lifeseries.network.packets.TriviaQuestionPayload;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
@@ -34,6 +36,12 @@ public class NetworkHandlerClient {
         ClientPlayNetworking.registerGlobalReceiver(HandshakePayload.ID, (payload, context) -> {
             MinecraftClient client = context.client();
             client.execute(NetworkHandlerClient::respondHandshake);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(TriviaQuestionPayload.ID, (payload, context) -> {
+            MinecraftClient client = context.client();
+            client.execute(() -> {
+                Trivia.receiveTrivia(payload);
+            });
         });
     }
     
@@ -69,6 +77,15 @@ public class NetworkHandlerClient {
             Main.LOGGER.info("[PACKET_CLIENT] Updated min. player MSPT to "+ number);
             TimeDilation.MIN_PLAYER_MSPT = (float) number;
         }
+    }
+
+    /*
+        Sending
+     */
+
+    public static void sendTriviaAnswer(int answer) {
+        Main.LOGGER.info("[PACKET_CLIENT] Sending trivia answer: "+ answer);
+        ClientPlayNetworking.send(new NumberPayload("trivia_answer", answer));
     }
 
     public static void respondHandshake() {
