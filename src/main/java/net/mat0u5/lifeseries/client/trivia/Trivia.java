@@ -26,9 +26,17 @@ public class Trivia {
         openGui();
     }
 
-    public static int getRemainingTime() {
-        int timeSinceStart = (int) Math.ceil((System.currentTimeMillis() - timestamp) / 1000.0);
+    public static long getRemainingTime() {
+        long timeSinceStart = (int) Math.ceil((System.currentTimeMillis() - timestamp) / 1000.0);
         return secondsToComplete - timeSinceStart;
+    }
+
+    public static boolean isDoingTrivia() {
+        if (Trivia.secondsToComplete == 0) return false;
+        long remaining = Trivia.getRemainingTime();
+        if (remaining <= 0) return false;
+        if (remaining > 1000000) return false;
+        return true;
     }
 
     public static void openGui() {

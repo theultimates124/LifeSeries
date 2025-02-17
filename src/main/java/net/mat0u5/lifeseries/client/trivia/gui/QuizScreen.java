@@ -39,7 +39,7 @@ public class QuizScreen extends Screen {
 
     private final List<List<OrderedText>> answers = new ArrayList<>();
     private String DIFFICULTY = "Difficulty: null";
-    private int timerSeconds = 120;
+    private long timerSeconds = 120;
     private final List<Rectangle> answerRects = new ArrayList<>();
 
     public QuizScreen() {
@@ -176,8 +176,8 @@ public class QuizScreen extends Screen {
         */
 
         // Timer
-        int minutes = timerSeconds / 60;
-        int seconds = timerSeconds - minutes * 60;
+        long minutes = timerSeconds / 60;
+        long seconds = timerSeconds - minutes * 60;
         String secondsStr = String.valueOf(seconds);
         String minutesStr = String.valueOf(minutes);
         while (secondsStr.length() < 2) secondsStr = "0" + secondsStr;
