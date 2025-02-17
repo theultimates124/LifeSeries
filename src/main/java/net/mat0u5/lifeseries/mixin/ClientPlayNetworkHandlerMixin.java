@@ -21,10 +21,10 @@ public class ClientPlayNetworkHandlerMixin {
 
         if (MinecraftClient.getInstance().player != null) {
             //? if <= 1.21 {
-            MinecraftClient.getInstance().player.sendMessage(Text.of("§cYou can't talk in chat while answering a Trivia Bot!"));
+            MinecraftClient.getInstance().player.sendMessage(Text.of("<Trivia Bot> No phoning a friend allowed!"));
             //?} else {
-            /*MinecraftClient.getInstance().player.sendMessage(Text.of("§cYou can't talk in chat while answering a Trivia Bot!"), false);
-            *///?}
+            /*MinecraftClient.getInstance().player.sendMessage(Text.of("<Trivia Bot> No phoning a friend allowed!"), false);
+             *///?}
         }
         ci.cancel();
     }
@@ -38,9 +38,9 @@ public class ClientPlayNetworkHandlerMixin {
         for (String s : notAllowedCommand) {
             if (command.startsWith(s+" ")) {
                 //? if <= 1.21 {
-                MinecraftClient.getInstance().player.sendMessage(Text.of("§cYou can't talk in chat while answering a Trivia Bot!"));
+                MinecraftClient.getInstance().player.sendMessage(Text.of("<Trivia Bot> No phoning a friend allowed!"));
                 //?} else {
-                /*MinecraftClient.getInstance().player.sendMessage(Text.of("§cYou can't talk in chat while answering a Trivia Bot!"), false);
+                /*MinecraftClient.getInstance().player.sendMessage(Text.of("<Trivia Bot> No phoning a friend allowed!"), false);
                  *///?}
                 ci.cancel();
                 return;

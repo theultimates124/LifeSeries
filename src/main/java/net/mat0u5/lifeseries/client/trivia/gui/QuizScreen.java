@@ -183,7 +183,9 @@ public class QuizScreen extends Screen {
         while (secondsStr.length() < 2) secondsStr = "0" + secondsStr;
         while (minutesStr.length() < 2) minutesStr = "0" + minutesStr;
 
-        drawTextCenter(context, Text.of(minutesStr + ":" + secondsStr), centerX, minY);
+        if (timerSeconds <= 5) drawTextCenter(context, Text.of(minutesStr + ":" + secondsStr), centerX, minY, 0xFFbf2222);
+        else if (timerSeconds <= 30) drawTextCenter(context, Text.of(minutesStr + ":" + secondsStr), centerX, minY, 0xFFd6961a);
+        else drawTextCenter(context, Text.of(minutesStr + ":" + secondsStr), centerX, minY);
 
         // Difficulty
         drawTextCenter(context, Text.of(DIFFICULTY), centerX, maxY);
@@ -225,7 +227,11 @@ public class QuizScreen extends Screen {
     }
 
     public void drawTextCenter(DrawContext context, Text text, int x, int y) {
-        context.drawText(this.textRenderer, text, x - this.textRenderer.getWidth(text)/2, y, TEXT_COLOR, false);
+        drawTextCenter(context, text, x, y, TEXT_COLOR);
+    }
+
+    public void drawTextCenter(DrawContext context, Text text, int x, int y, int color) {
+        context.drawText(this.textRenderer, text, x - this.textRenderer.getWidth(text)/2, y, color, false);
     }
 
     public void testDrawX(DrawContext context, int x) {

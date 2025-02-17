@@ -475,7 +475,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
         if (!interactedWith) {
             interactedAt = System.currentTimeMillis();
-            timeToComplete = 20;
+            timeToComplete = 60;
             difficulty = 1;
         }
 
