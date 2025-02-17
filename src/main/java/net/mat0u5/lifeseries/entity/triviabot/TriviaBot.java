@@ -140,7 +140,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     public ServerPlayerEntity getBoundPlayer() {
         if (server == null) return null;
         ServerPlayerEntity player = server.getPlayerManager().getPlayer(boundPlayerUUID);
-        if (player == null || player.isSpectator() && player.isDead()) {
+        if (player == null || (player.isSpectator() && player.isDead())) {
             nullPlayerChecks++;
             return null;
         }
@@ -215,7 +215,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
         }
 
 
-        chunkLoading();
+        //chunkLoading(); //TODO
         clearStatusEffects();
         playSounds();
     }
@@ -464,7 +464,6 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     /*
         Trivia stuff
      */
-
 
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {

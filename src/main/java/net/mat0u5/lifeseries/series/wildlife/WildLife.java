@@ -151,10 +151,12 @@ public class WildLife extends Series {
         MobSwap.BOSS_CHANCE_MULTIPLIER = seriesConfig.getOrCreateDouble("wildcard_mobswap_boss_chance_multiplier", 1);
 
         TriviaBot.CAN_START_RIDING = seriesConfig.getOrCreateBoolean("wildcard_triviabot_can_enter_boats", true);
+        TriviaBots.TRIVIA_BOTS_PER_PLAYER = seriesConfig.getOrCreateInt("wildcard_triviabot_bots_per_player", 5);
 
         Snails.loadConfig();
         Snails.loadSnailNames();
         Snails.reloadSnailNames();
+        TriviaBots.reload();
     }
 
     @Override

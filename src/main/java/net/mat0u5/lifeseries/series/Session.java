@@ -172,7 +172,8 @@ public class Session {
     public void tickSessionOn(MinecraftServer server) {
         float tickRate = server.getTickManager().getTickRate();
         if (tickRate == 20) {
-            passedTime++;
+            //passedTime++;
+            passedTime += 10;
         }
         else {
             passedTime += (20/tickRate);

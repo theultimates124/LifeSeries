@@ -14,6 +14,7 @@ import net.minecraft.server.world.ServerWorld;
 
 import java.util.*;
 
+import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
 
 public class Snails extends Wildcard {
@@ -31,7 +32,7 @@ public class Snails extends Wildcard {
     @Override
     public void activate() {
         snails.clear();
-        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+        for (ServerPlayerEntity player : currentSeries.getAlivePlayers()) {
             spawnSnailFor(player);
         }
         loadSnailNames();
@@ -49,7 +50,7 @@ public class Snails extends Wildcard {
     public void tick() {
         ticks++;
         if (ticks % 200 == 0) {
-            for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            for (ServerPlayerEntity player : currentSeries.getAlivePlayers()) {
                 UUID playerUUID = player.getUuid();
                 if (snails.containsKey(playerUUID)) {
                     Snail snail = snails.get(playerUUID);

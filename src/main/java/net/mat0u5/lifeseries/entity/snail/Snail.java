@@ -169,6 +169,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
                 .add(EntityAttributes.GENERIC_STEP_HEIGHT, 1)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 150)
                 .add(EntityAttributes.GENERIC_WATER_MOVEMENT_EFFICIENCY, 1)
+                .add(EntityAttributes.GENERIC_SAFE_FALL_DISTANCE, 100)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 20);
         //?} else {
         /*return MobEntity.createMobAttributes()
@@ -178,6 +179,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
                 .add(EntityAttributes.STEP_HEIGHT, 1)
                 .add(EntityAttributes.FOLLOW_RANGE, 150)
                 .add(EntityAttributes.WATER_MOVEMENT_EFFICIENCY, 1)
+                .add(EntityAttributes.SAFE_FALL_DISTANCE, 100)
                 .add(EntityAttributes.ATTACK_DAMAGE, 20);
         *///?}
     }
@@ -252,7 +254,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
         handleHighVelocity();
         updatePathFinders();
-        chunkLoading();
+        //chunkLoading(); //TODO
         playSounds();
         clearStatusEffects();
     }
@@ -635,7 +637,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public ServerPlayerEntity getBoundPlayer() {
         if (server == null) return null;
         ServerPlayerEntity player = server.getPlayerManager().getPlayer(boundPlayerUUID);
-        if (player == null || player.isSpectator() && player.isDead()) {
+        if (player == null || (player.isSpectator() && player.isDead())) {
             nullPlayerChecks++;
             return null;
         }

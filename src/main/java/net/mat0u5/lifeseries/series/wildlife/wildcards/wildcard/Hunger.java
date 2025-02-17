@@ -202,6 +202,7 @@ public class Hunger extends Wildcard {
     }
 
     public static void addHunger(ServerPlayerEntity player) {
+        if (player.isSpectator()) return;
         StatusEffectInstance statusEffectInstance = new StatusEffectInstance(StatusEffects.HUNGER, -1, 2);
         player.addStatusEffect(statusEffectInstance);
     }

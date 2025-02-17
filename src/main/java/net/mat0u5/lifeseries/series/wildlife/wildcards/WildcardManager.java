@@ -143,9 +143,7 @@ public class WildcardManager {
             if (!wildcard.active) continue;
             wildcard.tick();
         }
-        if (!isActiveWildcard(Wildcards.SIZE_SHIFTING)) {
-            SizeShifting.resetSizesTick();
-        }
+        SizeShifting.resetSizesTick(isActiveWildcard(Wildcards.SIZE_SHIFTING));
         if (!isActiveWildcard(Wildcards.MOB_SWAP) && server != null && server.getTicks() % 200 == 0) {
             MobSwap.killMobSwapMobs();
         }

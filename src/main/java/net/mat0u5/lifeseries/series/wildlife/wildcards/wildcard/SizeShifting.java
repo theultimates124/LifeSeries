@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
+import static net.mat0u5.lifeseries.Main.currentSeries;
+
 public class SizeShifting extends Wildcard {
 
     public static double MIN_SIZE_HARD = 0.06;
@@ -32,6 +34,7 @@ public class SizeShifting extends Wildcard {
     @Override
     public void tick() {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            if (player.isSpectator()) continue;
             if (player.isSneaking()) {
                 addPlayerSize(player, SNEAK_STEP * SIZE_CHANGE_MULTIPLIER);
             }
@@ -76,18 +79,20 @@ public class SizeShifting extends Wildcard {
         *///?}
     }
 
-    public static void resetSizesTick() {
+    public static void resetSizesTick(boolean isActive) {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
-            float size = getPlayerSize(player);
-            if (size == 1) return;
-            if (size < 0.98) {
-                addPlayerSize(player, 0.01);
-            }
-            else if (size > 1.02) {
-                addPlayerSize(player, -0.01);
-            }
-            else {
-                setPlayerSize(player, 1);
+            if (!isActive || (player.isSpectator() && !currentSeries.isAlive(player))) {
+                float size = getPlayerSize(player);
+                if (size == 1) return;
+                if (size < 0.98) {
+                    addPlayerSize(player, 0.01);
+                }
+                else if (size > 1.02) {
+                    addPlayerSize(player, -0.01);
+                }
+                else {
+                    setPlayerSize(player, 1);
+                }
             }
         }
     }
