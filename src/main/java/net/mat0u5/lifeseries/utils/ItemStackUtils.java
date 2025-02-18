@@ -159,6 +159,17 @@ public class ItemStackUtils {
 
         world.spawnEntity(itemEntity);
     }
+    public static void spawnItemForPlayerWithVelocity(ServerWorld world, Vec3d position, ItemStack stack, PlayerEntity player, Vec3d velocity) {
+        if (world == null || stack.isEmpty()) {
+            return;
+        }
+        ItemEntity itemEntity = new ItemEntity(world, position.x, position.y, position.z, stack);
+        itemEntity.setPickupDelay(20);
+        itemEntity.setVelocity(velocity);
+        if (player != null) itemEntity.setOwner(player.getUuid());
+
+        world.spawnEntity(itemEntity);
+    }
 
     public static ItemStack createEnchantedBook(RegistryKey<Enchantment> enchantment, int level) {
         if (server == null) return null;

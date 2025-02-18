@@ -84,7 +84,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
     public static final float MOVEMENT_SPEED = 0.35f;
     public static final float FLYING_SPEED = 0.3f;
-    public static final int STATIONARY_TP_COOLDOWN = 600; // No movement for 30 seconds teleports the snail
+    public static final int STATIONARY_TP_COOLDOWN = 400; // No movement for 20 seconds teleports the snail
     public static final int TP_MIN_RANGE = 15;
     public static final int MAX_DISTANCE = 150; // Distance over this teleports the snail to the player
     public static final int JUMP_COOLDOWN_SHORT = 10;

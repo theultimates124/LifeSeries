@@ -1,7 +1,9 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard;
 
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
+import net.mat0u5.lifeseries.network.packets.StringPayload;
 import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
@@ -114,6 +116,9 @@ public class TriviaBots extends Wildcard {
         spawnedBotsFor.clear();
         activatedAt = (int) currentSession.passedTime;
         bots.clear();
+        TriviaBot.cursedGigantificationPlayers.clear();
+        TriviaBot.cursedHeartPlayers.clear();
+        TriviaBot.cursedMoonJumpPlayers.clear();
         super.activate();
     }
 
@@ -124,6 +129,12 @@ public class TriviaBots extends Wildcard {
         bots.clear();
         killAllBots();
         killAllTriviaSnails();
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            TriviaBots.resetPlayerOnBotSpawn(player);
+        }
+        TriviaBot.cursedGigantificationPlayers.clear();
+        TriviaBot.cursedHeartPlayers.clear();
+        TriviaBot.cursedMoonJumpPlayers.clear();
         super.deactivate();
     }
 
@@ -163,6 +174,23 @@ public class TriviaBots extends Wildcard {
             }
         }
         killTriviaSnailFor(player);
+
+        if (TriviaBot.cursedGigantificationPlayers.contains(player.getUuid())) {
+            TriviaBot.cursedGigantificationPlayers.remove(player.getUuid());
+            SizeShifting.setPlayerSize(player, 1);
+        }
+        if (TriviaBot.cursedHeartPlayers.contains(player.getUuid())) {
+            TriviaBot.cursedHeartPlayers.remove(player.getUuid());
+            currentSeries.resetMaxPlayerHealth(player);
+        }
+        if (TriviaBot.cursedMoonJumpPlayers.contains(player.getUuid())) {
+            TriviaBot.cursedMoonJumpPlayers.remove(player.getUuid());
+            currentSeries.resetPlayerJumpHeight(player);
+        }
+
+        ServerPlayNetworking.send(player, new StringPayload("curse_sliding", "false"));
+
+
     }
 
     public static void killAllBots() {

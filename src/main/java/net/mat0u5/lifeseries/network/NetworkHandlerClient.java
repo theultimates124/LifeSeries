@@ -65,6 +65,14 @@ public class NetworkHandlerClient {
             }
             MainClient.clientActiveWildcards = newList;
         }
+        if (name.equalsIgnoreCase("curse_sliding")) {
+            if (value.equalsIgnoreCase("true")) {
+                MainClient.CURSE_SLIDING = true;
+            }
+            else {
+                MainClient.CURSE_SLIDING = false;
+            }
+        }
     }
 
     public static void handleNumberPacket(String name, double number) {

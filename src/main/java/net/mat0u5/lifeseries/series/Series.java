@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.series;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
+import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
 import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -396,12 +397,11 @@ public abstract class Series extends Session {
     }
 
     public void onPlayerJoin(ServerPlayerEntity player) {
-        if (getSeries() != SeriesList.SECRET_LIFE) {
-            double health = seriesConfig.getOrCreateDouble("max_player_health", 20.0d);
-            //? if <=1.21 {
-            Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(health);
-             //?} else
-            /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(health);*/
+        if (getSeries() != SeriesList.SECRET_LIFE && !(player.getMaxHealth() == 13 && TriviaBot.cursedHeartPlayers.contains(player.getUuid()))) {
+            resetMaxPlayerHealth(player);
+        }
+        if (!TriviaBot.cursedMoonJumpPlayers.contains(player.getUuid())) {
+            resetPlayerJumpHeight(player);
         }
         reloadPlayerTeam(player);
         TaskScheduler.scheduleTask(2, () -> {
@@ -414,6 +414,21 @@ public abstract class Series extends Session {
                 player.sendMessage(Text.of("After that, use §b'/session start'§f to start the session."));
             });
         }
+    }
+
+    public void resetMaxPlayerHealth(ServerPlayerEntity player) {
+        double health = seriesConfig.getOrCreateDouble("max_player_health", 20.0d);
+        //? if <=1.21 {
+        Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(health);
+        //?} else
+        /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(health);*/
+    }
+
+    public void resetPlayerJumpHeight(ServerPlayerEntity player) {
+        //? if <=1.21 {
+        Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_JUMP_STRENGTH)).setBaseValue(0.41999998688697815);
+        //?} else
+        /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.JUMP_STRENGTH)).setBaseValue(0.41999998688697815);*/
     }
 
     public void onPlayerDisconnect(ServerPlayerEntity player) {

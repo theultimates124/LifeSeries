@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard;
 
+import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
@@ -34,6 +35,7 @@ public class SizeShifting extends Wildcard {
     @Override
     public void tick() {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            if (TriviaBot.cursedGigantificationPlayers.contains(player.getUuid())) return;
             if (player.isSpectator()) continue;
             if (player.isSneaking()) {
                 addPlayerSize(player, SNEAK_STEP * SIZE_CHANGE_MULTIPLIER);
@@ -78,11 +80,19 @@ public class SizeShifting extends Wildcard {
         /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.SCALE)).setBaseValue(size);
         *///?}
     }
+    public static void setPlayerSizeUnchecked(ServerPlayerEntity player, double size) {
+        //? if <=1.21 {
+        Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_SCALE)).setBaseValue(size);
+        //?} else {
+        /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.SCALE)).setBaseValue(size);
+         *///?}
+    }
 
     public static void resetSizesTick(boolean isActive) {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             if (!isActive || (player.isSpectator() && !currentSeries.isAlive(player))) {
                 float size = getPlayerSize(player);
+                if (TriviaBot.cursedGigantificationPlayers.contains(player.getUuid())) return;
                 if (size == 1) return;
                 if (size < 0.98) {
                     addPlayerSize(player, 0.01);

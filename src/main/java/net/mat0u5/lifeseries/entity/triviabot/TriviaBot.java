@@ -8,40 +8,61 @@ import de.tomalbrc.bil.core.holder.entity.living.LivingEntityHolder;
 import de.tomalbrc.bil.core.model.Model;
 import de.tomalbrc.bil.file.loader.BbModelLoader;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.entity.AnimationHandler;
 import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.entity.triviabot.goal.TriviaBotGlideGoal;
 import net.mat0u5.lifeseries.entity.triviabot.goal.TriviaBotTeleportGoal;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
+import net.mat0u5.lifeseries.network.packets.StringPayload;
 import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TriviaBots;
-import net.mat0u5.lifeseries.utils.AnimationUtils;
+import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.block.BlockState;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.pathing.MobNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.RavagerEntity;
+import net.minecraft.entity.passive.BeeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
+import net.minecraft.particle.EntityEffectParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.potion.Potions;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
@@ -61,9 +82,11 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     public static final Model MODEL = BbModelLoader.load(ID);
     public static final ChunkTicketType<ChunkPos> BOT_TICKET = ChunkTicketType.create("triviabot", Comparator.comparingLong(ChunkPos::toLong), 100);
 
+    public static final int STATIONARY_TP_COOLDOWN = 400; // No movement for 20 seconds teleports the bot
     public static final float MOVEMENT_SPEED = 0.45f;
     public static final int MAX_DISTANCE = 100;
     public static boolean CAN_START_RIDING = true;
+    public static ItemSpawner itemSpawner;
 
     public boolean gliding = false;
 
@@ -343,45 +366,34 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
         if (!except.equalsIgnoreCase("snail_transform")) animator.pauseAnimation("snail_transform");
     }
 
-    public void teleportNearPlayer(double minDistanceFromPlayer) {
+    public void teleportToPlayer() {
         ServerPlayerEntity player = getBoundPlayer();
         if (player == null) return;
-        if (getWorld() instanceof ServerWorld world) {
-            this.playSound(SoundEvents.ENTITY_PLAYER_TELEPORT);
-            AnimationUtils.spawnTeleportParticles(world, getPos());
-
-            BlockPos tpTo = getBlockPosNearTarget(world, player.getBlockPos(), minDistanceFromPlayer);
-            Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
-            //? if <= 1.21 {
-            teleport(player.getServerWorld(), tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch());
-            //?} else {
-            /*teleport(player.getServerWorld(), tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch(), false);
-             *///?}
-
-            this.playSound(SoundEvents.ENTITY_PLAYER_TELEPORT);
-            AnimationUtils.spawnTeleportParticles(world, getPos());
-        }
+        teleportTo(player.getServerWorld(), player.getX(), player.getY(), player.getZ());
     }
 
     public void teleportAbovePlayer(double minDistanceFromPlayer, int distanceAbove) {
-        distanceAbove = 0; //TODO
+        distanceAbove = 0;//TODO remove
         ServerPlayerEntity player = getBoundPlayer();
         if (player == null) return;
         if (getWorld() instanceof ServerWorld world) {
-            this.playSound(SoundEvents.ENTITY_PLAYER_TELEPORT);
-            AnimationUtils.spawnTeleportParticles(world, getPos());
-
             BlockPos tpTo = getBlockPosNearTarget(world, player.getBlockPos().add(0, distanceAbove, 0), minDistanceFromPlayer);
-            Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
-            //? if <= 1.21 {
-            teleport(player.getServerWorld(), tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch());
-            //?} else {
-            /*teleport(player.getServerWorld(), tpTo.getX(), tpTo.getY(), tpTo.getZ(), flags, getYaw(), getPitch(), false);
-             *///?}
-
-            this.playSound(SoundEvents.ENTITY_PLAYER_TELEPORT);
-            AnimationUtils.spawnTeleportParticles(world, getPos());
+            teleportTo(player.getServerWorld(), tpTo.getX(), tpTo.getY(), tpTo.getZ());
         }
+    }
+
+    public void teleportTo(ServerWorld world, double x, double y, double z) {
+        //TODO make sure sounds still work after teleporting
+        this.playSound(SoundEvents.ENTITY_PLAYER_TELEPORT);
+        AnimationUtils.spawnTeleportParticles((ServerWorld) getWorld(), getPos());
+        Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
+        //? if <= 1.21 {
+        teleport(world, x, y, z, flags, getYaw(), getPitch());
+        //?} else {
+        /*teleport(world, x, y, z, flags, getYaw(), getPitch(), false);
+         *///?}
+        this.playSound(SoundEvents.ENTITY_PLAYER_TELEPORT);
+        AnimationUtils.spawnTeleportParticles(world, getPos());
     }
 
     public int getRemainingTime() {
@@ -413,7 +425,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     private BlockPos findNearestAirBlock(BlockPos pos, World world) {
         for (int yOffset = -5; yOffset <= 5; yOffset++) {
             BlockPos newPos = pos.up(yOffset);
-            if (world.getBlockState(newPos).isAir()) {
+            if (world.getBlockState(newPos).isAir() && world.getBlockState(pos.up(yOffset+1)).isAir()) {
                 return newPos;
             }
         }
@@ -475,8 +487,8 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
         if (!interactedWith) {
             interactedAt = System.currentTimeMillis();
-            timeToComplete = 60;
             difficulty = 1;
+            timeToComplete = difficulty * 60 + 120;
         }
 
         NetworkHandlerServer.sendTriviaPacket(boundPlayer, "Test test test test test test test test test test question :)", difficulty, interactedAt, timeToComplete, List.of("a b c d e f g h i j k l m n o p", "Grian", "Mumbo", "waaaaaaaaaaaaanjfebsjkfaes"));
@@ -486,21 +498,256 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     }
 
     public void handleAnswer(int answer) {
+        if (submittedAnswer) return;
         submittedAnswer = true;
-        answeredCorrect();
-        //answeredIncorrect();
+        if (answer == 0) {
+            answeredCorrect();
+        }
+        else {
+            answeredIncorrect();
+        }
     }
 
     public void answeredCorrect() {
         answeredRight = true;
         playAnalyzingAnimation();
-
+        TaskScheduler.scheduleTask(145, this::spawnItemForPlayer);
+        TaskScheduler.scheduleTask(170, this::spawnItemForPlayer);
+        TaskScheduler.scheduleTask(198, this::spawnItemForPlayer);
+        TaskScheduler.scheduleTask(213, this::blessPlayer);
     }
 
     public void answeredIncorrect() {
         answeredRight = false;
         playAnalyzingAnimation();
+        TaskScheduler.scheduleTask(210, this::cursePlayer);
+    }
 
+    public void cursePlayer() {
+        ServerPlayerEntity player = getBoundPlayer();
+        if (player == null) return;
+        player.playSoundToPlayer(SoundEvents.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.MASTER, 0.2f, 1f);
+        ServerWorld world = (ServerWorld) getWorld();
+        Vec3d pos = getPos();
+
+        world.spawnParticles(
+                EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, 0xFFa61111),
+                pos.getX(), pos.getY()+1, pos.getZ(),
+                40, 0.1, 0.25, 0.1, 0.035
+        );
+        int curse = world.random.nextInt(9);
+        switch (curse) {
+            case 0:
+                curse_hunger(player);
+                break;
+            case 1:
+                curse_ravager(player);
+                break;
+            case 2:
+                curse_infestation(player);
+                break;
+            case 3:
+                curse_gigantification(player);
+                break;
+            case 4:
+                curse_slippery_ground(player);
+                break;
+            case 5:
+                curse_binding_armor(player);
+                break;
+            case 6:
+                curse_hearts(player);
+                break;
+            case 7:
+                curse_moonjump(player);
+                break;
+            case 8:
+                curse_beeswarm(player);
+                break;
+            /* TODO
+            case 9:
+                curse_robotic_voice(player);
+                break;
+             */
+        }
+    }
+
+    private static final List<RegistryEntry<StatusEffect>> blessEffects = List.of(
+            StatusEffects.SPEED,
+            StatusEffects.HASTE,
+            StatusEffects.STRENGTH,
+            StatusEffects.JUMP_BOOST,
+            StatusEffects.REGENERATION,
+            StatusEffects.RESISTANCE,
+            StatusEffects.FIRE_RESISTANCE,
+            StatusEffects.WATER_BREATHING,
+            StatusEffects.NIGHT_VISION,
+            StatusEffects.HEALTH_BOOST,
+            StatusEffects.ABSORPTION
+    );
+    public void blessPlayer() {
+        ServerPlayerEntity player = getBoundPlayer();
+        if (player == null) return;
+        player.sendMessage(Text.of(""));
+        for (int i = 0; i < 3; i++) {
+            RegistryEntry<StatusEffect> effect = blessEffects.get(player.getRandom().nextInt(blessEffects.size()));
+            int amplifier;
+            if (effect == StatusEffects.FIRE_RESISTANCE || effect == StatusEffects.WATER_BREATHING || effect == StatusEffects.NIGHT_VISION) {
+                amplifier = 0;
+            }
+            else if (effect == StatusEffects.REGENERATION || effect == StatusEffects.STRENGTH || effect == StatusEffects.HEALTH_BOOST) {
+                amplifier = player.getRandom().nextInt(1);
+            }
+            else {
+                amplifier = player.getRandom().nextInt(4);
+            }
+            player.addStatusEffect(new StatusEffectInstance(effect, 36000, amplifier));
+
+            String romanNumeral = TextUtils.toRomanNumeral(amplifier + 1);
+            MutableText effectName = Text.translatable(effect.value().getTranslationKey()).formatted(Formatting.GRAY);
+            player.sendMessage(Text.literal(" §a§l+ ").append(effectName).append(Text.of(" §6"+romanNumeral)));
+        }
+        player.sendMessage(Text.of(""));
+    }
+
+    public void spawnItemForPlayer() {
+        if (itemSpawner == null) return;
+        if (getBoundPlayer() == null) return;
+        Vec3d playerPos = getBoundPlayer().getPos();
+        Vec3d pos = getPos().add(0,1,0);
+        Vec3d relativeTargetPos = new Vec3d(
+                playerPos.getX() - pos.getX(),
+                0,
+                playerPos.getZ() - pos.getZ()
+        );
+        Vec3d vector = Vec3d.ZERO;
+        if (relativeTargetPos.lengthSquared() > 0.0001) {
+            vector = relativeTargetPos.normalize().multiply(0.3).add(0,0.1,0);
+        }
+        itemSpawner.spawnRandomItemForPlayerWithVelocity((ServerWorld) getWorld(), pos, vector, getBoundPlayer());
+    }
+
+    public static void initializeItemSpawner() {
+        itemSpawner = new ItemSpawner();
+        itemSpawner.addItem(new ItemStack(Items.GOLDEN_APPLE, 2), 20);
+        itemSpawner.addItem(new ItemStack(Items.ENDER_PEARL, 2), 20);
+        itemSpawner.addItem(new ItemStack(Items.TRIDENT), 10);
+        itemSpawner.addItem(new ItemStack(Items.POWERED_RAIL, 16), 10);
+        itemSpawner.addItem(new ItemStack(Items.DIAMOND, 4), 20);
+        itemSpawner.addItem(new ItemStack(Items.CREEPER_SPAWN_EGG), 10);
+        itemSpawner.addItem(new ItemStack(Items.GOLDEN_CARROT, 8), 10);
+        itemSpawner.addItem(new ItemStack(Items.WIND_CHARGE, 16), 10);
+        itemSpawner.addItem(new ItemStack(Items.SCULK_SHRIEKER, 2), 10);
+        itemSpawner.addItem(new ItemStack(Items.SCULK_SENSOR, 8), 10);
+        itemSpawner.addItem(new ItemStack(Items.TNT, 8), 20);
+        itemSpawner.addItem(new ItemStack(Items.COBWEB, 8), 10);
+        itemSpawner.addItem(new ItemStack(Items.OBSIDIAN, 8), 10);
+        itemSpawner.addItem(new ItemStack(Items.PUFFERFISH_BUCKET), 10);
+        itemSpawner.addItem(new ItemStack(Items.NETHERITE_CHESTPLATE), 10);
+        itemSpawner.addItem(new ItemStack(Items.NETHERITE_LEGGINGS), 10);
+        itemSpawner.addItem(new ItemStack(Items.NETHERITE_BOOTS), 10);
+
+        ItemStack mace = new ItemStack(Items.MACE);
+        ItemStackUtils.setCustomComponentBoolean(mace, "IgnoreBlacklist", true);
+        ItemStackUtils.setCustomComponentBoolean(mace, "NoMending", true);
+        mace.setDamage(mace.getMaxDamage()-1);
+        itemSpawner.addItem(mace, 10);
+
+        ItemStack endCrystal = new ItemStack(Items.END_CRYSTAL);
+        ItemStackUtils.setCustomComponentBoolean(endCrystal, "IgnoreBlacklist", true);
+        itemSpawner.addItem(endCrystal, 10);
+
+        ItemStack patat = new ItemStack(Items.POISONOUS_POTATO);
+        patat.set(DataComponentTypes.CUSTOM_NAME, Text.of("§6§l§nThe Sacred Patat"));
+        ItemStackUtils.addLoreToItemStack(patat,
+                List.of(Text.of("§5§oEating this might help you. Or maybe not..."))
+        );
+        itemSpawner.addItem(patat, 1);
+    }
+
+    /*
+        Curses
+     */
+
+    public void curse_hunger(ServerPlayerEntity player) {
+        StatusEffectInstance statusEffectInstance = new StatusEffectInstance(StatusEffects.HUNGER, 18000, 2);
+        player.addStatusEffect(statusEffectInstance);
+    }
+
+    public void curse_ravager(ServerPlayerEntity player) {
+        BlockPos spawnPos = getBlockPosNearTarget(player.getServerWorld(), getBlockPos(), 5);
+        EntityType.RAVAGER.spawn(player.getServerWorld(), spawnPos, SpawnReason.COMMAND);
+    }
+
+    public void curse_infestation(ServerPlayerEntity player) {
+        StatusEffectInstance statusEffectInstance = new StatusEffectInstance(StatusEffects.INFESTED, 18000, 0);
+        player.addStatusEffect(statusEffectInstance);
+    }
+
+    public static List<UUID> cursedGigantificationPlayers = new ArrayList<>();
+    public void curse_gigantification(ServerPlayerEntity player) {
+        cursedGigantificationPlayers.add(player.getUuid());
+        SizeShifting.setPlayerSizeUnchecked(player, 5);
+    }
+
+    public void curse_slippery_ground(ServerPlayerEntity player) {
+        ServerPlayNetworking.send(player, new StringPayload("curse_sliding", "true"));
+    }
+
+    public void curse_binding_armor(ServerPlayerEntity player) {
+        for (ItemStack item : player.getArmorItems()) {
+            ItemStackUtils.spawnItemForPlayer(player.getServerWorld(), player.getPos(), item.copy(), player);
+        }
+        //ItemStack head = Items.LEATHER_HELMET.getDefaultStack();
+        ItemStack chest = Items.LEATHER_CHESTPLATE.getDefaultStack();
+        ItemStack legs = Items.LEATHER_LEGGINGS.getDefaultStack();
+        ItemStack boots = Items.LEATHER_BOOTS.getDefaultStack();
+        //head.addEnchantment(ItemStackUtils.getEnchantmentEntry(Enchantments.BINDING_CURSE), 1);
+        chest.addEnchantment(ItemStackUtils.getEnchantmentEntry(Enchantments.BINDING_CURSE), 1);
+        legs.addEnchantment(ItemStackUtils.getEnchantmentEntry(Enchantments.BINDING_CURSE), 1);
+        boots.addEnchantment(ItemStackUtils.getEnchantmentEntry(Enchantments.BINDING_CURSE), 1);
+        //player.equipStack(EquipmentSlot.HEAD, head);
+        player.equipStack(EquipmentSlot.CHEST, chest);
+        player.equipStack(EquipmentSlot.LEGS, legs);
+        player.equipStack(EquipmentSlot.FEET, boots);
+    }
+
+    public static List<UUID> cursedHeartPlayers = new ArrayList<>();
+    public void curse_hearts(ServerPlayerEntity player) {
+        cursedHeartPlayers.add(player.getUuid());
+        double newHealth = Math.max(player.getMaxHealth()-7, 1);
+        //? if <=1.21 {
+        Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)).setBaseValue(newHealth);
+        //?} else
+        /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.MAX_HEALTH)).setBaseValue(newHealth);*/
+    }
+
+    public static List<UUID> cursedMoonJumpPlayers = new ArrayList<>();
+    public void curse_moonjump(ServerPlayerEntity player) {
+        cursedMoonJumpPlayers.add(player.getUuid());
+        //? if <=1.21 {
+        Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_JUMP_STRENGTH)).setBaseValue(0.76);
+        //?} else
+        /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.JUMP_STRENGTH)).setBaseValue(0.76);*/
+    }
+
+    public void curse_beeswarm(ServerPlayerEntity player) {
+        BlockPos spawnPos = getBlockPosNearTarget(player.getServerWorld(), getBlockPos(), 1);
+        BeeEntity bee1 = EntityType.BEE.spawn((ServerWorld) getWorld(), spawnPos, SpawnReason.COMMAND);
+        BeeEntity bee2 = EntityType.BEE.spawn((ServerWorld) getWorld(), spawnPos, SpawnReason.COMMAND);
+        BeeEntity bee3 = EntityType.BEE.spawn((ServerWorld) getWorld(), spawnPos, SpawnReason.COMMAND);
+        BeeEntity bee4 = EntityType.BEE.spawn((ServerWorld) getWorld(), spawnPos, SpawnReason.COMMAND);
+        BeeEntity bee5 = EntityType.BEE.spawn((ServerWorld) getWorld(), spawnPos, SpawnReason.COMMAND);
+        if (bee1 != null) bee1.setAngryAt(player.getUuid());
+        if (bee2 != null) bee2.setAngryAt(player.getUuid());
+        if (bee3 != null) bee3.setAngryAt(player.getUuid());
+        if (bee4 != null) bee4.setAngryAt(player.getUuid());
+        if (bee5 != null) bee5.setAngryAt(player.getUuid());
+        if (bee1 != null) bee1.setAngerTime(1000000);
+        if (bee2 != null) bee2.setAngerTime(1000000);
+        if (bee3 != null) bee3.setAngerTime(1000000);
+        if (bee4 != null) bee4.setAngerTime(1000000);
+        if (bee5 != null) bee5.setAngerTime(1000000);
     }
 
     /*

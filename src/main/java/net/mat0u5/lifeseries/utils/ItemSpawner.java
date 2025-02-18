@@ -40,4 +40,8 @@ public class ItemSpawner {
         ItemStack randomItem = getRandomItem();
         ItemStackUtils.spawnItemForPlayer(world, pos, randomItem, player);
     }
+    public void spawnRandomItemForPlayerWithVelocity(ServerWorld world, Vec3d pos, Vec3d velocity, ServerPlayerEntity player) {
+        ItemStack randomItem = getRandomItem();
+        ItemStackUtils.spawnItemForPlayerWithVelocity(world, pos, randomItem, player, velocity);
+    }
 }

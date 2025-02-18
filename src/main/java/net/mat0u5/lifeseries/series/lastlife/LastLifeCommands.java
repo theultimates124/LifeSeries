@@ -104,7 +104,7 @@ public class LastLifeCommands {
         ((LastLife) currentSeries).addToLifeNoUpdate(target);
         AnimationUtils.playTotemAnimation(self);
         TaskScheduler.scheduleTask(40, () -> {
-            ((LastLife)currentSeries).livesManager.receiveLifeFromOtherPlayer(currentPlayerName,target);
+            ((LastLife)currentSeries).livesManager.receiveLifeFromOtherPlayer(currentPlayerName, target);
         });
 
         return 1;

@@ -32,7 +32,7 @@ public class LastLifeLivesManager {
     public void receiveLifeFromOtherPlayer(Text playerName, ServerPlayerEntity target) {
         target.playSoundToPlayer(SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.MASTER, 10, 1);
         target.sendMessage(Text.literal("You received a life from ").append(playerName));
-        PlayerUtils.sendTitleWithSubtitle(target, Text.of("You received a life"), Text.literal("from").append(playerName), 10, 30, 10);
+        PlayerUtils.sendTitleWithSubtitle(target, Text.of("You received a life"), Text.literal("from ").append(playerName), 10, 30, 10);
         AnimationUtils.createSpiral(target, 175);
         currentSeries.reloadPlayerTeam(target);
         Stats.givelife(playerName, target);

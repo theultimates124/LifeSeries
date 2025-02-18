@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards;
 
+import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
@@ -60,10 +61,13 @@ public class WildcardManager {
 
     public static void resetWildcardsOnPlayerJoin(ServerPlayerEntity player) {
         if (!isActiveWildcard(Wildcards.SIZE_SHIFTING)) {
-            if (SizeShifting.getPlayerSize(player) != 1) SizeShifting.setPlayerSize(player, 1);
+            if (SizeShifting.getPlayerSize(player) != 1 && !TriviaBot.cursedGigantificationPlayers.contains(player.getUuid())) SizeShifting.setPlayerSize(player, 1);
         }
         if (!isActiveWildcard(Wildcards.HUNGER)) {
             player.removeStatusEffect(StatusEffects.HUNGER);
+        }
+        if (!isActiveWildcard(Wildcards.TRIVIA_BOT)) {
+            TriviaBots.resetPlayerOnBotSpawn(player);
         }
         TaskScheduler.scheduleTask(20, () -> {
             Hunger.updateInventory(player);

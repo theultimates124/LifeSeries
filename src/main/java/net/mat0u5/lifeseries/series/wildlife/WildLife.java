@@ -13,6 +13,7 @@ import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PermissionManager;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.WardenEntity;
@@ -24,6 +25,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 
 import java.util.List;
+import java.util.Objects;
 
 import static net.mat0u5.lifeseries.Main.seriesConfig;
 
@@ -129,6 +131,7 @@ public class WildLife extends Series {
         super.initialize();
         Snails.loadConfig();
         Snails.loadSnailNames();
+        TriviaBot.initializeItemSpawner();
     }
 
     @Override
@@ -173,5 +176,20 @@ public class WildLife extends Series {
 
             }
         }
+    }
+
+    @Override
+    public void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
+        super.onPlayerDeath(player, source);
+
+        TriviaBot.cursedGigantificationPlayers.remove(player.getUuid());
+        TriviaBot.cursedHeartPlayers.remove(player.getUuid());
+        resetMaxPlayerHealth(player);
+
+        TriviaBot.cursedMoonJumpPlayers.remove(player.getUuid());
+        //? if <=1.21 {
+        Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_JUMP_STRENGTH)).setBaseValue(0.41999998688697815);
+        //?} else
+        /*Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.JUMP_STRENGTH)).setBaseValue(0.41999998688697815);*/
     }
 }

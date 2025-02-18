@@ -127,9 +127,9 @@ public class SecretLife extends Series {
 
         //Spawn Eggs
         itemSpawner.addItem(new ItemStack(Items.WOLF_SPAWN_EGG), 15);
-        itemSpawner.addItem(new ItemStack(Items.PANDA_SPAWN_EGG), 5);
-        itemSpawner.addItem(new ItemStack(Items.SNIFFER_SPAWN_EGG), 3);
-        itemSpawner.addItem(new ItemStack(Items.TURTLE_SPAWN_EGG), 5);
+        itemSpawner.addItem(new ItemStack(Items.PANDA_SPAWN_EGG), 10);
+        itemSpawner.addItem(new ItemStack(Items.SNIFFER_SPAWN_EGG), 7);
+        itemSpawner.addItem(new ItemStack(Items.TURTLE_SPAWN_EGG), 10);
 
         ItemStack camel = new ItemStack(Items.CAMEL_SPAWN_EGG);
         ItemStack zombieHorse = new ItemStack(Items.ZOMBIE_HORSE_SPAWN_EGG);
@@ -172,7 +172,7 @@ public class SecretLife extends Series {
         ItemStackUtils.setCustomComponentBoolean(mace, "IgnoreBlacklist", true);
         ItemStackUtils.setCustomComponentBoolean(mace, "NoMending", true);
         mace.setDamage(mace.getMaxDamage()-1);
-        itemSpawner.addItem(mace, 1);
+        itemSpawner.addItem(mace, 3);
 
         ItemStack patat = new ItemStack(Items.POISONOUS_POTATO);
         patat.set(DataComponentTypes.CUSTOM_NAME,Text.of("§6§l§nThe Sacred Patat"));
