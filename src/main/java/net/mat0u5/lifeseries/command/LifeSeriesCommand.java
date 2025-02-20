@@ -15,6 +15,8 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.io.File;
+
 import static net.mat0u5.lifeseries.Main.*;
 import static net.mat0u5.lifeseries.utils.PermissionManager.isAdmin;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -28,9 +30,6 @@ public class LifeSeriesCommand {
         dispatcher.register(
             literal("lifeseries")
                 .executes(context -> defaultCommand(context.getSource()))
-                .then(literal("config")
-                    .executes(context -> config(context.getSource()))
-                )
                 .then(literal("worlds")
                     .executes(context -> getWorlds(context.getSource()))
                 )
@@ -42,6 +41,10 @@ public class LifeSeriesCommand {
                 )
                 .then(literal("version")
                     .executes(context -> getVersion(context.getSource()))
+                )
+                .then(literal("config")
+                    .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                    .executes(context -> config(context.getSource()))
                 )
                 .then(literal("reload")
                     .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
@@ -107,14 +110,7 @@ public class LifeSeriesCommand {
     }
 
     public static int config(ServerCommandSource source) {
-        Text worldSavesText = Text.literal("Click").append(
-                Text.literal("here")
-                        .styled(style -> style
-                                .withColor(Formatting.BLUE)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, "./config/lifeseries"))
-                                .withUnderline(true)
-                        )).append(Text.of("§7 to open the folder where the Life Series config is."));
-        source.sendMessage(worldSavesText);
+        source.sendMessage(Text.of("§7 The life series config folder is located server-side at §a" + new File("./config/lifeseries").getAbsolutePath()));
         return 1;
     }
 

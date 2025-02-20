@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards;
 
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.*;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.SuperpowersWildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public enum Wildcards {
         if (wildcard == Wildcards.TIME_DILATION) return new TimeDilation();
         if (wildcard == Wildcards.TRIVIA) return new TriviaWildcard();
         if (wildcard == Wildcards.MOB_SWAP) return new MobSwap();
-        if (wildcard == Wildcards.SUPERPOWERS) return null;
+        if (wildcard == Wildcards.SUPERPOWERS) return new SuperpowersWildcard();
         if (wildcard == Wildcards.CALLBACK) return null;
         return null;
     }

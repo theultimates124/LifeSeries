@@ -282,7 +282,6 @@ public class TriviaWildcard extends Wildcard {
             usedEasyQuestions.clear();
             unusedQuestions = easyTrivia.getTriviaQuestions();
         }
-        OtherUtils.log("easy_left_"+unusedQuestions.size());
         if (unusedQuestions.isEmpty()) return TriviaQuestion.getDefault();
         TriviaQuestion result = unusedQuestions.get(rnd.nextInt(unusedQuestions.size()));
         usedEasyQuestions.add(result.getQuestion());
@@ -303,7 +302,6 @@ public class TriviaWildcard extends Wildcard {
             usedNormalQuestions.clear();
             unusedQuestions = normalTrivia.getTriviaQuestions();
         }
-        OtherUtils.log("normal_left_"+unusedQuestions.size());
         if (unusedQuestions.isEmpty()) return TriviaQuestion.getDefault();
         TriviaQuestion result = unusedQuestions.get(rnd.nextInt(unusedQuestions.size()));
         usedNormalQuestions.add(result.getQuestion());
@@ -324,7 +322,6 @@ public class TriviaWildcard extends Wildcard {
             usedHardQuestions.clear();
             unusedQuestions = hardTrivia.getTriviaQuestions();
         }
-        OtherUtils.log("hard_left_"+unusedQuestions.size());
         if (unusedQuestions.isEmpty()) return TriviaQuestion.getDefault();
         TriviaQuestion result = unusedQuestions.get(rnd.nextInt(unusedQuestions.size()));
         usedHardQuestions.add(result.getQuestion());

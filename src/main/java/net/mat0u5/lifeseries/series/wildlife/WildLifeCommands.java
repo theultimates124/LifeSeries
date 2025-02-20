@@ -8,6 +8,9 @@ import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Snails;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.Superpower;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.Superpowers;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.SuperpowersWildcard;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.command.CommandRegistryAccess;
@@ -90,21 +93,77 @@ public class WildLifeCommands {
                     )
                 )
         );
+        dispatcher.register(
+            literal("superpower")
+                .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
+                .then(literal("set")
+                    .then(argument("player", EntityArgumentType.player())
+                        .then(argument("superpower", StringArgumentType.string())
+                            .suggests((context, builder) -> CommandSource.suggestMatching(Superpowers.getImplementedStr(), builder))
+                            .executes(context -> setSuperpower(context.getSource(), EntityArgumentType.getPlayer(context, "player"), StringArgumentType.getString(context, "superpower")))
+                        )
+                    )
+                )
+                .then(literal("resetAll")
+                    .executes(context -> resetSuperpowers(context.getSource()))
+                )
+                .then(literal("setRandom")
+                    .executes(context -> setRandomSuperpowers(context.getSource()))
+                )
+                .then(literal("get")
+                    .then(argument("player", EntityArgumentType.player())
+                        .executes(context -> getSuperpower(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+                    )
+                )
+        );
+    }
+
+    public static int setRandomSuperpowers(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
+        SuperpowersWildcard.rollRandomSuperpowers();
+        source.sendMessage(Text.of("Deactivated everyone's superpowers."));
+        return 1;
+    }
+
+    public static int resetSuperpowers(ServerCommandSource source) {
+        if (checkBanned(source)) return -1;
+        SuperpowersWildcard.resetAllSuperpowers();
+        source.sendMessage(Text.of("Deactivated everyone's superpowers."));
+        return 1;
+    }
+
+    public static int getSuperpower(ServerCommandSource source, ServerPlayerEntity player) {
+        if (checkBanned(source)) return -1;
+        Superpowers superpower = SuperpowersWildcard.getSuperpower(player);
+        source.sendMessage(Text.of(player.getNameForScoreboard()+"'s superpower is " + Superpowers.getString(superpower)));
+        return 1;
+    }
+
+    public static int setSuperpower(ServerCommandSource source, ServerPlayerEntity player, String name) {
+        if (checkBanned(source)) return -1;
+        Superpowers superpower = Superpowers.fromString(name);
+        Superpower instance = Superpowers.getInstance(superpower);
+        SuperpowersWildcard.setSuperpower(player, instance);
+        source.sendMessage(Text.of("Set " + player.getNameForScoreboard()+"'s superpower to " + name));
+        return 1;
     }
 
     public static int setSnailName(ServerCommandSource source, ServerPlayerEntity player, String name) {
+        if (checkBanned(source)) return -1;
         Snails.setSnailName(player, name);
         source.sendMessage(Text.of("Set " + player.getNameForScoreboard()+"'s snail name to §o" + name));
         return 1;
     }
 
     public static int resetSnailName(ServerCommandSource source, ServerPlayerEntity player) {
+        if (checkBanned(source)) return -1;
         Snails.resetSnailName(player);
         source.sendMessage(Text.of("Reset " + player.getNameForScoreboard()+"'s snail name to §o"+player.getNameForScoreboard()+"'s Snail"));
         return 1;
     }
 
     public static int getSnailName(ServerCommandSource source, ServerPlayerEntity player) {
+        if (checkBanned(source)) return -1;
         source.sendMessage(Text.of(player.getNameForScoreboard()+"'s snail is called §o"+Snails.getSnailName(player)));
         return 1;
     }
