@@ -61,7 +61,6 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public static final RegistryKey<DamageType> SNAIL_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(Main.MOD_ID, "snail"));
     public static final Identifier ID = Identifier.of(Main.MOD_ID, "snail");
     public static final Model MODEL = BbModelLoader.load(ID);
-    public static final ChunkTicketType<ChunkPos> SNAIL_TICKET = ChunkTicketType.create("snail", Comparator.comparingLong(ChunkPos::toLong), 100);
     public static double GLOBAL_SPEED_MULTIPLIER = 1;
     public static boolean SHOULD_DROWN_PLAYER = true;
 

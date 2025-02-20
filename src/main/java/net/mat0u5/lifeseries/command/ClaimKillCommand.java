@@ -97,7 +97,7 @@ public class ClaimKillCommand {
         Text adminText = Text.literal("§7Click ").append(
                 Text.literal("here")
                         .styled(style -> style
-                                .withColor(Formatting.WHITE)
+                                .withColor(Formatting.BLUE)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/claimkill validate " + player.getNameForScoreboard() + " "+victim.getNameForScoreboard()))
                                 .withUnderline(true)
                         )).append(Text.of("§7 to accept the claim if you think it's valid."));

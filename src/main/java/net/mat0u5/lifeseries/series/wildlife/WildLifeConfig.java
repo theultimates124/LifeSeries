@@ -2,6 +2,8 @@ package net.mat0u5.lifeseries.series.wildlife;
 
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.config.ConfigManager;
+import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 
 import java.util.List;
 
@@ -80,8 +82,11 @@ public class WildLifeConfig extends ConfigManager {
         getOrCreateInt("wildcard_mobswap_spawn_mobs", 250);
         getOrCreateDouble("wildcard_mobswap_boss_chance_multiplier", 1);
 
-        getOrCreateBoolean("wildcard_triviabot_can_enter_boats", true);
-        getOrCreateInt("wildcard_triviabot_bots_per_player", 5);
+        getOrCreateBoolean("wildcard_trivia_bots_can_enter_boats", true);
+        getOrCreateInt("wildcard_trivia_bots_per_player", 5);
+        getOrCreateInt("wildcard_trivia_seconds_easy", 180);
+        getOrCreateInt("wildcard_trivia_seconds_normal", 240);
+        getOrCreateInt("wildcard_trivia_seconds_hard", 300);
 
         getOrCreateInt("max_player_health", 20);
         getOrCreateInt("default_lives", 6);

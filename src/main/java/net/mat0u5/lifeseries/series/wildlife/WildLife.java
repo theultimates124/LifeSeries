@@ -153,8 +153,11 @@ public class WildLife extends Series {
         MobSwap.SPAWN_MOBS = seriesConfig.getOrCreateInt("wildcard_mobswap_spawn_mobs", 250);
         MobSwap.BOSS_CHANCE_MULTIPLIER = seriesConfig.getOrCreateDouble("wildcard_mobswap_boss_chance_multiplier", 1);
 
-        TriviaBot.CAN_START_RIDING = seriesConfig.getOrCreateBoolean("wildcard_triviabot_can_enter_boats", true);
-        TriviaWildcard.TRIVIA_BOTS_PER_PLAYER = seriesConfig.getOrCreateInt("wildcard_triviabot_bots_per_player", 5);
+        TriviaBot.CAN_START_RIDING = seriesConfig.getOrCreateBoolean("wildcard_trivia_bots_can_enter_boats", true);
+        TriviaWildcard.TRIVIA_BOTS_PER_PLAYER = seriesConfig.getOrCreateInt("wildcard_trivia_bots_per_player", 5);
+        TriviaBot.EASY_TIME = seriesConfig.getOrCreateInt("wildcard_trivia_seconds_easy", 180);
+        TriviaBot.NORMAL_TIME = seriesConfig.getOrCreateInt("wildcard_trivia_seconds_normal", 240);
+        TriviaBot.HARD_TIME = seriesConfig.getOrCreateInt("wildcard_trivia_seconds_hard", 300);
 
         Snails.loadConfig();
         Snails.loadSnailNames();

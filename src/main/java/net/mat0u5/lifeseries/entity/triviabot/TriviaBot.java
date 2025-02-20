@@ -29,7 +29,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.control.MoveControl;
-import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.pathing.MobNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -76,13 +75,15 @@ import static net.mat0u5.lifeseries.Main.server;
 public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     public static final Identifier ID = Identifier.of(Main.MOD_ID, "triviabot");
     public static final Model MODEL = BbModelLoader.load(ID);
-    public static final ChunkTicketType<ChunkPos> BOT_TICKET = ChunkTicketType.create("triviabot", Comparator.comparingLong(ChunkPos::toLong), 100);
 
     public static final int STATIONARY_TP_COOLDOWN = 400; // No movement for 20 seconds teleports the bot
     public static final float MOVEMENT_SPEED = 0.45f;
     public static final int MAX_DISTANCE = 100;
     public static boolean CAN_START_RIDING = true;
     public static ItemSpawner itemSpawner;
+    public static int EASY_TIME = 180;
+    public static int NORMAL_TIME = 240;
+    public static int HARD_TIME = 300;
 
     public boolean gliding = false;
 
@@ -484,8 +485,11 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
         if (!interactedWith || question == null) {
             interactedAt = System.currentTimeMillis();
-            difficulty = 1;
+            difficulty = 1+getRandom().nextInt(3);
             timeToComplete = difficulty * 60 + 120;
+            if (difficulty == 1) timeToComplete = EASY_TIME;
+            if (difficulty == 2) timeToComplete = NORMAL_TIME;
+            if (difficulty == 3) timeToComplete = HARD_TIME;
             question = TriviaWildcard.getTriviaQuestion(difficulty);
         }
         NetworkHandlerServer.sendTriviaPacket(boundPlayer, question.getQuestion(), difficulty, interactedAt, timeToComplete, question.getAnswers());

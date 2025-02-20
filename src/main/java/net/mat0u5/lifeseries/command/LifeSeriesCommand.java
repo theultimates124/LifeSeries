@@ -21,8 +21,6 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class LifeSeriesCommand {
-    public static final String Credits_ModCreator = "Mat0u5";
-    public static final String Credits_IdeaCreator = "Grian";
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess commandRegistryAccess,
@@ -30,6 +28,9 @@ public class LifeSeriesCommand {
         dispatcher.register(
             literal("lifeseries")
                 .executes(context -> defaultCommand(context.getSource()))
+                .then(literal("config")
+                    .executes(context -> config(context.getSource()))
+                )
                 .then(literal("worlds")
                     .executes(context -> getWorlds(context.getSource()))
                 )
@@ -105,11 +106,23 @@ public class LifeSeriesCommand {
         Main.changeSeriesTo(setTo);
     }
 
+    public static int config(ServerCommandSource source) {
+        Text worldSavesText = Text.literal("Click").append(
+                Text.literal("here")
+                        .styled(style -> style
+                                .withColor(Formatting.BLUE)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, "./config/lifeseries"))
+                                .withUnderline(true)
+                        )).append(Text.of("§7 to open the folder where the Life Series config is."));
+        source.sendMessage(worldSavesText);
+        return 1;
+    }
+
     public static int getWorlds(ServerCommandSource source) {
         Text worldSavesText = Text.literal("§7Additionally, if you want to play on the exact same worlds as Grian did, click ").append(
                 Text.literal("here")
                         .styled(style -> style
-                                .withColor(Formatting.WHITE)
+                                .withColor(Formatting.BLUE)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.dropbox.com/scl/fo/jk9fhqx0jjbgeo2qa6v5i/AOZZxMx6S7MlS9HrIRJkkX4?rlkey=2khwcnf2zhgi6s4ik01e3z9d0&st=ghw1d8k6&dl=0"))
                                 .withUnderline(true)
                         )).append(Text.of("§7 to open a dropbox where you can download the pre-made worlds."));
@@ -151,9 +164,9 @@ public class LifeSeriesCommand {
     }
 
     public static int getCredits(ServerCommandSource source) {
-        source.sendMessage(Text.of("The Life Series was originally created by " + Credits_IdeaCreator +
+        source.sendMessage(Text.of("The Life Series was originally created by Grian" +
                 ", and this mod aims to implement every season of the Life Series. "));
-        source.sendMessage(Text.of("This mod was created by " + Credits_ModCreator + "."));
+        source.sendMessage(Text.of("This mod was created by Mat0u5."));
         return 1;
     }
 
