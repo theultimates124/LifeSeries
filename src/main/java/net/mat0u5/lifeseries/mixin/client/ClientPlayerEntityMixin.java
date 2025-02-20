@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.mixin.client;
 
 import net.mat0u5.lifeseries.MainClient;
+import net.mat0u5.lifeseries.client.ClientKeybinds;
 import net.mat0u5.lifeseries.network.NetworkHandlerClient;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
@@ -16,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ClientPlayerEntityMixin {
     @Inject(method = "tick", at = @At("TAIL"))
     private void tick(CallbackInfo ci) {
+        ClientKeybinds.tick();
         if (MainClient.clientCurrentSeries != SeriesList.WILD_LIFE) return;
         if (!MainClient.clientActiveWildcards.contains(Wildcards.SIZE_SHIFTING)) return;
         ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;

@@ -107,4 +107,8 @@ public class NetworkHandlerClient {
     public static void sendHoldingJumpPacket() {
         ClientPlayNetworking.send(new StringPayload("holding_jump", "true"));
     }
+
+    public static void pressSuperpowerKey() {
+        ClientPlayNetworking.send(new StringPayload("superpower_key", "true"));
+    }
 }

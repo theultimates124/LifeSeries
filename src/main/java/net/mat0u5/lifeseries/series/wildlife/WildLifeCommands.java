@@ -121,50 +121,49 @@ public class WildLifeCommands {
     public static int setRandomSuperpowers(ServerCommandSource source) {
         if (checkBanned(source)) return -1;
         SuperpowersWildcard.rollRandomSuperpowers();
-        source.sendMessage(Text.of("Deactivated everyone's superpowers."));
+        source.sendMessage(Text.of("§7Randomized everyone's superpowers."));
         return 1;
     }
 
     public static int resetSuperpowers(ServerCommandSource source) {
         if (checkBanned(source)) return -1;
         SuperpowersWildcard.resetAllSuperpowers();
-        source.sendMessage(Text.of("Deactivated everyone's superpowers."));
+        source.sendMessage(Text.of("§7Deactivated everyone's superpowers."));
         return 1;
     }
 
     public static int getSuperpower(ServerCommandSource source, ServerPlayerEntity player) {
         if (checkBanned(source)) return -1;
         Superpowers superpower = SuperpowersWildcard.getSuperpower(player);
-        source.sendMessage(Text.of(player.getNameForScoreboard()+"'s superpower is " + Superpowers.getString(superpower)));
+        source.sendMessage(Text.of("§7"+player.getNameForScoreboard()+"'s superpower is: §f" + Superpowers.getString(superpower)));
         return 1;
     }
 
     public static int setSuperpower(ServerCommandSource source, ServerPlayerEntity player, String name) {
         if (checkBanned(source)) return -1;
         Superpowers superpower = Superpowers.fromString(name);
-        Superpower instance = Superpowers.getInstance(superpower);
-        SuperpowersWildcard.setSuperpower(player, instance);
-        source.sendMessage(Text.of("Set " + player.getNameForScoreboard()+"'s superpower to " + name));
+        SuperpowersWildcard.setSuperpower(player, superpower);
+        source.sendMessage(Text.of("§7Set " + player.getNameForScoreboard()+"'s superpower to: §f" + name));
         return 1;
     }
 
     public static int setSnailName(ServerCommandSource source, ServerPlayerEntity player, String name) {
         if (checkBanned(source)) return -1;
         Snails.setSnailName(player, name);
-        source.sendMessage(Text.of("Set " + player.getNameForScoreboard()+"'s snail name to §o" + name));
+        source.sendMessage(Text.of("§7Set " + player.getNameForScoreboard()+"'s snail name to §f§o" + name));
         return 1;
     }
 
     public static int resetSnailName(ServerCommandSource source, ServerPlayerEntity player) {
         if (checkBanned(source)) return -1;
         Snails.resetSnailName(player);
-        source.sendMessage(Text.of("Reset " + player.getNameForScoreboard()+"'s snail name to §o"+player.getNameForScoreboard()+"'s Snail"));
+        source.sendMessage(Text.of("§7Reset " + player.getNameForScoreboard()+"'s snail name to §f§o"+player.getNameForScoreboard()+"'s Snail"));
         return 1;
     }
 
     public static int getSnailName(ServerCommandSource source, ServerPlayerEntity player) {
         if (checkBanned(source)) return -1;
-        source.sendMessage(Text.of(player.getNameForScoreboard()+"'s snail is called §o"+Snails.getSnailName(player)));
+        source.sendMessage(Text.of("§7"+player.getNameForScoreboard()+"'s snail is called §f§o"+Snails.getSnailName(player)));
         return 1;
     }
 
@@ -184,7 +183,7 @@ public class WildLifeCommands {
         wildcardInstance.deactivate();
         WildcardManager.activeWildcards.remove(wildcard);
 
-        source.sendMessage(Text.of("Deactivated " + wildcardName + "."));
+        source.sendMessage(Text.of("§7Deactivated §f" + wildcardName + "."));
         NetworkHandlerServer.sendUpdatePackets();
         return 1;
     }
@@ -207,13 +206,13 @@ public class WildLifeCommands {
         }
         TaskScheduler.scheduleTask(89, () -> WildcardManager.activeWildcards.put(wildcard, actualWildcard));
         WildcardManager.activateWildcards();
-        source.sendMessage(Text.of("Activated " + wildcardName + "."));
+        source.sendMessage(Text.of("§7Activated §f" + wildcardName + "."));
         return 1;
     }
 
     public static int listWildcards(ServerCommandSource source) {
         if (checkBanned(source)) return -1;
-        source.sendMessage(Text.of("Available Wildcards: " + String.join(", ", Wildcards.getWildcards())));
+        source.sendMessage(Text.of("§7Available Wildcards: §f" + String.join(", ", Wildcards.getWildcards())));
         return 1;
     }
 
