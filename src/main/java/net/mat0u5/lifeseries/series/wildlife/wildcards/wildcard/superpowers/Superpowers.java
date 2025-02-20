@@ -1,6 +1,6 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers;
 
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.TestSuperpower;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.TimeControl;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,7 +9,6 @@ import java.util.List;
 
 public enum Superpowers {
     NONE,
-    TEST,
 
     TIME_CONTROL,
     CREAKING,
@@ -29,7 +28,7 @@ public enum Superpowers {
     NECROMANCY;
 
     public static List<Superpowers> getImplemented() {
-        return List.of(TEST);
+        return List.of(TIME_CONTROL);
     }
 
     public static List<String> getImplementedStr() {
@@ -41,7 +40,7 @@ public enum Superpowers {
     }
     @Nullable
     public static Superpower getInstance(ServerPlayerEntity player, Superpowers superpower) {
-        if (superpower == TEST) return new TestSuperpower(player);
+        if (superpower == TIME_CONTROL) return new TimeControl(player);
         return null;
     }
 

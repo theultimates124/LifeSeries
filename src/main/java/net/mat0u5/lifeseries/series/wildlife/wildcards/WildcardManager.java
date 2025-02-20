@@ -142,6 +142,7 @@ public class WildcardManager {
 
     public static void tick() {
         for (Wildcard wildcard : activeWildcards.values()) {
+            wildcard.softTick();
             if (!wildcard.active) continue;
             wildcard.tick();
         }

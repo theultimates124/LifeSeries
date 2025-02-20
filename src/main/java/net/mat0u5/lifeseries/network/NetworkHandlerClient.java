@@ -4,11 +4,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.MainClient;
 import net.mat0u5.lifeseries.client.ClientHandler;
+import net.mat0u5.lifeseries.network.packets.*;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.Trivia;
-import net.mat0u5.lifeseries.network.packets.HandshakePayload;
-import net.mat0u5.lifeseries.network.packets.NumberPayload;
-import net.mat0u5.lifeseries.network.packets.StringPayload;
-import net.mat0u5.lifeseries.network.packets.TriviaQuestionPayload;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
@@ -41,6 +38,12 @@ public class NetworkHandlerClient {
             MinecraftClient client = context.client();
             client.execute(() -> {
                 Trivia.receiveTrivia(payload);
+            });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(LongPayload.ID, (payload, context) -> {
+            MinecraftClient client = context.client();
+            client.execute(() -> {
+                handleLongPacket(payload.name(),payload.number());
             });
         });
     }
@@ -84,6 +87,11 @@ public class NetworkHandlerClient {
         if (name.equalsIgnoreCase("player_min_mspt")) {
             Main.LOGGER.info("[PACKET_CLIENT] Updated min. player MSPT to "+ number);
             TimeDilation.MIN_PLAYER_MSPT = (float) number;
+        }
+    }
+    public static void handleLongPacket(String name, long number) {
+        if (name.equalsIgnoreCase("superpower_cooldown")) {
+            MainClient.SUPERPOWER_COOLDOWN_TIMESTAMP = number;
         }
     }
 

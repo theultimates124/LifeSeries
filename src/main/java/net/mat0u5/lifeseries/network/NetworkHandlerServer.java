@@ -4,10 +4,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.mat0u5.lifeseries.Main;
-import net.mat0u5.lifeseries.network.packets.HandshakePayload;
-import net.mat0u5.lifeseries.network.packets.NumberPayload;
-import net.mat0u5.lifeseries.network.packets.StringPayload;
-import net.mat0u5.lifeseries.network.packets.TriviaQuestionPayload;
+import net.mat0u5.lifeseries.network.packets.*;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
@@ -41,11 +38,13 @@ public class NetworkHandlerServer {
         PayloadTypeRegistry.playS2C().register(StringPayload.ID, StringPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(HandshakePayload.ID, HandshakePayload.CODEC);
         PayloadTypeRegistry.playS2C().register(TriviaQuestionPayload.ID, TriviaQuestionPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(LongPayload.ID, LongPayload.CODEC);
 
         PayloadTypeRegistry.playC2S().register(NumberPayload.ID, NumberPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(StringPayload.ID, StringPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(HandshakePayload.ID, HandshakePayload.CODEC);
         PayloadTypeRegistry.playC2S().register(TriviaQuestionPayload.ID, TriviaQuestionPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(LongPayload.ID, LongPayload.CODEC);
     }
     public static void registerServerReceiver() {
         ServerPlayNetworking.registerGlobalReceiver(HandshakePayload.ID, (payload, context) -> {
@@ -120,6 +119,13 @@ public class NetworkHandlerServer {
     public static void sendNumberPacket(ServerPlayerEntity player, String name, double number) {
         NumberPayload payload = new NumberPayload(name, number);
         Main.LOGGER.info("[PACKET_SERVER] Sending number packet to "+player.getNameForScoreboard()+": {"+name+": "+number+"}");
+        ServerPlayNetworking.send(player, payload);
+    }
+
+    public static void sendLongPacket(ServerPlayerEntity player, String name, long number) {
+        if (player == null) return;
+        LongPayload payload = new LongPayload(name, number);
+        Main.LOGGER.info("[PACKET_SERVER] Sending long packet to "+player.getNameForScoreboard()+": {"+name+": "+number+"}");
         ServerPlayNetworking.send(player, payload);
     }
 

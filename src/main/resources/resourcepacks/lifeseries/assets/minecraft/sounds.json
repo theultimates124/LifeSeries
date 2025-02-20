@@ -91,5 +91,7 @@
     "wildlife_snail_throw6": {"sounds": ["wildlife/snail/throw/throw6"]},
     "wildlife_snail_throw7": {"sounds": ["wildlife/snail/throw/throw7"]},
 
-    "wildlife_snail_walk": {"sounds": ["wildlife/snail/walk"]}
+    "wildlife_snail_walk": {"sounds": ["wildlife/snail/walk"]},
+	
+    "wildlife_superpowers": {"sounds": ["wildlife/superpowers/theme"]}
 }

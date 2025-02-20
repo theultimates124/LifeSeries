@@ -30,5 +30,6 @@ public abstract class Wildcard {
 
     public void tickSessionOn() {}
     public void tick() {}
+    public void softTick() {}
 
 }

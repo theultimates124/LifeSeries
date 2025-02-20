@@ -127,6 +127,12 @@ public class TimeDilation extends Wildcard {
         serverTickManager.setTickRate(rate);
     }
 
+    public static float getWorldSpeed() {
+        if (server == null) return 20;
+        ServerTickManager serverTickManager = server.getTickManager();
+        return serverTickManager.getTickRate();
+    }
+
     private static void adjustCreeperFuseTimes() {
         if (server == null) return;
         ServerTickManager serverTickManager = server.getTickManager();

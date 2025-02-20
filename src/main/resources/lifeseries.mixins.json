@@ -19,7 +19,8 @@
     "ServerPlayNetworkHandlerMixin",
     "SpawnEggItemMixin",
     "SpawnGroupMixin",
-    "SpawnHelperMixin"
+    "SpawnHelperMixin",
+    "superpowers.SleepManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
