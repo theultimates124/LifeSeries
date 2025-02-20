@@ -2,8 +2,6 @@ package net.mat0u5.lifeseries.mixin;
 
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
-import net.mat0u5.lifeseries.series.wildlife.WildLife;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -41,18 +39,4 @@ public abstract class PlayerEntityMixin {
             }
         }
     }
-
-    //? if <=1.21 {
-    
-    @Inject(method = "jump", at = @At("TAIL"))
-    public void onJump(CallbackInfo ci) {
-        if (!Main.isLogicalSide()) return;
-        PlayerEntity player = (PlayerEntity) (Object) this;
-        if (currentSeries instanceof WildLife wildLife) {
-            if (player instanceof ServerPlayerEntity serverPlayer) {
-                WildcardManager.onJump(serverPlayer);
-            }
-        }
-    }
-     //?}
 }

@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard;
 
 import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -22,11 +23,8 @@ public class SizeShifting extends Wildcard {
     public static double MAX_SIZE = 3;
 
     public static double SIZE_CHANGE_MULTIPLIER = 1;
-    public static double SNEAK_STEP = -0.0015;
-    public static double JUMP_STEP = 0.015;
-    public static int JUMP_STEP_TIME = 5;
-    private static HashMap<UUID, Integer> ticksAddingSize = new HashMap<>();
-
+    public static double SIZE_CHANGE_STEP = 0.0015;
+    
     @Override
     public Wildcards getType() {
         return Wildcards.SIZE_SHIFTING;
@@ -38,25 +36,14 @@ public class SizeShifting extends Wildcard {
             if (TriviaBot.cursedGigantificationPlayers.contains(player.getUuid())) return;
             if (player.isSpectator()) continue;
             if (player.isSneaking()) {
-                addPlayerSize(player, SNEAK_STEP * SIZE_CHANGE_MULTIPLIER);
-            }
-            if (ticksAddingSize.containsKey(player.getUuid())) {
-                addPlayerSize(player, (JUMP_STEP / JUMP_STEP_TIME) * SIZE_CHANGE_MULTIPLIER);
-                int remaining = ticksAddingSize.get(player.getUuid());
-                remaining--;
-                if (remaining > 0) {
-                    ticksAddingSize.put(player.getUuid(), remaining);
-                }
-                else {
-                    ticksAddingSize.remove(player.getUuid());
-                }
+                addPlayerSize(player, -SIZE_CHANGE_STEP * SIZE_CHANGE_MULTIPLIER);
             }
         }
     }
 
-    public void onJump(ServerPlayerEntity player) {
-        if (!active) return;
-        ticksAddingSize.put(player.getUuid(), JUMP_STEP_TIME);
+    public static void onHoldingJump(ServerPlayerEntity player) {
+        if (TriviaBot.cursedGigantificationPlayers.contains(player.getUuid())) return;
+        addPlayerSize(player, SIZE_CHANGE_STEP * SIZE_CHANGE_MULTIPLIER);
     }
 
     public static float getPlayerSize(ServerPlayerEntity player) {

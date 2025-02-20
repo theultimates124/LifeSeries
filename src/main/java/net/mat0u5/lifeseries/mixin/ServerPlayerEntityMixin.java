@@ -1,9 +1,6 @@
 package net.mat0u5.lifeseries.mixin;
 
 import net.mat0u5.lifeseries.Main;
-import net.mat0u5.lifeseries.series.wildlife.WildLife;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -33,16 +30,6 @@ public class ServerPlayerEntityMixin {
             currentSeries.onPlayerRespawn(Objects.requireNonNull(Objects.requireNonNull(player.getServer()).getPlayerManager().getPlayer(uuid)));
         });
     }
-
-    //? if >= 1.21.2 {
-    /*@Inject(method = "jump", at = @At("TAIL"))
-    public void onJump(CallbackInfo ci) {
-        ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-        if (currentSeries instanceof WildLife wildLife) {
-            WildcardManager.onJump(player);
-        }
-    }
-     *///?}
 
     @Inject(method = "openHandledScreen", at = @At("HEAD"))
     private void onInventoryOpen(@Nullable NamedScreenHandlerFactory factory, CallbackInfoReturnable<OptionalInt> cir) {

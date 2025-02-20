@@ -1,4 +1,4 @@
-package net.mat0u5.lifeseries.mixin;
+package net.mat0u5.lifeseries.mixin.client;
 
 import net.mat0u5.lifeseries.MainClient;
 import net.minecraft.block.Block;

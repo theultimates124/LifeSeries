@@ -25,9 +25,10 @@
     "defaultRequire": 1
   },
   "client": [
-    "BlockMixin",
-    "ClientPlayNetworkHandlerMixin",
-    "MinecraftClientMixin",
-    "SoundSystemMixin"
+    "client.BlockMixin",
+    "client.ClientPlayerEntityMixin",
+    "client.ClientPlayNetworkHandlerMixin",
+    "client.MinecraftClientMixin",
+    "client.SoundSystemMixin"
   ]
 }

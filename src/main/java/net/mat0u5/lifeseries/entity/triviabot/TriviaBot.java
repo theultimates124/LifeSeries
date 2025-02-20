@@ -118,7 +118,6 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
-        OtherUtils.log("writeCustomDataToNbt");
         super.writeCustomDataToNbt(nbt);
         if (boundPlayerUUID == null) return;
         nbt.putUuid("boundPlayer", boundPlayerUUID);
@@ -126,7 +125,6 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
-        OtherUtils.log("readCustomDataFromNbt");
         super.readCustomDataFromNbt(nbt);
         UUID newUUID = nbt.getUuid("boundPlayer");
         if (newUUID != null) {
@@ -257,7 +255,6 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     public void chunkLoading() {
         if (getWorld() instanceof ServerWorld world) {
             if ((--this.chunkTicketExpiryTicks <= 0L)) {
-                OtherUtils.log("chunkLoading");
                 world.resetIdleTimeout();
                 this.chunkTicketExpiryTicks = addTicket(world) - 20L;
             }

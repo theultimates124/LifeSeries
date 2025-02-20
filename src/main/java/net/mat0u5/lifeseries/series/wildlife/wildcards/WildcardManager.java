@@ -177,13 +177,6 @@ public class WildcardManager {
         return activeWildcards.containsKey(wildcard);
     }
 
-    public static void onJump(ServerPlayerEntity player) {
-        if (!isActiveWildcard(Wildcards.SIZE_SHIFTING)) return;
-        if (activeWildcards.get(Wildcards.SIZE_SHIFTING) instanceof SizeShifting sizeShifting) {
-            sizeShifting.onJump(player);
-        }
-    }
-
     public static void onUseItem(ServerPlayerEntity player) {
         Hunger.onUseItem(player);
     }

@@ -21,6 +21,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 
 import java.util.List;
@@ -166,13 +167,11 @@ public class WildLife extends Series {
         super.modifyMobDrops(entity, damageSource);
         if (damageSource.getSource() instanceof PlayerEntity) {
             if (entity instanceof WardenEntity || entity instanceof WitherEntity) {
-
                 //? if <= 1.21 {
                 entity.dropStack(Items.TOTEM_OF_UNDYING.getDefaultStack());
                  //?} else {
                 /*entity.dropStack((ServerWorld) entity.getWorld(), Items.TOTEM_OF_UNDYING.getDefaultStack());
                 *///?}
-
             }
         }
     }

@@ -103,4 +103,8 @@ public class NetworkHandlerClient {
         ClientPlayNetworking.send(payload);
         Main.LOGGER.info("[PACKET_CLIENT] Sent handshake: {"+modVersionStr+", "+modVersion+"}");
     }
+
+    public static void sendHoldingJumpPacket() {
+        ClientPlayNetworking.send(new StringPayload("holding_jump", "true"));
+    }
 }

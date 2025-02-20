@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.network;
 
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.mat0u5.lifeseries.Main;
@@ -12,10 +13,12 @@ import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.DisconnectionInfo;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -58,12 +61,24 @@ public class NetworkHandlerServer {
                 handleNumberPacket(player, payload.name(), payload.number());
             });
         });
+        ServerPlayNetworking.registerGlobalReceiver(StringPayload.ID, (payload, context) -> {
+            ServerPlayerEntity player = context.player();
+            MinecraftServer server = context.server();
+            server.execute(() -> {
+                handleStringPacket(player, payload.name(),payload.value());
+            });
+        });
     }
     public static void handleNumberPacket(ServerPlayerEntity player, String name, double value) {
         int intValue = (int) value;
         if (name.equalsIgnoreCase("trivia_answer")) {
             Main.LOGGER.info("[PACKET_SERVER] Received trivia answer (from "+player.getNameForScoreboard()+"): "+ intValue);
             TriviaWildcard.handleAnswer(player, intValue);
+        }
+    }
+    public static void handleStringPacket(ServerPlayerEntity player, String name, String value) {
+        if (name.equalsIgnoreCase("holding_jump") && currentSeries.getSeries() == SeriesList.WILD_LIFE && WildcardManager.isActiveWildcard(Wildcards.SIZE_SHIFTING)) {
+            SizeShifting.onHoldingJump(player);
         }
     }
 

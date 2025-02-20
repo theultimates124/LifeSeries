@@ -1,10 +1,7 @@
-package net.mat0u5.lifeseries.mixin;
+package net.mat0u5.lifeseries.mixin.client;
 
 import net.mat0u5.lifeseries.MainClient;
-import net.mat0u5.lifeseries.series.SeriesList;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
-import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.world.tick.TickManager;
 import org.spongepowered.asm.mixin.Mixin;

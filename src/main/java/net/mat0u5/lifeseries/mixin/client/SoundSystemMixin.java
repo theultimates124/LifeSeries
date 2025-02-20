@@ -1,4 +1,4 @@
-package net.mat0u5.lifeseries.mixin;
+package net.mat0u5.lifeseries.mixin.client;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.SoundInstance;

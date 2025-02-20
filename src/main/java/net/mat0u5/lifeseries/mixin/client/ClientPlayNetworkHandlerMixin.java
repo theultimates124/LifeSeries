@@ -1,4 +1,4 @@
-package net.mat0u5.lifeseries.mixin;
+package net.mat0u5.lifeseries.mixin.client;
 
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.Trivia;
 import net.minecraft.client.MinecraftClient;
