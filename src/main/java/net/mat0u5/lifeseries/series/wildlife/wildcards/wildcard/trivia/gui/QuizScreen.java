@@ -1,13 +1,11 @@
-package net.mat0u5.lifeseries.client.trivia.gui;
+package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.mat0u5.lifeseries.client.trivia.Trivia;
-import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.Trivia;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.DisplayEntity;

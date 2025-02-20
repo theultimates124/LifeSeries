@@ -1,11 +1,10 @@
-package net.mat0u5.lifeseries.client.trivia.gui;
+package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.gui;
 
 
-import net.mat0u5.lifeseries.client.trivia.Trivia;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.Trivia;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 

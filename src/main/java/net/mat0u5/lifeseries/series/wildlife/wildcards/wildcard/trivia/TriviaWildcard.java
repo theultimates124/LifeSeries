@@ -1,12 +1,14 @@
-package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard;
+package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
 import net.mat0u5.lifeseries.network.packets.StringPayload;
 import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.Entity;
@@ -14,11 +16,12 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 
+import java.io.IOException;
 import java.util.*;
 
 import static net.mat0u5.lifeseries.Main.*;
 
-public class TriviaBots extends Wildcard {
+public class TriviaWildcard extends Wildcard {
     private static final Map<UUID, Queue<Integer>> playerSpawnQueue = new HashMap<>();
     private static final Map<UUID, Integer> spawnedBotsFor = new HashMap<>();
     private static boolean globalScheduleInitialized = false;
@@ -26,10 +29,14 @@ public class TriviaBots extends Wildcard {
     public static int activatedAt = -1;
     public static int TRIVIA_BOTS_PER_PLAYER = 5;
     public static int MIN_BOT_DELAY = 8400;
+    public static TriviaQuestionManager easyTrivia;
+    public static TriviaQuestionManager normalTrivia;
+    public static TriviaQuestionManager hardTrivia;
+    private static Random rnd = new Random();
 
     @Override
     public Wildcards getType() {
-        return Wildcards.TRIVIA_BOT;
+        return Wildcards.TRIVIA;
     }
 
     @Override
@@ -37,6 +44,39 @@ public class TriviaBots extends Wildcard {
         int passedTime = (int) ((float) currentSession.passedTime - activatedAt);
         if (passedTime % 20 == 0) trySpawnBots();
         if (passedTime % 200 == 0) updateDeadBots();
+    }
+    @Override
+    public void activate() {
+        usedEasyQuestions.clear();
+        usedNormalQuestions.clear();
+        usedHardQuestions.clear();
+        resetQueue();
+        spawnedBotsFor.clear();
+        activatedAt = (int) currentSession.passedTime;
+        bots.clear();
+        TriviaBot.cursedGigantificationPlayers.clear();
+        TriviaBot.cursedHeartPlayers.clear();
+        TriviaBot.cursedMoonJumpPlayers.clear();
+        super.activate();
+    }
+
+    @Override
+    public void deactivate() {
+        usedEasyQuestions.clear();
+        usedNormalQuestions.clear();
+        usedHardQuestions.clear();
+        resetQueue();
+        spawnedBotsFor.clear();
+        bots.clear();
+        killAllBots();
+        killAllTriviaSnails();
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            TriviaWildcard.resetPlayerOnBotSpawn(player);
+        }
+        TriviaBot.cursedGigantificationPlayers.clear();
+        TriviaBot.cursedHeartPlayers.clear();
+        TriviaBot.cursedMoonJumpPlayers.clear();
+        super.deactivate();
     }
 
     public void trySpawnBots() {
@@ -97,7 +137,6 @@ public class TriviaBots extends Wildcard {
         }
     }
 
-
     public void updateDeadBots() {
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             UUID playerUUID = player.getUuid();
@@ -110,39 +149,14 @@ public class TriviaBots extends Wildcard {
         }
     }
 
-    @Override
-    public void activate() {
-        resetQueue();
-        spawnedBotsFor.clear();
-        activatedAt = (int) currentSession.passedTime;
-        bots.clear();
-        TriviaBot.cursedGigantificationPlayers.clear();
-        TriviaBot.cursedHeartPlayers.clear();
-        TriviaBot.cursedMoonJumpPlayers.clear();
-        super.activate();
-    }
-
-    @Override
-    public void deactivate() {
-        resetQueue();
-        spawnedBotsFor.clear();
-        bots.clear();
-        killAllBots();
-        killAllTriviaSnails();
-        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
-            TriviaBots.resetPlayerOnBotSpawn(player);
-        }
-        TriviaBot.cursedGigantificationPlayers.clear();
-        TriviaBot.cursedHeartPlayers.clear();
-        TriviaBot.cursedMoonJumpPlayers.clear();
-        super.deactivate();
-    }
-
     public static void reload() {
         resetQueue();
     }
 
     public static void resetQueue() {
+        easyTrivia = new TriviaQuestionManager("./config/lifeseries/wildlife","easy-trivia.json");
+        normalTrivia = new TriviaQuestionManager("./config/lifeseries/wildlife","normal-trivia.json");
+        hardTrivia = new TriviaQuestionManager("./config/lifeseries/wildlife","hard-trivia.json");
         globalScheduleInitialized = false;
         playerSpawnQueue.clear();
     }
@@ -205,6 +219,7 @@ public class TriviaBots extends Wildcard {
         }
         toKill.forEach(Entity::discard);
     }
+
     public static void killAllTriviaSnails() {
         if (server == null) return;
         List<Entity> toKill = new ArrayList<>();
@@ -219,6 +234,7 @@ public class TriviaBots extends Wildcard {
         }
         toKill.forEach(Entity::discard);
     }
+
     public static void killTriviaSnailFor(ServerPlayerEntity player) {
         if (server == null) return;
         List<Entity> toKill = new ArrayList<>();
@@ -235,5 +251,83 @@ public class TriviaBots extends Wildcard {
             }
         }
         toKill.forEach(Entity::discard);
+    }
+
+    public static TriviaQuestion getTriviaQuestion(int difficulty) {
+        try {
+            if (difficulty == 1) {
+                return getEasyQuestion();
+            }
+            if (difficulty == 2) {
+                return getNormalQuestion();
+            }
+            return getHardQuestion();
+        }catch(Exception e) {
+            LOGGER.error(e.toString());
+            return TriviaQuestion.getDefault();
+        }
+    }
+
+    private static List<String> usedEasyQuestions = new ArrayList<>();
+    public static TriviaQuestion getEasyQuestion() throws IOException {
+        if (easyTrivia == null) {
+            easyTrivia = new TriviaQuestionManager("./config/lifeseries/wildlife","easy-trivia.json");
+        }
+        List<TriviaQuestion> unusedQuestions = new ArrayList<>();
+        for (TriviaQuestion trivia : easyTrivia.getTriviaQuestions()) {
+            if (usedEasyQuestions.contains(trivia.getQuestion())) continue;
+            unusedQuestions.add(trivia);
+        }
+        if (unusedQuestions.isEmpty()) {
+            usedEasyQuestions.clear();
+            unusedQuestions = easyTrivia.getTriviaQuestions();
+        }
+        OtherUtils.log("easy_left_"+unusedQuestions.size());
+        if (unusedQuestions.isEmpty()) return TriviaQuestion.getDefault();
+        TriviaQuestion result = unusedQuestions.get(rnd.nextInt(unusedQuestions.size()));
+        usedEasyQuestions.add(result.getQuestion());
+        return result;
+    }
+
+    private static List<String> usedNormalQuestions = new ArrayList<>();
+    public static TriviaQuestion getNormalQuestion() throws IOException {
+        if (normalTrivia == null) {
+            normalTrivia = new TriviaQuestionManager("./config/lifeseries/wildlife","normal-trivia.json");
+        }
+        List<TriviaQuestion> unusedQuestions = new ArrayList<>();
+        for (TriviaQuestion trivia : normalTrivia.getTriviaQuestions()) {
+            if (usedNormalQuestions.contains(trivia.getQuestion())) continue;
+            unusedQuestions.add(trivia);
+        }
+        if (unusedQuestions.isEmpty()) {
+            usedNormalQuestions.clear();
+            unusedQuestions = normalTrivia.getTriviaQuestions();
+        }
+        OtherUtils.log("normal_left_"+unusedQuestions.size());
+        if (unusedQuestions.isEmpty()) return TriviaQuestion.getDefault();
+        TriviaQuestion result = unusedQuestions.get(rnd.nextInt(unusedQuestions.size()));
+        usedNormalQuestions.add(result.getQuestion());
+        return result;
+    }
+
+    private static List<String> usedHardQuestions = new ArrayList<>();
+    public static TriviaQuestion getHardQuestion() throws IOException {
+        if (hardTrivia == null) {
+            hardTrivia = new TriviaQuestionManager("./config/lifeseries/wildlife","hard-trivia.json");
+        }
+        List<TriviaQuestion> unusedQuestions = new ArrayList<>();
+        for (TriviaQuestion trivia : hardTrivia.getTriviaQuestions()) {
+            if (usedHardQuestions.contains(trivia.getQuestion())) continue;
+            unusedQuestions.add(trivia);
+        }
+        if (unusedQuestions.isEmpty()) {
+            usedHardQuestions.clear();
+            unusedQuestions = hardTrivia.getTriviaQuestions();
+        }
+        OtherUtils.log("hard_left_"+unusedQuestions.size());
+        if (unusedQuestions.isEmpty()) return TriviaQuestion.getDefault();
+        TriviaQuestion result = unusedQuestions.get(rnd.nextInt(unusedQuestions.size()));
+        usedHardQuestions.add(result.getQuestion());
+        return result;
     }
 }

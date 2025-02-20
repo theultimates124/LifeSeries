@@ -4,11 +4,11 @@ import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
-import net.mat0u5.lifeseries.series.Boogeyman;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.*;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PermissionManager;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
@@ -21,7 +21,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 
 import java.util.List;
@@ -154,12 +153,12 @@ public class WildLife extends Series {
         MobSwap.BOSS_CHANCE_MULTIPLIER = seriesConfig.getOrCreateDouble("wildcard_mobswap_boss_chance_multiplier", 1);
 
         TriviaBot.CAN_START_RIDING = seriesConfig.getOrCreateBoolean("wildcard_triviabot_can_enter_boats", true);
-        TriviaBots.TRIVIA_BOTS_PER_PLAYER = seriesConfig.getOrCreateInt("wildcard_triviabot_bots_per_player", 5);
+        TriviaWildcard.TRIVIA_BOTS_PER_PLAYER = seriesConfig.getOrCreateInt("wildcard_triviabot_bots_per_player", 5);
 
         Snails.loadConfig();
         Snails.loadSnailNames();
         Snails.reloadSnailNames();
-        TriviaBots.reload();
+        TriviaWildcard.reload();
     }
 
     @Override

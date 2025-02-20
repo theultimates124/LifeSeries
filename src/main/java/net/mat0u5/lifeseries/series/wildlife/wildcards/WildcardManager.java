@@ -5,17 +5,15 @@ import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.SessionAction;
 import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.*;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +54,7 @@ public class WildcardManager {
         //activeWildcards.put(Wildcards.TIME_DILATION, new TimeDilation());
         //activeWildcards.put(Wildcards.SNAILS, new Snails());
         //activeWildcards.put(Wildcards.MOB_SWAP, new MobSwap());
-        activeWildcards.put(Wildcards.TRIVIA_BOT, new TriviaBots());
+        activeWildcards.put(Wildcards.TRIVIA, new TriviaWildcard());
     }
 
     public static void resetWildcardsOnPlayerJoin(ServerPlayerEntity player) {
@@ -66,8 +64,8 @@ public class WildcardManager {
         if (!isActiveWildcard(Wildcards.HUNGER)) {
             player.removeStatusEffect(StatusEffects.HUNGER);
         }
-        if (!isActiveWildcard(Wildcards.TRIVIA_BOT)) {
-            TriviaBots.resetPlayerOnBotSpawn(player);
+        if (!isActiveWildcard(Wildcards.TRIVIA)) {
+            TriviaWildcard.resetPlayerOnBotSpawn(player);
         }
         TaskScheduler.scheduleTask(20, () -> {
             Hunger.updateInventory(player);

@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.MainClient;
 import net.mat0u5.lifeseries.client.ClientHandler;
-import net.mat0u5.lifeseries.client.trivia.Trivia;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.Trivia;
 import net.mat0u5.lifeseries.network.packets.HandshakePayload;
 import net.mat0u5.lifeseries.network.packets.NumberPayload;
 import net.mat0u5.lifeseries.network.packets.StringPayload;

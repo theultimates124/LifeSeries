@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.series.SeriesList;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TriviaBots;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
@@ -161,7 +161,7 @@ public class LifeSeriesCommand {
         ServerPlayerEntity player = source.getPlayer();
         if (player == null) return -1;
         source.sendMessage(Text.of("Test Command 1"));
-        TriviaBots.spawnBotFor(player);
+        TriviaWildcard.spawnBotFor(player);
         return 1;
     }
 
@@ -169,7 +169,7 @@ public class LifeSeriesCommand {
         ServerPlayerEntity player = source.getPlayer();
         if (player == null) return -1;
         source.sendMessage(Text.of("Test Command 2"));
-        TriviaBots.killAllBots();
+        TriviaWildcard.killAllBots();
         return 1;
     }
     public static int test3(ServerCommandSource source) {

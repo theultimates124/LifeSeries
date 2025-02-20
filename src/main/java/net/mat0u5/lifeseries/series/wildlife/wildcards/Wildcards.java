@@ -1,6 +1,7 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards;
 
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.*;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ public enum Wildcards {
     HUNGER,
     SNAILS,
     TIME_DILATION,
-    TRIVIA_BOT,
+    TRIVIA,
     MOB_SWAP,
     SUPERPOWERS,
     CALLBACK;
@@ -21,7 +22,7 @@ public enum Wildcards {
         if (wildcard.equalsIgnoreCase("hunger")) return HUNGER;
         if (wildcard.equalsIgnoreCase("snails")) return SNAILS;
         if (wildcard.equalsIgnoreCase("time_dilation")) return TIME_DILATION;
-        if (wildcard.equalsIgnoreCase("trivia_bot")) return TRIVIA_BOT;
+        if (wildcard.equalsIgnoreCase("trivia")) return TRIVIA;
         if (wildcard.equalsIgnoreCase("mob_swap")) return MOB_SWAP;
         if (wildcard.equalsIgnoreCase("superpowers")) return SUPERPOWERS;
         if (wildcard.equalsIgnoreCase("callback")) return CALLBACK;
@@ -33,7 +34,7 @@ public enum Wildcards {
         if (wildcard == Wildcards.HUNGER) return new Hunger();
         if (wildcard == Wildcards.SNAILS) return new Snails();
         if (wildcard == Wildcards.TIME_DILATION) return new TimeDilation();
-        if (wildcard == Wildcards.TRIVIA_BOT) return new TriviaBots();
+        if (wildcard == Wildcards.TRIVIA) return new TriviaWildcard();
         if (wildcard == Wildcards.MOB_SWAP) return new MobSwap();
         if (wildcard == Wildcards.SUPERPOWERS) return null;
         if (wildcard == Wildcards.CALLBACK) return null;
@@ -45,7 +46,7 @@ public enum Wildcards {
         if (wildcard == Wildcards.HUNGER) return "hunger";
         if (wildcard == Wildcards.SNAILS) return "snails";
         if (wildcard == Wildcards.TIME_DILATION) return "time_dilation";
-        if (wildcard == Wildcards.TRIVIA_BOT) return "trivia_bot";
+        if (wildcard == Wildcards.TRIVIA) return "trivia";
         if (wildcard == Wildcards.MOB_SWAP) return "mob_swap";
         if (wildcard == Wildcards.SUPERPOWERS) return "superpowers";
         if (wildcard == Wildcards.CALLBACK) return "callback";
@@ -53,7 +54,7 @@ public enum Wildcards {
     }
 
     public static List<String> getWildcards() {
-        return List.of("size_shifting","hunger","snails","time_dilation","trivia_bot","mob_swap","superpowers","callback");
+        return List.of("size_shifting","hunger","snails","time_dilation","trivia","mob_swap","superpowers","callback");
     }
 
     public static List<String> getNonActiveWildcards() {

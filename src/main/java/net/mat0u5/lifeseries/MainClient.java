@@ -4,7 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.mat0u5.lifeseries.client.render.ClientRenderUtils;
+import net.mat0u5.lifeseries.client.ClientRenderUtils;
 import net.mat0u5.lifeseries.network.NetworkHandlerClient;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;

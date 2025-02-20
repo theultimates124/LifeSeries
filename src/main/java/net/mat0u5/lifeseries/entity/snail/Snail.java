@@ -15,7 +15,7 @@ import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Snails;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TriviaBots;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 import net.mat0u5.lifeseries.utils.AnimationUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.block.BlockState;
@@ -107,6 +107,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     public void setBoundPlayer(ServerPlayerEntity player) {
         if (player == null) return;
         boundPlayerUUID = player.getUuid();
+        writeCustomDataToNbt(new NbtCompound());
         updateSnailName();
     }
 
@@ -223,7 +224,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
                 }
             }
             else {
-                if (!WildcardManager.isActiveWildcard(Wildcards.TRIVIA_BOT)) {
+                if (!WildcardManager.isActiveWildcard(Wildcards.TRIVIA)) {
                     despawn();
                 }
                 else if (age >= 36000) {
@@ -254,7 +255,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
         handleHighVelocity();
         updatePathFinders();
-        //chunkLoading(); //TODO
+        chunkLoading();
         playSounds();
         clearStatusEffects();
     }
@@ -269,25 +270,21 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
     public void chunkLoading() {
         if (getWorld() instanceof ServerWorld world) {
-            int i = ChunkSectionPos.getSectionCoordFloored(this.getPos().getX());
-            int j = ChunkSectionPos.getSectionCoordFloored(this.getPos().getZ());
-            BlockPos blockPos = BlockPos.ofFloored(this.getPos());
-            ChunkPos chunkPos = this.getChunkPos();
-            if ((--this.chunkTicketExpiryTicks <= 0L || i != ChunkSectionPos.getSectionCoord(blockPos.getX()) || j != ChunkSectionPos.getSectionCoord(blockPos.getZ()))) {
+            if ((--this.chunkTicketExpiryTicks <= 0L)) {
                 world.resetIdleTimeout();
-                this.chunkTicketExpiryTicks = addTicket(world, chunkPos) - 5L;
+                this.chunkTicketExpiryTicks = addTicket(world) - 20L;
             }
         }
     }
 
-    public static long addTicket(ServerWorld world, ChunkPos chunkPos) {
-        world.getChunkManager().addTicket(SNAIL_TICKET, chunkPos, 2, chunkPos);
-        return SNAIL_TICKET.getExpiryTicks();
+    public long addTicket(ServerWorld world) {
+        world.getChunkManager().addTicket(ChunkTicketType.PORTAL, new ChunkPos(getBlockPos()), 1, getBlockPos());
+        return ChunkTicketType.PORTAL.getExpiryTicks();
     }
 
     public void despawn() {
         if (boundPlayerUUID != null) {
-            TriviaBots.bots.remove(boundPlayerUUID);
+            TriviaWildcard.bots.remove(boundPlayerUUID);
         }
         killPathFinders();
         //? if <= 1.21 {
@@ -496,6 +493,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
             this.playSound(SoundEvents.ENTITY_PLAYER_TELEPORT);
             AnimationUtils.spawnTeleportParticles(world, getPos());
+            this.chunkTicketExpiryTicks = 0L;
         }
     }
 
@@ -583,6 +581,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
 
     public void updateNavigationTarget() {
         if (getBoundPlayer() == null) return;
+        if (this.distanceTo(getBoundPlayer()) > MAX_DISTANCE) return;
         if (navigation instanceof BirdNavigation) {
             navigation.setSpeed(1);
             Path path = navigation.findPathTo(getBoundPlayer(), 0);

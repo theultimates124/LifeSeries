@@ -13,6 +13,7 @@ import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.entity.AnimationHandler;
 import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.entity.triviabot.goal.TriviaBotGlideGoal;
+import net.mat0u5.lifeseries.entity.triviabot.goal.TriviaBotLookAtPlayerGoal;
 import net.mat0u5.lifeseries.entity.triviabot.goal.TriviaBotTeleportGoal;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.network.packets.StringPayload;
@@ -20,18 +21,15 @@ import net.mat0u5.lifeseries.registries.MobRegistry;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.SizeShifting;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TriviaBots;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaQuestion;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.control.MoveControl;
+import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.pathing.MobNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -41,7 +39,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.RavagerEntity;
 import net.minecraft.entity.passive.BeeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
@@ -51,7 +48,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.EntityEffectParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.potion.Potions;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -98,6 +94,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     public Boolean answeredRight = null;
     public boolean ranOutOfTime = false;
     public int snailTransformation = 0;
+    public TriviaQuestion question;
 
     public int nullPlayerChecks = 0;
     private long chunkTicketExpiryTicks = 0L;
@@ -121,6 +118,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
+        OtherUtils.log("writeCustomDataToNbt");
         super.writeCustomDataToNbt(nbt);
         if (boundPlayerUUID == null) return;
         nbt.putUuid("boundPlayer", boundPlayerUUID);
@@ -128,6 +126,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
+        OtherUtils.log("readCustomDataFromNbt");
         super.readCustomDataFromNbt(nbt);
         UUID newUUID = nbt.getUuid("boundPlayer");
         if (newUUID != null) {
@@ -176,19 +175,21 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     public void setBoundPlayer(ServerPlayerEntity player) {
         if (player == null) return;
         boundPlayerUUID = player.getUuid();
+        writeCustomDataToNbt(new NbtCompound());
     }
 
     @Override
     protected void initGoals() {
         goalSelector.add(0, new TriviaBotTeleportGoal(this));
         goalSelector.add(1, new TriviaBotGlideGoal(this));
+        goalSelector.add(2, new TriviaBotLookAtPlayerGoal(this));
     }
 
     @Override
     public void tick() {
         super.tick();
         if (age % 100 == 0) {
-            if (!TriviaBots.bots.containsValue(this) || !WildcardManager.isActiveWildcard(Wildcards.TRIVIA_BOT)) {
+            if (!TriviaWildcard.bots.containsValue(this) || !WildcardManager.isActiveWildcard(Wildcards.TRIVIA)) {
                 despawn();
             }
         }
@@ -238,7 +239,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
         }
 
 
-        //chunkLoading(); //TODO
+        chunkLoading();
         clearStatusEffects();
         playSounds();
     }
@@ -255,25 +256,22 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
     public void chunkLoading() {
         if (getWorld() instanceof ServerWorld world) {
-            int i = ChunkSectionPos.getSectionCoordFloored(this.getPos().getX());
-            int j = ChunkSectionPos.getSectionCoordFloored(this.getPos().getZ());
-            BlockPos blockPos = BlockPos.ofFloored(this.getPos());
-            ChunkPos chunkPos = this.getChunkPos();
-            if ((--this.chunkTicketExpiryTicks <= 0L || i != ChunkSectionPos.getSectionCoord(blockPos.getX()) || j != ChunkSectionPos.getSectionCoord(blockPos.getZ()))) {
+            if ((--this.chunkTicketExpiryTicks <= 0L)) {
+                OtherUtils.log("chunkLoading");
                 world.resetIdleTimeout();
-                this.chunkTicketExpiryTicks = addTicket(world, chunkPos) - 5L;
+                this.chunkTicketExpiryTicks = addTicket(world) - 20L;
             }
         }
     }
 
-    public static long addTicket(ServerWorld world, ChunkPos chunkPos) {
-        world.getChunkManager().addTicket(BOT_TICKET, chunkPos, 2, chunkPos);
-        return BOT_TICKET.getExpiryTicks();
+    public long addTicket(ServerWorld world) {
+        world.getChunkManager().addTicket(ChunkTicketType.PORTAL, new ChunkPos(getBlockPos()), 2, getBlockPos());
+        return ChunkTicketType.PORTAL.getExpiryTicks();
     }
 
     public void despawn() {
         if (boundPlayerUUID != null) {
-            TriviaBots.bots.remove(boundPlayerUUID);
+            TriviaWildcard.bots.remove(boundPlayerUUID);
         }
         //? if <= 1.21 {
         this.kill();
@@ -394,6 +392,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
          *///?}
         this.playSound(SoundEvents.ENTITY_PLAYER_TELEPORT);
         AnimationUtils.spawnTeleportParticles(world, getPos());
+        this.chunkTicketExpiryTicks = 0L;
     }
 
     public int getRemainingTime() {
@@ -440,6 +439,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
 
     public void updateNavigationTarget() {
         if (getBoundPlayer() == null) return;
+        if (this.distanceTo(getBoundPlayer()) > MAX_DISTANCE) return;
         navigation.setSpeed(MOVEMENT_SPEED);
         Path path = navigation.findPathTo(getBoundPlayer(), 3);
         if (path != null) navigation.startMovingAlong(path, MOVEMENT_SPEED);
@@ -485,13 +485,13 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
         if (submittedAnswer) return ActionResult.PASS;
         if (interactedWith && getRemainingTime() <= 0) return ActionResult.PASS;
 
-        if (!interactedWith) {
+        if (!interactedWith || question == null) {
             interactedAt = System.currentTimeMillis();
             difficulty = 1;
             timeToComplete = difficulty * 60 + 120;
+            question = TriviaWildcard.getTriviaQuestion(difficulty);
         }
-
-        NetworkHandlerServer.sendTriviaPacket(boundPlayer, "Test test test test test test test test test test question :)", difficulty, interactedAt, timeToComplete, List.of("a b c d e f g h i j k l m n o p", "Grian", "Mumbo", "waaaaaaaaaaaaanjfebsjkfaes"));
+        NetworkHandlerServer.sendTriviaPacket(boundPlayer, question.getQuestion(), difficulty, interactedAt, timeToComplete, question.getAnswers());
         interactedWith = true;
 
         return ActionResult.PASS;
@@ -500,7 +500,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     public void handleAnswer(int answer) {
         if (submittedAnswer) return;
         submittedAnswer = true;
-        if (answer == 0) {
+        if (answer == question.getCorrectAnswerIndex()) {
             answeredCorrect();
         }
         else {

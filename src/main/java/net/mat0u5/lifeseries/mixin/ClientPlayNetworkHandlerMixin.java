@@ -1,7 +1,6 @@
 package net.mat0u5.lifeseries.mixin;
 
-import net.mat0u5.lifeseries.client.trivia.Trivia;
-import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.Trivia;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.text.Text;

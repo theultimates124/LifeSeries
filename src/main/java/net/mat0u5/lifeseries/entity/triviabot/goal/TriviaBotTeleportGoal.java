@@ -1,6 +1,5 @@
 package net.mat0u5.lifeseries.entity.triviabot.goal;
 
-import net.mat0u5.lifeseries.entity.snail.Snail;
 import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.network.ServerPlayerEntity;

@@ -13,7 +13,7 @@ import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Hunger;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TimeDilation;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.TriviaBots;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.network.DisconnectionInfo;
@@ -63,7 +63,7 @@ public class NetworkHandlerServer {
         int intValue = (int) value;
         if (name.equalsIgnoreCase("trivia_answer")) {
             Main.LOGGER.info("[PACKET_SERVER] Received trivia answer (from "+player.getNameForScoreboard()+"): "+ intValue);
-            TriviaBots.handleAnswer(player, intValue);
+            TriviaWildcard.handleAnswer(player, intValue);
         }
     }
 

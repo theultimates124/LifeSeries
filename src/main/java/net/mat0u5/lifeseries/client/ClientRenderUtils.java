@@ -1,12 +1,11 @@
-package net.mat0u5.lifeseries.client.render;
+package net.mat0u5.lifeseries.client;
 
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.mat0u5.lifeseries.client.trivia.Trivia;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.Trivia;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public class ClientRenderUtils {
