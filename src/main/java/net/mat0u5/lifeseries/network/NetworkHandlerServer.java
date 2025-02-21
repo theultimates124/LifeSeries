@@ -1,6 +1,5 @@
 package net.mat0u5.lifeseries.network;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.mat0u5.lifeseries.Main;
@@ -16,7 +15,6 @@ import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.Supe
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.DisconnectionInfo;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -39,12 +37,14 @@ public class NetworkHandlerServer {
         PayloadTypeRegistry.playS2C().register(HandshakePayload.ID, HandshakePayload.CODEC);
         PayloadTypeRegistry.playS2C().register(TriviaQuestionPayload.ID, TriviaQuestionPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(LongPayload.ID, LongPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(PlayerDisguisePayload.ID, PlayerDisguisePayload.CODEC);
 
         PayloadTypeRegistry.playC2S().register(NumberPayload.ID, NumberPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(StringPayload.ID, StringPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(HandshakePayload.ID, HandshakePayload.CODEC);
         PayloadTypeRegistry.playC2S().register(TriviaQuestionPayload.ID, TriviaQuestionPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(LongPayload.ID, LongPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(PlayerDisguisePayload.ID, PlayerDisguisePayload.CODEC);
     }
     public static void registerServerReceiver() {
         ServerPlayNetworking.registerGlobalReceiver(HandshakePayload.ID, (payload, context) -> {
@@ -149,6 +149,13 @@ public class NetworkHandlerServer {
         }
     }
 
+    public static void sendPlayerDisguise(String name, String disguisedEntity, String disguisedAsPlayer) {
+        PlayerDisguisePayload payload = new PlayerDisguisePayload(name, disguisedEntity.toString(), disguisedAsPlayer.toString());
+        for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
+            ServerPlayNetworking.send(player, payload);
+        }
+    }
+
     public static void tick() {
         HashMap<UUID, Integer> newAwaiting = new HashMap<>();
         for (Map.Entry<UUID, Integer> entry : awaitingHandshake.entrySet()) {
@@ -178,4 +185,5 @@ public class NetworkHandlerServer {
                         ));
         player.networkHandler.disconnect(new DisconnectionInfo(disconnectText));
     }
+
 }

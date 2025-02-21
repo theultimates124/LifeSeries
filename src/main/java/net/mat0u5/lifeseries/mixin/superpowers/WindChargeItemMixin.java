@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
-@Mixin(WindChargeItem.class)
+@Mixin(value = WindChargeItem.class, priority = 1)
 public class WindChargeItemMixin {
     @Inject(method = "use", at = @At("RETURN"))
     //? if <= 1.21 {

@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(Block.class)
+@Mixin(value = Block.class, priority = 1)
 public abstract class BlockMixin {
     @Inject(method = "getSlipperiness", at = @At("RETURN"), cancellable = true)
     private void injectSlipperiness(CallbackInfoReturnable<Float> cir) {

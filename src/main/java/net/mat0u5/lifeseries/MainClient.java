@@ -13,7 +13,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class MainClient implements ClientModInitializer {
 
@@ -22,6 +24,9 @@ public class MainClient implements ClientModInitializer {
     public static long TIME_DILATION_TIMESTAMP = 0;
     public static long SUPERPOWER_COOLDOWN_TIMESTAMP = 0;
     public static boolean CURSE_SLIDING = false;
+
+    public static HashMap<String, UUID> playerDisguise = new HashMap<>();
+
     @Override
     public void onInitializeClient() {
         FabricLoader.getInstance().getModContainer(Main.MOD_ID).ifPresent(container -> {

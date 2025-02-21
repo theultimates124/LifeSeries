@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
-@Mixin(AdvancedExplosionBehavior.class)
+@Mixin(value = AdvancedExplosionBehavior.class, priority = 1)
 public class AdvancedExplosionBehaviorMixin {
     @Inject(method = "getKnockbackModifier", at = @At("RETURN"), cancellable = true)
     public void getKnockbackModifier(Entity entity, CallbackInfoReturnable<Float> cir) {

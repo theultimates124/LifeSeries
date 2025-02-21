@@ -17,7 +17,7 @@ import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
-@Mixin(SleepManager.class)
+@Mixin(value = SleepManager.class, priority = 1)
 public abstract class SleepManagerMixin {
     @Inject(method = "canResetTime", at = @At("RETURN"), cancellable = true)
     public void canResetTime(int percentage, List<ServerPlayerEntity> players, CallbackInfoReturnable<Boolean> cir) {

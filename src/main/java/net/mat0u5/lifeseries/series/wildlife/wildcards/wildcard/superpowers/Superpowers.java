@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers;
 
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.AstralProjection;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.Creaking;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.TimeControl;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.WindCharge;
@@ -30,7 +31,7 @@ public enum Superpowers {
     NECROMANCY;
 
     public static List<Superpowers> getImplemented() {
-        return List.of(TIME_CONTROL, CREAKING, WIND_CHARGE);
+        return List.of(TIME_CONTROL, CREAKING, WIND_CHARGE, ASTRAL_PROJECTION);
     }
 
     @Nullable
@@ -38,6 +39,7 @@ public enum Superpowers {
         if (superpower == TIME_CONTROL) return new TimeControl(player);
         if (superpower == CREAKING) return new Creaking(player);
         if (superpower == WIND_CHARGE) return new WindCharge(player);
+        if (superpower == ASTRAL_PROJECTION) return new AstralProjection(player);
         return null;
     }
 

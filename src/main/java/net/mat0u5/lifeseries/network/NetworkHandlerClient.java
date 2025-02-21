@@ -15,6 +15,7 @@ import net.minecraft.client.MinecraftClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class NetworkHandlerClient {
     public static void registerClientReceiver() {
@@ -44,6 +45,12 @@ public class NetworkHandlerClient {
             MinecraftClient client = context.client();
             client.execute(() -> {
                 handleLongPacket(payload.name(),payload.number());
+            });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(PlayerDisguisePayload.ID, (payload, context) -> {
+            MinecraftClient client = context.client();
+            client.execute(() -> {
+                handlePlayerDisguise(payload.name(),payload.disguisedPlayerUUID(), payload.disguisedAsPlayerUUID());
             });
         });
     }
@@ -89,9 +96,23 @@ public class NetworkHandlerClient {
             TimeDilation.MIN_PLAYER_MSPT = (float) number;
         }
     }
+
     public static void handleLongPacket(String name, long number) {
         if (name.equalsIgnoreCase("superpower_cooldown")) {
             MainClient.SUPERPOWER_COOLDOWN_TIMESTAMP = number;
+        }
+    }
+
+    public static void handlePlayerDisguise(String name, String disguisedEntity, String disguisedAsPlayer) {
+        if (name.equalsIgnoreCase("player_disguise")) {
+            if (disguisedAsPlayer.isEmpty()) {
+                MainClient.playerDisguise.remove(disguisedEntity);
+            }
+            else {
+                try {
+                    MainClient.playerDisguise.put(disguisedEntity, UUID.fromString(disguisedAsPlayer));
+                }catch(Exception ignored) {}
+            }
         }
     }
 

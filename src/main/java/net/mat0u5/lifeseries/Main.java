@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class Main implements ModInitializer {
-	public static final String MOD_VERSION = "dev-1.2.2.58";
+	public static final String MOD_VERSION = "dev-1.2.2.59";
 	public static final String MOD_ID = "lifeseries";
 	public static final String GITHUB_API_URL = "https://api.github.com/repos/Mat0u5/LifeSeries/releases/latest";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
