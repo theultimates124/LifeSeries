@@ -369,7 +369,6 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     }
 
     public void teleportAbovePlayer(double minDistanceFromPlayer, int distanceAbove) {
-        distanceAbove = 0;//TODO remove
         ServerPlayerEntity player = getBoundPlayer();
         if (player == null) return;
         if (getWorld() instanceof ServerWorld world) {

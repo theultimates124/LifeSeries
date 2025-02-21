@@ -24,7 +24,7 @@ public class Session {
     public int currentTimer = 20;
 
     public Integer sessionLength = null;
-    public double passedTime;
+    public double passedTime = 0;
     public SessionStatus status = SessionStatus.NOT_STARTED;
 
     SessionAction endWarning1 = new SessionAction(OtherUtils.minutesToTicks(-5)) {
@@ -72,6 +72,7 @@ public class Session {
         OtherUtils.broadcastMessage(Text.literal("The session has ended!").formatted(Formatting.GOLD));
         Stats.sessionEnd();
         Stats.sendTranscriptToAdmins();
+        passedTime = 0;
     }
 
     public void sessionPause() {

@@ -92,10 +92,11 @@ public class OtherUtils {
         return hours+":"+ formatTimeNumber(minutes)+":"+ formatTimeNumber(seconds);
     }
 
-    public static String formatTimeNoHours(int totalTicks) {
-        int hours = totalTicks / 72000;
-        int minutes = (totalTicks % 72000) / 1200;
-        int seconds = (totalTicks % 1200) / 20;
+    public static String formatTimeMillis(long millis) {
+        long totalSeconds = (long) Math.ceil((double) millis / 1000.0);
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = (totalSeconds % 60);
         if (hours == 0) {
             return formatTimeNumber(minutes)+":"+ formatTimeNumber(seconds);
         }
@@ -104,6 +105,12 @@ public class OtherUtils {
     }
 
     public static String formatTimeNumber(int time) {
+        String value = String.valueOf(time);
+        while (value.length() < 2) value = "0" + value;
+        return value;
+    }
+
+    public static String formatTimeNumber(long time) {
         String value = String.valueOf(time);
         while (value.length() < 2) value = "0" + value;
         return value;

@@ -21,8 +21,8 @@ public class ClientRenderUtils {
     public static void renderHud(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
         int yPos = client.getWindow().getScaledHeight() - 10;
-        yPos += renderTriviaTimer(context, yPos);
         yPos += renderSuperpowerCooldown(context, yPos);
+        yPos += renderTriviaTimer(context, yPos);
     }
 
     public static int renderTriviaTimer(DrawContext context, int y) {
@@ -32,7 +32,7 @@ public class ClientRenderUtils {
 
         int secondsLeft = (int) Trivia.getRemainingTime();
 
-        Text actualTimer = Text.of(OtherUtils.formatTimeNoHours(secondsLeft*20));
+        Text actualTimer = Text.of(OtherUtils.formatTimeMillis(secondsLeft*1000L));
         Text timerText = Text.of("§7Trivia timer: ");
 
         int screenWidth = client.getWindow().getScaledWidth();
@@ -55,7 +55,7 @@ public class ClientRenderUtils {
         if (millisLeft > 10000000) return 0;
         MinecraftClient client = MinecraftClient.getInstance();
 
-        Text timerText = Text.of("§7Superpower cooldown: §f"+OtherUtils.formatTimeNoHours((int) (millisLeft / 50.0)));
+        Text timerText = Text.of("§7Superpower cooldown: §f"+OtherUtils.formatTimeMillis(millisLeft));
 
         int screenWidth = client.getWindow().getScaledWidth();
         int x = screenWidth - 10;

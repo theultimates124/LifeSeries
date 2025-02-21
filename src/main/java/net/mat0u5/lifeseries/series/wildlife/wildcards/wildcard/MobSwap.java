@@ -1,5 +1,8 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard;
 
+import net.mat0u5.lifeseries.entity.pathfinder.PathFinder;
+import net.mat0u5.lifeseries.entity.snail.Snail;
+import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
@@ -10,6 +13,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -158,8 +162,11 @@ public class MobSwap extends Wildcard {
 
     public int getDiv() {
         List<Integer> triggerTimes = new ArrayList<>();
-        triggerTimes.add(MAX_DELAY);
         int lastTime = 0;
+        if (MAX_DELAY > 2400) {
+            lastTime = 2400;
+            if (2400 > (currentSession.passedTime - activatedAt)) triggerTimes.add(2400);
+        }
         while (lastTime < currentSession.sessionLength) {
             float sessionProgress = ((float) lastTime) / (currentSession.sessionLength);
             sessionProgress = Math.max(0, Math.min(1, sessionProgress));
@@ -233,6 +240,9 @@ public class MobSwap extends Wildcard {
             world.iterateEntities().forEach((entity) -> {
                 if (!(entity instanceof LivingEntity)) return;
                 if (entity instanceof PlayerEntity) return;
+                if (entity instanceof Snail) return;
+                if (entity instanceof TriviaBot) return;
+                if (entity instanceof PathFinder) return;
                 if (entity.hasCustomName()) return;
                 toKill.add(entity);
             });
@@ -260,25 +270,26 @@ public class MobSwap extends Wildcard {
             world.iterateEntities().forEach((entity) -> {
                 if (!(entity instanceof LivingEntity)) return;
                 if (entity instanceof PlayerEntity) return;
+                if (entity instanceof Snail) return;
+                if (entity instanceof TriviaBot) return;
+                if (entity instanceof PathFinder) return;
                 if (entity.hasCustomName()) return;
 
-                //? if <=1.21 {
-                Entity newMob = getRandomMob(progress, dangerThresholdMin, dangerThresholdMax).create(world);
-                 //?} else {
-                /*Entity newMob = getRandomMob(progress, dangerThresholdMin, dangerThresholdMax).create(world, SpawnReason.COMMAND);
-                *///?}
-                if (newMob != null) {
-                    newMob.refreshPositionAndAngles(entity.getX(), entity.getY(), entity.getZ(), entity.getYaw(), entity.getPitch());
-                    newMob.addCommandTag("mobswap");
-                    if (newMob instanceof MobEntity mobEntity) {
-                        mobEntity.setPersistent();
+                EntityType<?> randomMob = getRandomMob(progress, dangerThresholdMin, dangerThresholdMax);
+                if (randomMob != null) {
+                    Entity newMob = randomMob.spawn(world, entity.getBlockPos(), SpawnReason.COMMAND);
+                    if (newMob != null) {
+                        newMob.refreshPositionAndAngles(entity.getX(), entity.getY(), entity.getZ(), entity.getYaw(), entity.getPitch());
+                        newMob.addCommandTag("mobswap");
+                        if (newMob instanceof MobEntity mobEntity) {
+                            mobEntity.setPersistent();
+                        }
+                        if (newMob instanceof WardenEntity wardenEntity) {
+                            wardenEntity.getBrain().remember(MemoryModuleType.DIG_COOLDOWN, Unit.INSTANCE, 12000000L);
+                        }
                     }
-                    if (newMob instanceof WardenEntity wardenEntity) {
-                        wardenEntity.getBrain().remember(MemoryModuleType.DIG_COOLDOWN, Unit.INSTANCE, 12000000L);
-                    }
-                    world.spawnEntity(newMob);
-                    toKill.add(entity);
                 }
+                toKill.add(entity);
             });
 
             toKill.forEach(Entity::discard);
@@ -320,6 +331,9 @@ public class MobSwap extends Wildcard {
             world.iterateEntities().forEach((entity) -> {
                 if (!(entity instanceof LivingEntity)) return;
                 if (entity instanceof PlayerEntity) return;
+                if (entity instanceof Snail) return;
+                if (entity instanceof TriviaBot) return;
+                if (entity instanceof PathFinder) return;
                 if (entity.hasCustomName()) return;
                 if (!entity.getCommandTags().contains("mobswap")) return;
                 toKill.add(entity);

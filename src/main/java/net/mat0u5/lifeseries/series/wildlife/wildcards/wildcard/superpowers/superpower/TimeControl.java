@@ -20,7 +20,7 @@ public class TimeControl extends Superpower {
 
     @Override
     public int getCooldownSeconds() {
-        return 240;//TODO this was just a guess.
+        return 240; //TODO
     }
 
     @Override
