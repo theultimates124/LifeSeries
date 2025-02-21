@@ -9,7 +9,7 @@ import java.util.UUID;
 import static net.mat0u5.lifeseries.Main.server;
 
 public abstract class Superpower {
-    public boolean active = true;
+    public boolean active = false;
     public long cooldown = 0;
     private final UUID playerUUID;
     public Superpower(ServerPlayerEntity player) {
@@ -34,20 +34,15 @@ public abstract class Superpower {
 
     public void onKeyPressed() {
         if (System.currentTimeMillis() < cooldown) {
-            cooldownFailed();
+            sendCooldownPacket();
             return;
         }
         activate();
     }
 
-    public void cooldownFailed() {
-        NetworkHandlerServer.sendLongPacket(getPlayer(), "superpower_cooldown", cooldown);
-    }
-
     public void activate() {
-        cooldown = System.currentTimeMillis()+ (getCooldownSeconds()* 1000L);
         active = true;
-        NetworkHandlerServer.sendLongPacket(getPlayer(), "superpower_cooldown", cooldown);
+        cooldown(getCooldownSeconds());
     }
 
     public void deactivate() {
@@ -56,5 +51,17 @@ public abstract class Superpower {
 
     public void turnOff() {
         //Fully deactivate superpower.
+        deactivate();
+    }
+
+    public void cooldown(int seconds) {
+        cooldown = System.currentTimeMillis()+ (seconds* 1000L);
+        if (System.currentTimeMillis() < (cooldown - 100)) {
+            sendCooldownPacket();
+        }
+    }
+
+    public void sendCooldownPacket() {
+        NetworkHandlerServer.sendLongPacket(getPlayer(), "superpower_cooldown", cooldown);
     }
 }

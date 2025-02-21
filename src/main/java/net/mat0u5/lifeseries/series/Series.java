@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.series;
 
 import net.mat0u5.lifeseries.config.ConfigManager;
 import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
+import net.mat0u5.lifeseries.series.wildlife.WildLife;
 import net.mat0u5.lifeseries.utils.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -15,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.scoreboard.ScoreHolder;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -67,6 +69,15 @@ public abstract class Series extends Session {
     public void reload() {}
 
     public void createTeams() {
+        Collection<Team> allTeams = TeamUtils.getAllTeams();
+        if (allTeams != null) {
+            for (Team team : allTeams) {
+                if (team.getName().startsWith("creaking_")) {
+                    TeamUtils.deleteTeam(team.getName());
+                }
+            }
+        }
+
         TeamUtils.createTeam("Dead", Formatting.DARK_GRAY);
         TeamUtils.createTeam("Unassigned", Formatting.GRAY);
 
@@ -74,6 +85,8 @@ public abstract class Series extends Session {
         TeamUtils.createTeam("Yellow", Formatting.YELLOW);
         TeamUtils.createTeam("Green", Formatting.GREEN);
         TeamUtils.createTeam("DarkGreen", Formatting.DARK_GREEN);
+
+
     }
 
     public Formatting getColorForLives(Integer lives) {
@@ -106,6 +119,7 @@ public abstract class Series extends Session {
     }
 
     public void reloadPlayerTeam(ServerPlayerEntity player) {
+        if (player == null) return;
         if (!player.isDead()) {
             reloadPlayerTeamActual(player);
         }
@@ -116,12 +130,13 @@ public abstract class Series extends Session {
 
     public void reloadPlayerTeamActual(ServerPlayerEntity player) {
         Integer lives = getPlayerLives(player);
-        if (lives == null) TeamUtils.addPlayerToTeam("Unassigned",player);
-        else if (lives <= 0) TeamUtils.addPlayerToTeam("Dead",player);
-        else if (lives == 1) TeamUtils.addPlayerToTeam("Red",player);
-        else if (lives == 2) TeamUtils.addPlayerToTeam("Yellow",player);
-        else if (lives == 3) TeamUtils.addPlayerToTeam("Green",player);
-        else if (lives >= 4) TeamUtils.addPlayerToTeam("DarkGreen",player);
+        if (lives == null) TeamUtils.addEntityToTeam("Unassigned",player);
+        else if (lives <= 0) TeamUtils.addEntityToTeam("Dead",player);
+        else if (lives == 1) TeamUtils.addEntityToTeam("Red",player);
+        else if (lives == 2) TeamUtils.addEntityToTeam("Yellow",player);
+        else if (lives == 3) TeamUtils.addEntityToTeam("Green",player);
+        else if (lives >= 4) TeamUtils.addEntityToTeam("DarkGreen",player);
+        if (currentSeries.getSeries() == SeriesList.WILD_LIFE) WildLife.changedPlayerTeam(player);
     }
 
     public Integer getPlayerLives(ServerPlayerEntity player) {

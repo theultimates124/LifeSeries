@@ -94,11 +94,11 @@ public class LimitedLife extends Series {
     @Override
     public void reloadPlayerTeamActual(ServerPlayerEntity player) {
         Integer lives = getPlayerLives(player);
-        if (lives == null) TeamUtils.addPlayerToTeam("Unassigned",player);
-        else if (lives <= 0) TeamUtils.addPlayerToTeam("Dead",player);
-        else if (lives >= YELLOW_TIME) TeamUtils.addPlayerToTeam("Green",player);
-        else if (lives >= RED_TIME) TeamUtils.addPlayerToTeam("Yellow",player);
-        else if (lives >= 1) TeamUtils.addPlayerToTeam("Red",player);
+        if (lives == null) TeamUtils.addEntityToTeam("Unassigned",player);
+        else if (lives <= 0) TeamUtils.addEntityToTeam("Dead",player);
+        else if (lives >= YELLOW_TIME) TeamUtils.addEntityToTeam("Green",player);
+        else if (lives >= RED_TIME) TeamUtils.addEntityToTeam("Yellow",player);
+        else if (lives >= 1) TeamUtils.addEntityToTeam("Red",player);
     }
 
     @Override

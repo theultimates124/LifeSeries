@@ -1,11 +1,16 @@
 package net.mat0u5.lifeseries.utils;
 
 import net.mat0u5.lifeseries.Main;
+import net.minecraft.entity.Entity;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.List;
 
 import static net.mat0u5.lifeseries.Main.server;
 
@@ -23,7 +28,7 @@ public class TeamUtils {
         team.setColor(color);
     }
 
-    public static void addPlayerToTeam(String teamName, ServerPlayerEntity player) {
+    public static void addEntityToTeam(String teamName, Entity entity) {
         if (server == null) return;
         Scoreboard scoreboard = server.getScoreboard();
         Team team = scoreboard.getTeam(teamName);
@@ -33,7 +38,7 @@ public class TeamUtils {
             return;
         }
 
-        scoreboard.addScoreHolderToTeam(player.getNameForScoreboard(), team);
+        scoreboard.addScoreHolderToTeam(entity.getNameForScoreboard(), team);
     }
 
     public static boolean removePlayerFromTeam(ServerPlayerEntity player) {
@@ -57,7 +62,6 @@ public class TeamUtils {
         Team team = scoreboard.getTeam(teamName);
 
         if (team == null) {
-            Main.LOGGER.warn("Team with name " + teamName + " does not exist!");
             return false;
         }
 
@@ -69,5 +73,11 @@ public class TeamUtils {
         if (server == null) return null;
         Scoreboard scoreboard = server.getScoreboard();
         return scoreboard.getScoreHolderTeam(player.getNameForScoreboard());
+    }
+
+    public static Collection<Team> getAllTeams() {
+        if (server == null) return null;
+        Scoreboard scoreboard = server.getScoreboard();
+        return scoreboard.getTeams();
     }
 }

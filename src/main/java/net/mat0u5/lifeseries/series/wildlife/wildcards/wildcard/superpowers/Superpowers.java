@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers;
 
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.Creaking;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.TimeControl;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +18,7 @@ public enum Superpowers {
     SUPER_PUNCH,
     MIMICRY,
     TELEPORTATION,
-    LISTENING,
+    //LISTENING,
     SHADOW_PLAY,
     FLIGHT,
     PLAYER_DISGUISE,
@@ -28,7 +29,7 @@ public enum Superpowers {
     NECROMANCY;
 
     public static List<Superpowers> getImplemented() {
-        return List.of(TIME_CONTROL);
+        return List.of(TIME_CONTROL, CREAKING);
     }
 
     public static List<String> getImplementedStr() {
@@ -41,6 +42,7 @@ public enum Superpowers {
     @Nullable
     public static Superpower getInstance(ServerPlayerEntity player, Superpowers superpower) {
         if (superpower == TIME_CONTROL) return new TimeControl(player);
+        if (superpower == CREAKING) return new Creaking(player);
         return null;
     }
 
