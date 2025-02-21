@@ -25,7 +25,7 @@ public abstract class PlayerInventoryMixin {
         PlayerEntity player = inventory.player;
         if (player instanceof ServerPlayerEntity serverPlayer) {
             if (blacklist != null) {
-                blacklist.onInventoryUpdated(serverPlayer,inventory,ci);
+                blacklist.onInventoryUpdated(serverPlayer,inventory);
             }
             if (currentSeries instanceof WildLife) {
                 if (!WildcardManager.isActiveWildcard(Wildcards.HUNGER)) {

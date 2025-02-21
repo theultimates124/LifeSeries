@@ -86,4 +86,9 @@ public class SuperpowersWildcard extends Wildcard {
         if (!playerSuperpowers.containsKey(player.getUuid())) return false;
         return playerSuperpowers.get(player.getUuid()).getSuperpower() == superpower;
     }
+
+    public static boolean hasActivatedPower(ServerPlayerEntity player, Superpowers superpower) {
+        if (!playerSuperpowers.containsKey(player.getUuid())) return false;
+        return playerSuperpowers.get(player.getUuid()).active;
+    }
 }

@@ -19,6 +19,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
@@ -26,6 +27,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 import java.util.Objects;
@@ -202,6 +204,13 @@ public class WildLife extends Series {
             if (SuperpowersWildcard.playerSuperpowers.get(player.getUuid()) instanceof Creaking creakingPower) {
                 creakingPower.deactivate();
             }
+        }
+    }
+    @Override
+    public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount, CallbackInfo ci) {
+        if (!source.getType().msgId().equalsIgnoreCase("fall")) return;
+        if (SuperpowersWildcard.hasActivatedPower(player, Superpowers.WIND_CHARGE)) {
+            ci.cancel();
         }
     }
 }

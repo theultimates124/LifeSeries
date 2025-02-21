@@ -18,6 +18,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -183,7 +184,7 @@ public class SecretLife extends Series {
     }
 
     @Override
-    public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
+    public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount, CallbackInfo ci) {
         if (player.hasStatusEffect(StatusEffects.HEALTH_BOOST)) {
             player.removeStatusEffect(StatusEffects.HEALTH_BOOST);
         }

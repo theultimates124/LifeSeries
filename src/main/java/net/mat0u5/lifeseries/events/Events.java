@@ -69,6 +69,7 @@ public class Events {
         try {
             UpdateChecker.onPlayerJoin(player);
             currentSeries.onPlayerJoin(player);
+            blacklist.onInventoryUpdated(player, player.getInventory());
         } catch(Exception e) {Main.LOGGER.error(e.getMessage());}
     }
     private static void onPlayerDisconnect(MinecraftServer server, ServerPlayerEntity player) {

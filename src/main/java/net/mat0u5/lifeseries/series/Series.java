@@ -26,6 +26,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.*;
 
@@ -363,7 +364,7 @@ public abstract class Series extends Session {
         Stats.claimKill(killer, victim);
     }
 
-    public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount) {
+    public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount, CallbackInfo ci) {
     }
 
     public void onPlayerHeal(ServerPlayerEntity player, float amount) {

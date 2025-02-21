@@ -20,7 +20,9 @@
     "SpawnEggItemMixin",
     "SpawnGroupMixin",
     "SpawnHelperMixin",
-    "superpowers.SleepManagerMixin"
+    "superpowers.AdvancedExplosionBehaviorMixin",
+    "superpowers.SleepManagerMixin",
+    "superpowers.WindChargeItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

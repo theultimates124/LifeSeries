@@ -17,15 +17,15 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 @Mixin(value = PlayerEntity.class, priority = 1)
 public abstract class PlayerEntityMixin {
 
-    @Inject(method = "applyDamage", at = @At("TAIL"))
+    @Inject(method = "applyDamage", at = @At("HEAD"), cancellable = true)
     //? if <=1.21 {
-    private void onApplyDamage(DamageSource source, float amount, CallbackInfo info) {
+    private void onApplyDamage(DamageSource source, float amount, CallbackInfo ci) {
      //?} else
-    /*private void onApplyDamage(ServerWorld world, DamageSource source, float amount, CallbackInfo info) {*/
+    /*private void onApplyDamage(ServerWorld world, DamageSource source, float amount, CallbackInfo ci) {*/
         if (!Main.isLogicalSide()) return;
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player instanceof ServerPlayerEntity serverPlayer) {
-            currentSeries.onPlayerDamage(serverPlayer, source, amount);
+            currentSeries.onPlayerDamage(serverPlayer, source, amount, ci);
         }
     }
 

@@ -29,8 +29,8 @@ public abstract class Superpower {
         return 1;
     }
 
-    public void tick() {
-    }
+    public void tick() {}
+    public void playerUseItem() {}
 
     public void onKeyPressed() {
         if (System.currentTimeMillis() < cooldown) {

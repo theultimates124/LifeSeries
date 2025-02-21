@@ -1,6 +1,9 @@
 package net.mat0u5.lifeseries.series;
 
 import net.mat0u5.lifeseries.Main;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.Superpowers;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.SuperpowersWildcard;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.WindCharge;
 import net.mat0u5.lifeseries.utils.ItemStackUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.block.Block;
@@ -251,7 +254,7 @@ public class Blacklist {
         processItemStack(player, stack);
     }
 
-    public void onInventoryUpdated(ServerPlayerEntity player, PlayerInventory inventory, CallbackInfo ci) {
+    public void onInventoryUpdated(ServerPlayerEntity player, PlayerInventory inventory) {
         if (Main.server == null) return;
         if (player.isCreative() && seriesConfig.getOrCreateBoolean("creative_ignore_blacklist", true)) return;
         for (int i = 0; i < inventory.size(); i++) {
@@ -286,6 +289,21 @@ public class Blacklist {
         if (isBlacklistedItem(itemStack) && !ItemStackUtils.hasCustomComponentEntry(itemStack, "IgnoreBlacklist")) {
             itemStack.setCount(0);
             player.getInventory().updateItems();
+            return;
+        }
+
+        if (ItemStackUtils.hasCustomComponentEntry(itemStack, "FromSuperpower")) {
+            if (ItemStackUtils.hasCustomComponentEntry(itemStack, "WindChargeSuperpower")) {
+                boolean remove = true;
+                if (SuperpowersWildcard.hasActivatedPower(player, Superpowers.WIND_CHARGE)) {
+                    remove = false;
+                }
+                if (remove) {
+                    itemStack.setCount(0);
+                    player.getInventory().updateItems();
+                    return;
+                }
+            }
             return;
         }
         ItemEnchantmentsComponent enchants = itemStack.getComponents().get(DataComponentTypes.ENCHANTMENTS);
