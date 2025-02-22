@@ -5,6 +5,7 @@ import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.Superpowers;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.ToggleableSuperpower;
 import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.DisconnectionInfo;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
@@ -79,9 +80,9 @@ public class AstralProjection extends ToggleableSuperpower {
         PlayerInventory inv = player.getInventory();
 
         FakePlayer.createFake(fakePlayerName, player.server, startedPos, startedLooking[0], startedLooking[1], player.server.getOverworld().getRegistryKey(),
-                GameMode.SURVIVAL, false, inv, player.getUuid()).thenAccept((fakePlayer) -> {
+                GameMode.SURVIVAL, false, inv, player.getUuid(), player.getDisplayName()).thenAccept((fakePlayer) -> {
             clone = fakePlayer;
-            NetworkHandlerServer.sendPlayerDisguise("player_disguise", clone.getUuid().toString(), player.getUuid().toString());
+            NetworkHandlerServer.sendPlayerDisguise("player_disguise", clone.getUuid().toString(), clone.getName().getString(), player.getUuid().toString(), player.getName().getString());
         });
     }
 
@@ -93,7 +94,7 @@ public class AstralProjection extends ToggleableSuperpower {
         if (clone != null) {
             toBackPos = clone.getPos();
             clone.networkHandler.onDisconnected(new DisconnectionInfo(Text.of("")));
-            NetworkHandlerServer.sendPlayerDisguise("player_disguise", clone.getUuid().toString(), "");
+            NetworkHandlerServer.sendPlayerDisguise("player_disguise", clone.getUuid().toString(), clone.getName().getString(), "", "");
         }
 
         if (startedWorld != null && toBackPos != null) {
@@ -106,5 +107,21 @@ public class AstralProjection extends ToggleableSuperpower {
             *///?}
         }
         player.changeGameMode(GameMode.SURVIVAL);
+    }
+
+
+    //? if <= 1.21 {
+    public void onDamageClone(DamageSource source, float amount) {
+     //?} else {
+    /*public void onDamageClone(ServerWorld world, DamageSource source, float amount) {
+    *///?}
+        deactivate();
+        ServerPlayerEntity player = getPlayer();
+        if (player == null) return;
+        //? if <= 1.21 {
+        player.damage(source, amount);
+         //?} else {
+        /*player.damage(world, source, amount);
+        *///?}
     }
 }

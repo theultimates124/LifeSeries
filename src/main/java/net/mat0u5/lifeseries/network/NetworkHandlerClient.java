@@ -1,5 +1,6 @@
 package net.mat0u5.lifeseries.network;
 
+import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.MainClient;
@@ -50,7 +51,7 @@ public class NetworkHandlerClient {
         ClientPlayNetworking.registerGlobalReceiver(PlayerDisguisePayload.ID, (payload, context) -> {
             MinecraftClient client = context.client();
             client.execute(() -> {
-                handlePlayerDisguise(payload.name(),payload.disguisedPlayerUUID(), payload.disguisedAsPlayerUUID());
+                handlePlayerDisguise(payload.name(),payload.hiddenUUID(), payload.hiddenName(), payload.shownUUID(), payload.shownName());
             });
         });
     }
@@ -103,16 +104,24 @@ public class NetworkHandlerClient {
         }
     }
 
-    public static void handlePlayerDisguise(String name, String disguisedEntity, String disguisedAsPlayer) {
+    public static void handlePlayerDisguise(String name, String hiddenUUID, String hiddenName, String shownUUID, String shownName) {
         if (name.equalsIgnoreCase("player_disguise")) {
-            if (disguisedAsPlayer.isEmpty()) {
-                MainClient.playerDisguise.remove(disguisedEntity);
-            }
-            else {
+            if (shownName.isEmpty()) {
+                MainClient.playerDisguiseNames.remove(hiddenName);
                 try {
-                    MainClient.playerDisguise.put(disguisedEntity, UUID.fromString(disguisedAsPlayer));
+                    UUID hideUUID = UUID.fromString(hiddenUUID);
+                    MainClient.playerDisguiseUUIDs.remove(hideUUID);
                 }catch(Exception ignored) {}
             }
+            else {
+                MainClient.playerDisguiseNames.put(hiddenName, shownName);
+                try {
+                    UUID hideUUID = UUID.fromString(hiddenUUID);
+                    UUID showUUID = UUID.fromString(shownUUID);
+                    MainClient.playerDisguiseUUIDs.put(hideUUID, showUUID);
+                }catch(Exception ignored) {}
+            }
+
         }
     }
 

@@ -238,7 +238,7 @@ public class Session {
             message = "Session has ended";
         }
         for (UUID uuid : displayTimer) {
-            ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
+            ServerPlayerEntity player = PlayerUtils.getPlayer(uuid);
             if (player == null) continue;
             player.sendMessage(Text.literal(message).formatted(Formatting.GRAY), true);
         }

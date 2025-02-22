@@ -25,7 +25,8 @@ public class MainClient implements ClientModInitializer {
     public static long SUPERPOWER_COOLDOWN_TIMESTAMP = 0;
     public static boolean CURSE_SLIDING = false;
 
-    public static HashMap<String, UUID> playerDisguise = new HashMap<>();
+    public static HashMap<String, String> playerDisguiseNames = new HashMap<>();
+    public static HashMap<UUID, UUID> playerDisguiseUUIDs = new HashMap<>();
 
     @Override
     public void onInitializeClient() {

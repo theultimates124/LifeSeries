@@ -95,14 +95,17 @@ public class LastLife extends Series {
     public void onPlayerJoin(ServerPlayerEntity player) {
         super.onPlayerJoin(player);
         boogeymanManager.onPlayerJoin(player);
-        TaskScheduler.scheduleTask(99, () -> {
-            if (PermissionManager.isAdmin(player)) {
-                player.sendMessage(Text.of("§7Last Life commands: §r/lifeseries, /session, /claimkill, /lives, /givelife, /boogeyman, /lastlife"));
-            }
-            else {
-                player.sendMessage(Text.of("§7Last Life non-admin commands: §r/claimkill, /lives, /givelife"));
-            }
-        });
+    }
+
+    @Override
+    public void onPlayerFinishJoining(ServerPlayerEntity player) {
+        if (PermissionManager.isAdmin(player)) {
+            player.sendMessage(Text.of("§7Last Life commands: §r/lifeseries, /session, /claimkill, /lives, /givelife, /boogeyman, /lastlife"));
+        }
+        else {
+            player.sendMessage(Text.of("§7Last Life non-admin commands: §r/claimkill, /lives, /givelife"));
+        }
+        super.onPlayerFinishJoining(player);
     }
 
     @Override

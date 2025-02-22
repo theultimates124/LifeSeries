@@ -423,12 +423,12 @@ public abstract class Series extends Session {
         TaskScheduler.scheduleTask(2, () -> {
             PlayerUtils.applyResourcepack(player.getUuid());
         });
+    }
 
+    public void onPlayerFinishJoining(ServerPlayerEntity player) {
         if (statusNotStarted() && PermissionManager.isAdmin(player)) {
-            TaskScheduler.scheduleTask(100, () -> {
-                player.sendMessage(Text.of("\nUse §b'/session timer set <time>'§f to set the desired session time."));
-                player.sendMessage(Text.of("After that, use §b'/session start'§f to start the session."));
-            });
+            player.sendMessage(Text.of("\nUse §b'/session timer set <time>'§f to set the desired session time."));
+            player.sendMessage(Text.of("After that, use §b'/session start'§f to start the session."));
         }
     }
 

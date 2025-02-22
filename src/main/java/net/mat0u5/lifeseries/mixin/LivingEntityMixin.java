@@ -5,6 +5,7 @@ import net.mat0u5.lifeseries.utils.ItemStackUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.mob.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -14,6 +15,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.function.DoubleSupplier;
+import java.util.function.Predicate;
 
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
@@ -57,4 +61,15 @@ public abstract class LivingEntityMixin {
          //?} else
         /*cir.setReturnValue(entity.damage(world, source, 2));*/
     }
+
+    //? if = 1.21.2 {
+    /*@Inject(method = "isEntityLookingAtMe", at = @At("HEAD"), cancellable = true)
+    public void isEntityLookingAtMe(LivingEntity entity, double d, boolean bl, boolean visualShape, Predicate<LivingEntity> predicate, DoubleSupplier[] entityYChecks, CallbackInfoReturnable<Boolean> cir) {
+        LivingEntity me = (LivingEntity) (Object) this;
+        if (me instanceof CreakingEntity creaking) {
+            OtherUtils.log("overr");
+            if (creaking.isTeammate(entity)) cir.setReturnValue(false);
+        }
+    }
+    *///?}
 }

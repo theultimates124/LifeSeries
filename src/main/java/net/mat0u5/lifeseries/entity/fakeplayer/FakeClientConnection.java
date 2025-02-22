@@ -5,6 +5,9 @@ import net.minecraft.network.NetworkSide;
 import net.minecraft.network.NetworkState;
 import net.minecraft.network.listener.PacketListener;
 
+/*
+    Used code from https://github.com/gnembon/fabric-carpet
+ */
 public class FakeClientConnection extends ClientConnection {
     public FakeClientConnection(NetworkSide side) {
         super(side);

@@ -2,6 +2,7 @@ package net.mat0u5.lifeseries.series.doublelife;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.mat0u5.lifeseries.series.SeriesList;
+import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.PlayerManager;
@@ -151,12 +152,11 @@ public class DoubleLifeCommands {
 
         DoubleLife series = ((DoubleLife) currentSeries);
 
-        PlayerManager playerManager = source.getServer().getPlayerManager();
         boolean noSoulmates = true;
         for (Map.Entry<UUID, UUID> entry : series.soulmatesOrdered.entrySet()) {
             noSoulmates = false;
-            ServerPlayerEntity player = playerManager.getPlayer(entry.getKey());
-            ServerPlayerEntity soulmate = playerManager.getPlayer(entry.getValue());
+            ServerPlayerEntity player = PlayerUtils.getPlayer(entry.getKey());
+            ServerPlayerEntity soulmate = PlayerUtils.getPlayer(entry.getValue());
             MutableText pt1 = Text.literal(entry.getKey().toString());
             Text pt2 = Text.of("'s soulmate is ");
             Text pt3 = Text.of(entry.getValue().toString());

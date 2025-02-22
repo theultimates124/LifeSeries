@@ -18,6 +18,7 @@ import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.Snails;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 import net.mat0u5.lifeseries.utils.AnimationUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.control.FlightMoveControl;
@@ -634,7 +635,7 @@ public class Snail extends HostileEntity implements AnimatedEntity {
     @Nullable
     public ServerPlayerEntity getBoundPlayer() {
         if (server == null) return null;
-        ServerPlayerEntity player = server.getPlayerManager().getPlayer(boundPlayerUUID);
+        ServerPlayerEntity player = PlayerUtils.getPlayer(boundPlayerUUID);
         if (player == null || (player.isSpectator() && player.isDead())) {
             nullPlayerChecks++;
             return null;

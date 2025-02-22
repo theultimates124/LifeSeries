@@ -207,21 +207,23 @@ public class SecretLife extends Series {
             player.setHealth((float) MAX_HEALTH);
         }
 
-        TaskScheduler.scheduleTask(75, TaskManager::checkSecretLifePositions);
-
         if (TaskManager.tasksChosen && !TaskManager.tasksChosenFor.contains(player.getUuid())) {
             TaskScheduler.scheduleTask(100, () -> {
                 TaskManager.chooseTasks(List.of(player), null);
             });
         }
-        TaskScheduler.scheduleTask(99, () -> {
-            if (PermissionManager.isAdmin(player)) {
-                player.sendMessage(Text.of("§7Secret Life commands: §r/lifeseries, /session, /claimkill, /lives, /gift, /task, /health, /secretlife"));
-            }
-            else {
-                player.sendMessage(Text.of("§7Secret Life non-admin commands: §r/claimkill, /lives, /gift"));
-            }
-        });
+    }
+
+    @Override
+    public void onPlayerFinishJoining(ServerPlayerEntity player) {
+        TaskManager.checkSecretLifePositions();
+        if (PermissionManager.isAdmin(player)) {
+            player.sendMessage(Text.of("§7Secret Life commands: §r/lifeseries, /session, /claimkill, /lives, /gift, /task, /health, /secretlife"));
+        }
+        else {
+            player.sendMessage(Text.of("§7Secret Life non-admin commands: §r/claimkill, /lives, /gift"));
+        }
+        super.onPlayerFinishJoining(player);
     }
 
     @Override

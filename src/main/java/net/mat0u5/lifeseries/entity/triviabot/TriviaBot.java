@@ -160,7 +160,7 @@ public class TriviaBot extends AmbientEntity implements AnimatedEntity {
     @Nullable
     public ServerPlayerEntity getBoundPlayer() {
         if (server == null) return null;
-        ServerPlayerEntity player = server.getPlayerManager().getPlayer(boundPlayerUUID);
+        ServerPlayerEntity player = PlayerUtils.getPlayer(boundPlayerUUID);
         if (player == null || (player.isSpectator() && player.isDead())) {
             nullPlayerChecks++;
             return null;

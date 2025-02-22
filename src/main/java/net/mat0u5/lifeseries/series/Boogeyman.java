@@ -1,10 +1,9 @@
 package net.mat0u5.lifeseries.series;
 
+import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.UUID;
-
-import static net.mat0u5.lifeseries.Main.server;
 
 public class Boogeyman {
     public UUID uuid;
@@ -18,8 +17,6 @@ public class Boogeyman {
     }
 
     public ServerPlayerEntity getPlayer() {
-        if (server == null) return null;
-        if (uuid == null) return null;
-        return server.getPlayerManager().getPlayer(uuid);
+        return PlayerUtils.getPlayer(uuid);
     }
 }

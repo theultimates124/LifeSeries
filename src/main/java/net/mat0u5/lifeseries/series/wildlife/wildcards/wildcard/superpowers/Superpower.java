@@ -1,12 +1,11 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers;
 
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
+import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
-
-import static net.mat0u5.lifeseries.Main.server;
 
 public abstract class Superpower {
     public boolean active = false;
@@ -18,9 +17,7 @@ public abstract class Superpower {
 
     @Nullable
     public ServerPlayerEntity getPlayer() {
-        if (server == null) return null;
-        if (playerUUID == null) return null;
-        return server.getPlayerManager().getPlayer(playerUUID);
+        return PlayerUtils.getPlayer(playerUUID);
     }
 
     public abstract Superpowers getSuperpower();

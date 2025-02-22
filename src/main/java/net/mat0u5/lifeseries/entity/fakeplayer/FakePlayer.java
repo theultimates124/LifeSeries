@@ -14,6 +14,7 @@ import net.minecraft.network.NetworkSide;
 import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.network.packet.s2c.play.EntitySetHeadYawS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 
@@ -38,11 +39,12 @@ public class FakePlayer extends ServerPlayerEntity {
     private static final Set<String> spawning = new HashSet<>();
     public Runnable fixStartingPosition = () -> {};
     private UUID shadow;
+    private Text customDisplayName;
 
     public static CompletableFuture<FakePlayer> createFake(
             String username, MinecraftServer server, Vec3d pos, double yaw, double pitch,
-             RegistryKey<World> dimensionId, GameMode gamemode, boolean flying, PlayerInventory inv, UUID shadow)
-    {
+             RegistryKey<World> dimensionId, GameMode gamemode, boolean flying, PlayerInventory inv,
+            UUID shadow, Text displayName) {
         ServerWorld worldIn = server.getWorld(dimensionId);
         UserCache.setUseRemote(false);
         GameProfile gameprofile;
@@ -78,14 +80,15 @@ public class FakePlayer extends ServerPlayerEntity {
             ConnectedClientData data =  new ConnectedClientData(current, 0, instance.getClientOptions(), true);
             server.getPlayerManager().onPlayerConnect(connection, instance, data);
             //? if <= 1.21 {
-            instance.teleport(worldIn, pos.x, pos.y, pos.z, Set.of(), (float) yaw, (float) pitch);
+            instance.teleport(worldIn, pos.x, pos.y, pos.z, EnumSet.noneOf(PositionFlag.class), (float) yaw, (float) pitch);
              //?} else {
-            /*instance.teleport(worldIn, pos.x, pos.y, pos.z, Set.of(), (float) yaw, (float) pitch, false);
+            /*instance.teleport(worldIn, pos.x, pos.y, pos.z, EnumSet.noneOf(PositionFlag.class), (float) yaw, (float) pitch, false);
             *///?}
             instance.setHealth(20.0F);
             instance.unsetRemoved();
             instance.changeGameMode(gamemode);
             server.getPlayerManager().sendToAll(new EntitySetHeadYawS2CPacket(instance, (byte) (instance.getYaw() * 256 / 360)));
+            instance.dataTracker.set(PLAYER_MODEL_PARTS, (byte) 0x7f);
             instance.getAbilities().flying = flying;
 
             instance.getInventory().clone(inv);
@@ -94,6 +97,8 @@ public class FakePlayer extends ServerPlayerEntity {
             instance.currentScreenHandler.sendContentUpdates();
 
             instance.shadow = shadow;
+            instance.customDisplayName = displayName;
+            //instance.setCustomName(displayName);
             future.complete(instance);
         }, server);
 
@@ -160,7 +165,11 @@ public class FakePlayer extends ServerPlayerEntity {
             if (player != null) {
                 if (SuperpowersWildcard.hasActivatedPower(player, Superpowers.ASTRAL_PROJECTION)) {
                     if (SuperpowersWildcard.playerSuperpowers.get(player.getUuid()) instanceof AstralProjection projection) {
-                        projection.deactivate();
+                        //? if <= 1.21 {
+                        projection.onDamageClone(source, amount);
+                         //?} else {
+                        /*projection.onDamageClone(world, source, amount);
+                        *///?}
                     }
                 }
             }
@@ -172,5 +181,4 @@ public class FakePlayer extends ServerPlayerEntity {
         *///?}
 
     }
-
 }

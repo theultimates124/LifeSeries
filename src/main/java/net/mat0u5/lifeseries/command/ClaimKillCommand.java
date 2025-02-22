@@ -3,6 +3,7 @@ package net.mat0u5.lifeseries.command;
 import com.mojang.brigadier.CommandDispatcher;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -67,7 +68,7 @@ public class ClaimKillCommand {
         List<String> suggestions = new ArrayList<>();
         Set<UUID> recentDeaths = currentSession.playerNaturalDeathLog.keySet();
         for (UUID uuid : recentDeaths) {
-            ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
+            ServerPlayerEntity player = PlayerUtils.getPlayer(uuid);
             if (player == null) continue;
             suggestions.add(player.getNameForScoreboard());
         }

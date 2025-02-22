@@ -22,6 +22,7 @@
     "SpawnHelperMixin",
     "superpowers.AdvancedExplosionBehaviorMixin",
     "superpowers.PlayerManagerMixin",
+    "superpowers.SavePropertiesMixin",
     "superpowers.SleepManagerMixin",
     "superpowers.WindChargeItemMixin"
   ],
@@ -34,6 +35,7 @@
     "client.ClientPlayNetworkHandlerMixin",
     "client.MinecraftClientMixin",
     "client.SoundSystemMixin",
-    "superpowers.PlayerEntityRendererMixin"
+    "superpowers.client.AbstractClientPlayerEntityMixin",
+    "superpowers.client.EntityRendererMixin"
   ]
 }

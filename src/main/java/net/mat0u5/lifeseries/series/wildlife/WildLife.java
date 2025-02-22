@@ -6,6 +6,7 @@ import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.SeriesList;
+import net.mat0u5.lifeseries.series.secretlife.TaskManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.*;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.Superpowers;
@@ -50,22 +51,22 @@ public class WildLife extends Series {
     public void onPlayerJoin(ServerPlayerEntity player) {
         super.onPlayerJoin(player);
 
-        NetworkHandlerServer.sendHandshake(player);
-        NetworkHandlerServer.sendUpdatePacketTo(player);
-
         if (!hasAssignedLives(player)) {
             int lives = seriesConfig.getOrCreateInt("default_lives", 6);
             setPlayerLives(player, lives);
         }
-        TaskScheduler.scheduleTask(99, () -> {
-            if (PermissionManager.isAdmin(player)) {
-                player.sendMessage(Text.of("§7Wild Life commands: §r/lifeseries, /session, /claimkill, /lives, /wildcard"));
-            }
-            else {
-                player.sendMessage(Text.of("§7Wild Life non-admin commands: §r/claimkill, /lives"));
-            }
-        });
         WildcardManager.resetWildcardsOnPlayerJoin(player);
+    }
+
+    @Override
+    public void onPlayerFinishJoining(ServerPlayerEntity player) {
+        if (PermissionManager.isAdmin(player)) {
+            player.sendMessage(Text.of("§7Wild Life commands: §r/lifeseries, /session, /claimkill, /lives, /wildcard, /superpower, /snailname"));
+        }
+        else {
+            player.sendMessage(Text.of("§7Wild Life non-admin commands: §r/claimkill, /lives"));
+        }
+        super.onPlayerFinishJoining(player);
     }
 
     @Override

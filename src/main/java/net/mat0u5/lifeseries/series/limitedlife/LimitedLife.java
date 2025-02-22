@@ -260,14 +260,17 @@ public class LimitedLife extends Series {
         if (!hasAssignedLives(player)) {
             setPlayerLives(player, DEFAULT_TIME);
         }
-        TaskScheduler.scheduleTask(99, () -> {
-            if (PermissionManager.isAdmin(player)) {
-                player.sendMessage(Text.of("§7Limited Life commands: §r/lifeseries, /session, /claimkill, /lives, /boogeyman"));
-            }
-            else {
-                player.sendMessage(Text.of("§7Limited Life non-admin commands: §r/claimkill, /lives"));
-            }
-        });
+    }
+
+    @Override
+    public void onPlayerFinishJoining(ServerPlayerEntity player) {
+        if (PermissionManager.isAdmin(player)) {
+            player.sendMessage(Text.of("§7Limited Life commands: §r/lifeseries, /session, /claimkill, /lives, /boogeyman"));
+        }
+        else {
+            player.sendMessage(Text.of("§7Limited Life non-admin commands: §r/claimkill, /lives"));
+        }
+        super.onPlayerFinishJoining(player);
     }
 
     @Override

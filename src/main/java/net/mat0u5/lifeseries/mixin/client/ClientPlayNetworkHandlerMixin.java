@@ -56,6 +56,7 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "handlePlayerListAction", at = @At("HEAD"), cancellable = true)
     private void handlePlayerListAction(PlayerListS2CPacket.Action action, PlayerListS2CPacket.Entry receivedEntry, PlayerListEntry currentEntry, CallbackInfo ci) {
+        if (action == PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME) return;
         if (receivedEntry.profile() != null) {
             if (receivedEntry.profile().getName().startsWith("`")) {
                 ci.cancel();

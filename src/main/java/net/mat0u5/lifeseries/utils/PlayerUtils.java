@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.client.ClientHandler;
+import net.mat0u5.lifeseries.entity.fakeplayer.FakePlayer;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.Series;
 import net.mat0u5.lifeseries.series.secretlife.SecretLife;
@@ -31,7 +32,7 @@ public class PlayerUtils {
         if (server == null) return;
         if (player == null) return;
         if (player.isDead()) {
-            TaskScheduler.scheduleTask(5, () -> sendTitleWithSubtitle(server.getPlayerManager().getPlayer(player.getUuid()), title, subtitle, fadeIn, stay, fadeOut));
+            TaskScheduler.scheduleTask(5, () -> sendTitleWithSubtitle(getPlayer(player.getUuid()), title, subtitle, fadeIn, stay, fadeOut));
             return;
         }
         TitleFadeS2CPacket fadePacket = new TitleFadeS2CPacket(fadeIn, stay, fadeOut);
@@ -46,7 +47,7 @@ public class PlayerUtils {
         if (server == null) return;
         if (player == null) return;
         if (player.isDead()) {
-            TaskScheduler.scheduleTask(5, () -> sendTitle(server.getPlayerManager().getPlayer(player.getUuid()), title, fadeIn, stay, fadeOut));
+            TaskScheduler.scheduleTask(5, () -> sendTitle(getPlayer(player.getUuid()), title, fadeIn, stay, fadeOut));
             return;
         }
         TitleFadeS2CPacket fadePacket = new TitleFadeS2CPacket(fadeIn, stay, fadeOut);
@@ -82,7 +83,23 @@ public class PlayerUtils {
 
     public static List<ServerPlayerEntity> getAllPlayers() {
         if (server == null) return new ArrayList<>();
-        return server.getPlayerManager().getPlayerList();
+        List<ServerPlayerEntity> result = new ArrayList<>();
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            if (!(player instanceof FakePlayer)) {
+                result.add(player);
+            }
+        }
+        return result;
+    }
+
+    public static ServerPlayerEntity getPlayer(String name) {
+        if (server == null || name == null) return null;
+        return server.getPlayerManager().getPlayer(name);
+    }
+
+    public static ServerPlayerEntity getPlayer(UUID uuid) {
+        if (server == null || uuid == null) return null;
+        return server.getPlayerManager().getPlayer(uuid);
     }
 
     public static void applyResourcepack(UUID uuid) {
@@ -95,7 +112,7 @@ public class PlayerUtils {
     }
     public static void applyServerResourcepack(UUID uuid) {
         if (server == null) return;
-        ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
+        ServerPlayerEntity player = getPlayer(uuid);
         if (player == null) return;
         applySingleResourcepack(player, Series.RESOURCEPACK_MAIN_URL, Series.RESOURCEPACK_MAIN_SHA, "Life Series Main Resourcepack.");
         if (currentSeries instanceof SecretLife) {

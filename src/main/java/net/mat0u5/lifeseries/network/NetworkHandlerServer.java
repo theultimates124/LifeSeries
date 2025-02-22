@@ -21,6 +21,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.*;
 
@@ -28,7 +29,6 @@ import static net.mat0u5.lifeseries.Main.currentSeries;
 import static net.mat0u5.lifeseries.Main.server;
 
 public class NetworkHandlerServer {
-    public static HashMap<UUID, Integer> awaitingHandshake = new HashMap<>();
     public static List<UUID> handshakeSuccessful = new ArrayList<>();
 
     public static void registerPackets() {
@@ -87,7 +87,6 @@ public class NetworkHandlerServer {
 
     public static void handleHandshakeResponse(ServerPlayerEntity player, String modVersionStr, int modVersion) {
         Main.LOGGER.info("[PACKET_SERVER] Received handshake (from "+player.getNameForScoreboard()+"): {"+modVersionStr+", "+modVersion+"}");
-        awaitingHandshake.remove(player.getUuid());
         handshakeSuccessful.add(player.getUuid());
     }
 
@@ -105,7 +104,6 @@ public class NetworkHandlerServer {
         int modVersion = OtherUtils.getModVersionInt(modVersionStr);
         HandshakePayload payload = new HandshakePayload(modVersionStr, modVersion);
         ServerPlayNetworking.send(player, payload);
-        awaitingHandshake.put(player.getUuid(), 150);
         handshakeSuccessful.remove(player.getUuid());
         Main.LOGGER.info("[PACKET_SERVER] Sending handshake to "+player.getNameForScoreboard()+": {"+modVersionStr+", "+modVersion+"}");
     }
@@ -149,33 +147,17 @@ public class NetworkHandlerServer {
         }
     }
 
-    public static void sendPlayerDisguise(String name, String disguisedEntity, String disguisedAsPlayer) {
-        PlayerDisguisePayload payload = new PlayerDisguisePayload(name, disguisedEntity.toString(), disguisedAsPlayer.toString());
+    public static void sendPlayerDisguise(String name, String hiddenUUID, String hiddenName, String shownUUID, String shownName) {
+        PlayerDisguisePayload payload = new PlayerDisguisePayload(name, hiddenUUID, hiddenName, shownUUID, shownName);
         for (ServerPlayerEntity player : PlayerUtils.getAllPlayers()) {
             ServerPlayNetworking.send(player, payload);
         }
     }
 
-    public static void tick() {
-        HashMap<UUID, Integer> newAwaiting = new HashMap<>();
-        for (Map.Entry<UUID, Integer> entry : awaitingHandshake.entrySet()) {
-            UUID uuid = entry.getKey();
-            int num = entry.getValue();
-            num--;
-            if (num > 0) {
-                newAwaiting.put(uuid, num);
-            }
-            else {
-                kickFailedHandshake(uuid);
-            }
-        }
-        awaitingHandshake = newAwaiting;
-    }
-
-    public static void kickFailedHandshake(UUID uuid) {
+    public static void tryKickFailedHandshake(ServerPlayerEntity player) {
         if (server == null) return;
-        ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
-        if (player == null) return;
+        if (currentSeries.getSeries() != SeriesList.WILD_LIFE) return;
+        if (handshakeSuccessful.contains(player.getUuid())) return;
         Text disconnectText = Text.literal("You must have the §2Life Series mod\n§l installed on the client§r§r§f to play Wild Life!\n").append(
                 Text.literal("Click to download on Modrinth.")
                         .styled(style -> style

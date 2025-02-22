@@ -92,7 +92,7 @@ public class BoogeymanManager {
     public void resetBoogeymen() {
         if (server == null) return;
         for (Boogeyman boogeyman : boogeymen) {
-            ServerPlayerEntity player = server.getPlayerManager().getPlayer(boogeyman.uuid);
+            ServerPlayerEntity player = PlayerUtils.getPlayer(boogeyman.uuid);
             if (player == null) continue;
             player.sendMessage(Text.of("§c [NOTICE] You are no longer a Boogeyman!"));
         }
@@ -182,7 +182,7 @@ public class BoogeymanManager {
             if (boogeyman.died) continue;
 
             if (!boogeyman.cured) {
-                ServerPlayerEntity player = server.getPlayerManager().getPlayer(boogeyman.uuid);
+                ServerPlayerEntity player = PlayerUtils.getPlayer(boogeyman.uuid);
                 if (player == null) {
                     OtherUtils.broadcastMessageToAdmins(Text.of("§c[BoogeymanManager] The Boogeyman ("+boogeyman.name+") has failed to kill a person, and is offline at session end. " +
                             "That means their lives have not been set to 1. You must do this manually once they are online again."));

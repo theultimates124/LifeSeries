@@ -84,15 +84,17 @@ public class DoubleLife extends Series {
 
         ServerPlayerEntity soulmate = getSoulmate(player);
         syncPlayers(player, soulmate);
+    }
 
-        TaskScheduler.scheduleTask(99, () -> {
-            if (PermissionManager.isAdmin(player)) {
-                player.sendMessage(Text.of("§7Double Life commands: §r/lifeseries, /session, /claimkill, /lives, /soulmate"));
-            }
-            else {
-                player.sendMessage(Text.of("§7Double Life non-admin commands: §r/claimkill, /lives"));
-            }
-        });
+    @Override
+    public void onPlayerFinishJoining(ServerPlayerEntity player) {
+        if (PermissionManager.isAdmin(player)) {
+            player.sendMessage(Text.of("§7Double Life commands: §r/lifeseries, /session, /claimkill, /lives, /soulmate"));
+        }
+        else {
+            player.sendMessage(Text.of("§7Double Life non-admin commands: §r/claimkill, /lives"));
+        }
+        super.onPlayerFinishJoining(player);
     }
 
     @Override
@@ -159,14 +161,14 @@ public class DoubleLife extends Series {
         if (server == null) return false;
         if (!hasSoulmate(player)) return false;
         UUID soulmateUUID = soulmates.get(player.getUuid());
-        return server.getPlayerManager().getPlayer(soulmateUUID) != null;
+        return PlayerUtils.getPlayer(soulmateUUID) != null;
     }
 
     public ServerPlayerEntity getSoulmate(ServerPlayerEntity player) {
         if (server == null) return null;
         if (!isSoulmateOnline(player)) return null;
         UUID soulmateUUID = soulmates.get(player.getUuid());
-        return server.getPlayerManager().getPlayer(soulmateUUID);
+        return PlayerUtils.getPlayer(soulmateUUID);
     }
 
     public void setSoulmate(ServerPlayerEntity player1, ServerPlayerEntity player2) {
