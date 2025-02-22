@@ -11,6 +11,8 @@ import net.minecraft.network.DisconnectionInfo;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
@@ -69,6 +71,7 @@ public class AstralProjection extends ToggleableSuperpower {
         ServerPlayerEntity player = getPlayer();
         if (player == null) return;
         if (player.isSpectator()) return;
+        player.playSoundToPlayer(SoundEvents.BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE, SoundCategory.MASTER, 0.3f, 1);
 
         String fakePlayerName = "`"+player.getNameForScoreboard();
 
@@ -90,6 +93,7 @@ public class AstralProjection extends ToggleableSuperpower {
         ServerPlayerEntity player = getPlayer();
         if (player == null) return;
 
+
         Vec3d toBackPos = startedPos;
         if (clone != null) {
             toBackPos = clone.getPos();
@@ -107,6 +111,7 @@ public class AstralProjection extends ToggleableSuperpower {
             *///?}
         }
         player.changeGameMode(GameMode.SURVIVAL);
+        player.playSoundToPlayer(SoundEvents.ENTITY_EVOKER_DEATH, SoundCategory.MASTER, 0.3f, 1);
     }
 
 

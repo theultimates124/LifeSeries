@@ -20,8 +20,8 @@ public class Session {
     public List<SessionAction> activeActions = new ArrayList<>();
     public List<UUID> displayTimer = new ArrayList<>();
     public static final int NATURAL_DEATH_LOG_MAX = 2400;
-    public static final int DISPLAY_TIMER_INTERVAL = 20;
-    public int currentTimer = 20;
+    public static final int DISPLAY_TIMER_INTERVAL = 5;
+    public int currentTimer = 5;
 
     public Integer sessionLength = null;
     public double passedTime = 0;
@@ -222,7 +222,7 @@ public class Session {
             *///?}
         }
     }
-
+    public static HashMap<UUID, Integer> skipTimer = new HashMap<>();
     public void displayTimers(MinecraftServer server) {
         String message = "";
         if (statusNotStarted()) {
@@ -238,6 +238,13 @@ public class Session {
             message = "Session has ended";
         }
         for (UUID uuid : displayTimer) {
+            if (skipTimer.containsKey(uuid)) {
+                int value = skipTimer.get(uuid);
+                value--;
+                if (value > 0) skipTimer.put(uuid, value);
+                else skipTimer.remove(uuid);
+                continue;
+            }
             ServerPlayerEntity player = PlayerUtils.getPlayer(uuid);
             if (player == null) continue;
             player.sendMessage(Text.literal(message).formatted(Formatting.GRAY), true);

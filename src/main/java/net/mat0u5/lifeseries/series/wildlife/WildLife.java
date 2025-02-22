@@ -12,6 +12,7 @@ import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.*;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.Superpowers;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.SuperpowersWildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.Creaking;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.PlayerDisguise;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PermissionManager;
@@ -209,6 +210,11 @@ public class WildLife extends Series {
     }
     @Override
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount, CallbackInfo ci) {
+        if (SuperpowersWildcard.hasActivatedPower(player, Superpowers.PLAYER_DISGUISE)) {
+            if (SuperpowersWildcard.playerSuperpowers.get(player.getUuid()) instanceof PlayerDisguise power) {
+                power.onTakeDamage();
+            }
+        }
         if (!source.getType().msgId().equalsIgnoreCase("fall")) return;
         if (SuperpowersWildcard.hasActivatedPower(player, Superpowers.WIND_CHARGE)) {
             ci.cancel();

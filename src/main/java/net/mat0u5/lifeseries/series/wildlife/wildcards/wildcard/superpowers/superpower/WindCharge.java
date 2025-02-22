@@ -11,6 +11,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,7 @@ public class WindCharge extends ToggleableSuperpower {
     @Override
     public void activate() {
         super.activate();
+        if (getPlayer() != null) getPlayer().playSoundToPlayer(SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.MASTER, 0.3f, 1);
         giveMace();
         giveWindCharge();
     }
@@ -39,6 +42,7 @@ public class WindCharge extends ToggleableSuperpower {
         super.deactivate();
         ServerPlayerEntity player = getPlayer();
         if (player != null) {
+            player.playSoundToPlayer(SoundEvents.ENTITY_WIND_CHARGE_WIND_BURST.value(), SoundCategory.MASTER, 0.3f, 1);
             player.getInventory().markDirty();
         }
     }

@@ -1,9 +1,6 @@
 package net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers;
 
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.AstralProjection;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.Creaking;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.TimeControl;
-import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.WindCharge;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.*;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,7 +28,7 @@ public enum Superpowers {
     NECROMANCY;
 
     public static List<Superpowers> getImplemented() {
-        return List.of(TIME_CONTROL, CREAKING, WIND_CHARGE, ASTRAL_PROJECTION);
+        return List.of(TIME_CONTROL, CREAKING, WIND_CHARGE, ASTRAL_PROJECTION, PLAYER_DISGUISE);
     }
 
     @Nullable
@@ -40,6 +37,7 @@ public enum Superpowers {
         if (superpower == CREAKING) return new Creaking(player);
         if (superpower == WIND_CHARGE) return new WindCharge(player);
         if (superpower == ASTRAL_PROJECTION) return new AstralProjection(player);
+        if (superpower == PLAYER_DISGUISE) return new PlayerDisguise(player);
         return null;
     }
 

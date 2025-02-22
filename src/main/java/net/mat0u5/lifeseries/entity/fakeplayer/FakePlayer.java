@@ -98,6 +98,9 @@ public class FakePlayer extends ServerPlayerEntity {
 
             instance.shadow = shadow;
             instance.customDisplayName = displayName;
+            instance.clearStatusEffects();
+            instance.setOnFire(false);
+            instance.setFireTicks(0);
             //instance.setCustomName(displayName);
             future.complete(instance);
         }, server);

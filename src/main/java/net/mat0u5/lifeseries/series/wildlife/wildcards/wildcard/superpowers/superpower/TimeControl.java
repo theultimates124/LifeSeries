@@ -7,7 +7,7 @@ import net.mat0u5.lifeseries.utils.TaskScheduler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class TimeControl extends Superpower {
-
+    //TODO sounds
     public TimeControl(ServerPlayerEntity player) {
         super(player);
     }

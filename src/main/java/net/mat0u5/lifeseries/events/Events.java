@@ -2,7 +2,6 @@ package net.mat0u5.lifeseries.events;
 
 
 
-import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -12,6 +11,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.config.DatapackManager;
 import net.mat0u5.lifeseries.config.UpdateChecker;
+import net.mat0u5.lifeseries.entity.fakeplayer.FakePlayer;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.SeriesList;
 import net.mat0u5.lifeseries.series.doublelife.DoubleLife;
@@ -76,7 +76,6 @@ public class Events {
     private static void onPlayerJoin(MinecraftServer server, ServerPlayerEntity player) {
         if (isFakePlayer(player)) return;
 
-        OtherUtils.log("onPlayerJoin");
         try {
             playerStartJoining(player);
             currentSeries.onPlayerJoin(player);
@@ -87,7 +86,6 @@ public class Events {
     private static void onPlayerFinishJoining(MinecraftServer server, ServerPlayerEntity player) {
         if (isFakePlayer(player)) return;
 
-        OtherUtils.log("onPlayerFinishJoining");
         try {
             UpdateChecker.onPlayerJoin(player);
             currentSeries.onPlayerFinishJoining(player);
@@ -256,14 +254,7 @@ public class Events {
         joiningPlayersYaw.remove(uuid);
         joiningPlayersPitch.remove(uuid);
     }
-
     public static boolean isFakePlayer(Entity entity) {
-        if (entity instanceof FakePlayer) {
-            return true;
-        }
-        if (entity instanceof ServerPlayerEntity player) {
-            return player.getGameProfile().getName().contains("`");
-        }
-        return false;
+        return entity instanceof FakePlayer;
     }
 }

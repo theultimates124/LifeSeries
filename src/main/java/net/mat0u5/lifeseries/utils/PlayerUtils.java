@@ -7,7 +7,11 @@ import net.mat0u5.lifeseries.client.ClientHandler;
 import net.mat0u5.lifeseries.entity.fakeplayer.FakePlayer;
 import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.Series;
+import net.mat0u5.lifeseries.series.Session;
 import net.mat0u5.lifeseries.series.secretlife.SecretLife;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.common.ResourcePackRemoveS2CPacket;
@@ -19,6 +23,12 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
+import net.minecraft.world.World;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -162,5 +172,29 @@ public class PlayerUtils {
                 inventory.removeStack(i);
             }
         }
+    }
+
+    public static Entity getEntityLookingAt(ServerPlayerEntity player, double maxDistance) {
+        Vec3d start = player.getCameraPosVec(1.0F);
+        Vec3d direction = player.getRotationVec(1.0F).normalize().multiply(maxDistance);
+        Vec3d end = start.add(direction);
+
+        HitResult entityHit = ProjectileUtil.raycast(player, start, end,
+                player.getBoundingBox().stretch(direction).expand(1.0),
+                entity -> !entity.isSpectator() && entity.isAlive(), maxDistance*maxDistance);
+
+        if (entityHit instanceof EntityHitResult entityHitResult) {
+            return entityHitResult.getEntity();
+        }
+
+        return null;
+    }
+
+    public static boolean isFakePlayer(PlayerEntity player) {
+        return player instanceof FakePlayer;
+    }
+    public static void displayMessageToPlayer(ServerPlayerEntity player, Text text, int timeFor) {
+        Session.skipTimer.put(player.getUuid(), timeFor/5);
+        player.sendMessage(text, true);
     }
 }
