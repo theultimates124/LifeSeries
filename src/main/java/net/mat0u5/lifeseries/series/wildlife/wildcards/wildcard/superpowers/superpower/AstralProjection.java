@@ -5,6 +5,7 @@ import net.mat0u5.lifeseries.network.NetworkHandlerServer;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.Superpowers;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.ToggleableSuperpower;
 import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.utils.TextUtils;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.DisconnectionInfo;
@@ -85,7 +86,9 @@ public class AstralProjection extends ToggleableSuperpower {
         FakePlayer.createFake(fakePlayerName, player.server, startedPos, startedLooking[0], startedLooking[1], player.server.getOverworld().getRegistryKey(),
                 GameMode.SURVIVAL, false, inv, player.getUuid(), player.getDisplayName()).thenAccept((fakePlayer) -> {
             clone = fakePlayer;
-            NetworkHandlerServer.sendPlayerDisguise("player_disguise", clone.getUuid().toString(), clone.getName().getString(), player.getUuid().toString(), player.getName().getString());
+            String name = TextUtils.textToLegacyString(player.getStyledDisplayName());
+            System.out.println("TEss_" + name);
+            NetworkHandlerServer.sendPlayerDisguise("player_disguise", clone.getUuid().toString(), clone.getName().getString(), player.getUuid().toString(), name);
         });
     }
 

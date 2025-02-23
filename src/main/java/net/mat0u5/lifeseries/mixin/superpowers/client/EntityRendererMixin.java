@@ -1,6 +1,8 @@
 package net.mat0u5.lifeseries.mixin.superpowers.client;
 
 import net.mat0u5.lifeseries.MainClient;
+import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.utils.TextUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -35,11 +37,11 @@ public class EntityRendererMixin<T extends Entity> {
                     return text;
                 }
                 for (PlayerListEntry entry : MinecraftClient.getInstance().getNetworkHandler().getPlayerList()) {
-                    if (entry.getProfile().getName().equalsIgnoreCase(name)) {
+                    if (entry.getProfile().getName().equalsIgnoreCase(TextUtils.removeFormattingCodes(name))) {
                         if (entry.getDisplayName() != null) {
                             return entry.getDisplayName();
                         }
-                        return Text.literal(name).setStyle(text.getStyle());
+                        return Text.literal(name);
                     }
                 }
             }

@@ -5,6 +5,7 @@ import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.Supe
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.ToggleableSuperpower;
 import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
+import net.mat0u5.lifeseries.utils.TextUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
@@ -41,7 +42,7 @@ public class PlayerDisguise extends ToggleableSuperpower {
             if (lookingAt instanceof PlayerEntity lookingAtPlayer) {
                 if (!PlayerUtils.isFakePlayer(lookingAtPlayer)) {
                     copiedPlayerUUID = lookingAtPlayer.getUuidAsString();
-                    copiedPlayerName = lookingAtPlayer.getName().getString();
+                    copiedPlayerName = TextUtils.textToLegacyString(lookingAtPlayer.getStyledDisplayName());
                     player.playSoundToPlayer(SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.MASTER, 0.3f, 1);
                     PlayerUtils.displayMessageToPlayer(player, Text.literal("Copied DNA of ").append(lookingAtPlayer.getStyledDisplayName()).append(Text.of(" — Press again to disguise")), 65);
                     return;

@@ -41,7 +41,7 @@ import java.util.List;
 public class Main implements ModInitializer, EntityComponentInitializer {
 	public static final ComponentKey<MorphComponent> MORPH_COMPONENT =
 			ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.of("lifeseries","morph"), MorphComponent.class);
-	public static final String MOD_VERSION = "dev-1.2.2.62";
+	public static final String MOD_VERSION = "dev-1.2.2.63";
 	public static final String MOD_ID = "lifeseries";
 	public static final String GITHUB_API_URL = "https://api.github.com/repos/Mat0u5/LifeSeries/releases/latest";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);

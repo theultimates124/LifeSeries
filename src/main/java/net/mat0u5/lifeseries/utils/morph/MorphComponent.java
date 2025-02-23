@@ -35,22 +35,6 @@ public class MorphComponent implements AutoSyncedComponent, ClientTickingCompone
     public void setMorph(EntityType<?> morph){
         shouldMorph = morph != null;
         this.morph = morph;
-
-        if (shouldMorph) {
-            //? if <= 1.21 {
-            Entity defaultMorph = morph.create(player.getWorld());
-            //?} else {
-            /*Entity defaultMorph = morph.create(player.getWorld(), SpawnReason.COMMAND);
-            *///?}
-            if (defaultMorph != null) {
-                double scale = defaultMorph.getBoundingBox().getLengthY() / player.getBoundingBox().getLengthY();
-                SizeShifting.setPlayerSizeUnchecked((ServerPlayerEntity) player, scale);
-            }
-            return;
-        }
-
-        SizeShifting.setPlayerSizeUnchecked((ServerPlayerEntity) player, 1);
-
     }
     public boolean isMorphed(){
         return (morph != null) && shouldMorph;

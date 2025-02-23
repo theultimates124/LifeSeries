@@ -1,5 +1,10 @@
 package net.mat0u5.lifeseries.utils;
 
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
+import net.minecraft.util.Formatting;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,5 +50,41 @@ public class TextUtils {
 
     public static String capitalize(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
+    public static String textToLegacyString(Text text) {
+        StringBuilder formattedString = new StringBuilder();
+        Style style = text.getStyle();
+
+        // Convert color
+        if (style.getColor() != null) {
+            formattedString.append(getColorCode(style.getColor()));
+        }
+
+        // Convert other formatting (bold, italic, etc.)
+        if (style.isBold()) formattedString.append("§l");
+        if (style.isItalic()) formattedString.append("§o");
+        if (style.isUnderlined()) formattedString.append("§n");
+        if (style.isStrikethrough()) formattedString.append("§m");
+        if (style.isObfuscated()) formattedString.append("§k");
+
+        // Append the raw text
+        formattedString.append(text.getString());
+
+        return formattedString.toString();
+    }
+
+    public static String getColorCode(TextColor color) {
+        // Convert TextColor to Formatting if it's a built-in color
+        for (Formatting formatting : Formatting.values()) {
+            if (formatting.getColorValue() == color.getRgb()) {
+                return "§" + formatting.getCode();
+            }
+        }
+        // If it's a custom RGB color, return nothing (Minecraft doesn't support direct RGB in legacy formatting)
+        return "";
+    }
+    public static String removeFormattingCodes(String input) {
+        return input.replaceAll("§[0-9a-fk-or]", "");
     }
 }
