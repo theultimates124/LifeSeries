@@ -3,9 +3,11 @@ package net.mat0u5.lifeseries.mixin;
 import net.mat0u5.lifeseries.Main;
 import net.mat0u5.lifeseries.utils.ItemStackUtils;
 import net.mat0u5.lifeseries.utils.OtherUtils;
+import net.mat0u5.lifeseries.utils.morph.DummyInterface;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.*;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -22,7 +24,7 @@ import java.util.function.Predicate;
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
 @Mixin(value = LivingEntity.class, priority = 1)
-public abstract class LivingEntityMixin {
+public abstract class LivingEntityMixin implements DummyInterface {
     @Inject(method = "heal", at = @At("HEAD"), cancellable = true)
     private void onHealHead(float amount, CallbackInfo info) {
         if (!Main.isLogicalSide())return;
@@ -72,4 +74,32 @@ public abstract class LivingEntityMixin {
         }
     }
     *///?}
+
+
+    public boolean dummy;
+    public PlayerEntity player;
+
+    @Override
+    public void makeDummy() {
+        dummy = true;
+    }
+    @Override
+    public void setPlayer(PlayerEntity playerEntity) {
+        player = playerEntity;
+    }
+
+    @Inject(method = "tickMovement", at = @At("HEAD"), cancellable = true)
+    public void stopTickingMovement(CallbackInfo ci){
+        if(dummy){
+            ci.cancel();
+        }
+    }
+    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+    public void stopTicking(CallbackInfo ci){
+        if(dummy){
+            ci.cancel();
+        }
+    }
+
+
 }

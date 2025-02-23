@@ -38,6 +38,7 @@ public class BoogeymanCommand {
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
         dispatcher.register(
             literal("boogeyman")
+                .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null) || !currentSeries.isAlive(source.getPlayer()))))
                 .then(literal("clear")
                     .requires(source -> ((isAdmin(source.getPlayer()) || (source.getEntity() == null))))
                     .executes(context -> boogeyClear(

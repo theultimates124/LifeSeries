@@ -36,6 +36,7 @@
     "client.MinecraftClientMixin",
     "client.SoundSystemMixin",
     "superpowers.client.AbstractClientPlayerEntityMixin",
-    "superpowers.client.EntityRendererMixin"
+    "superpowers.client.EntityRendererMixin",
+    "superpowers.client.PlayerEntityRendererMixin"
   ]
 }

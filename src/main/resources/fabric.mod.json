@@ -23,7 +23,8 @@
 		],
 		"fabric-datagen": [
 			"net.mat0u5.lifeseries.MainDataGenerator"
-		]
+		],
+		"cardinal-components-entity": ["net.mat0u5.lifeseries.Main"]
 	},
 	"mixins": [
 		"lifeseries.mixins.json"
@@ -36,5 +37,10 @@
 	},
 	"suggests": {
 		"another-mod": "*"
+	},
+	"custom": {
+		"cardinal-components": [
+			"lifeseries:morph"
+		]
 	}
 }

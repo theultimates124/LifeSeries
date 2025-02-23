@@ -44,10 +44,21 @@ public class PlayerManagerMixin {
         }
     }
 
-    @Inject(method = "onPlayerConnect", at = @At("RETURN"))
+    /*@Inject(method = "onPlayerConnect", at = @At("RETURN"))
     private void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
         if (player instanceof FakePlayer fake) {
             player.networkHandler = new FakePlayerNetworkHandler(this.server, connection, fake, clientData);
+        }
+    }    */
+
+    @Redirect(method = "onPlayerConnect", at = @At(value = "NEW", target = "(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/network/ClientConnection;Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/server/network/ConnectedClientData;)Lnet/minecraft/server/network/ServerPlayNetworkHandler;"))
+    public ServerPlayNetworkHandler onPlayerConnect(MinecraftServer server, ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData) {
+        //TODO compatibility with Fabric Carpet
+        if (player instanceof FakePlayer fake) {
+            return new FakePlayerNetworkHandler(this.server, connection, fake, clientData);
+        }
+        else {
+            return new ServerPlayNetworkHandler(this.server, connection, player, clientData);
         }
     }
 }

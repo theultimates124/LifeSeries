@@ -4,6 +4,7 @@ import net.mat0u5.lifeseries.entity.triviabot.TriviaBot;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcard;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.Wildcards;
+import net.mat0u5.lifeseries.utils.OtherUtils;
 import net.mat0u5.lifeseries.utils.PlayerUtils;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
+import static net.mat0u5.lifeseries.Main.MORPH_COMPONENT;
 import static net.mat0u5.lifeseries.Main.currentSeries;
 
 public class SizeShifting extends Wildcard {
@@ -60,6 +62,10 @@ public class SizeShifting extends Wildcard {
         if (size < MIN_SIZE) size = MIN_SIZE;
         if (size > MAX_SIZE) size = MAX_SIZE;
 
+
+        if (MORPH_COMPONENT.maybeGet(player).isPresent()) {
+            if (MORPH_COMPONENT.maybeGet(player).get().isMorphed()) return;
+        }
 
         //? if <=1.21 {
         Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_SCALE)).setBaseValue(size);

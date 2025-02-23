@@ -37,7 +37,7 @@ public class UnassignedSeries extends Series {
     public void broadcastNotice() {
         OtherUtils.broadcastMessage(Text.literal("[LifeSeries] You must select a series with ").formatted(Formatting.RED)
                 .append(Text.literal("'/lifeseries setSeries <series>'").formatted(Formatting.GRAY)), 120);
-        OtherUtils.broadcastMessage(Text.literal("You must be an admin to use this command.").formatted(Formatting.RED), 120);
+        OtherUtils.broadcastMessage(Text.literal("You must have§n operator permissions§n to use most commands in this mod.").formatted(Formatting.RED), 120);
         Text text = Text.literal("§7Click ").append(
                 Text.literal("here")
                         .styled(style -> style

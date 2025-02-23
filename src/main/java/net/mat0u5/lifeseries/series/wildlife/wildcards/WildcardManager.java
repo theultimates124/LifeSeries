@@ -19,8 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-import static net.mat0u5.lifeseries.Main.currentSeries;
-import static net.mat0u5.lifeseries.Main.server;
+import static net.mat0u5.lifeseries.Main.*;
 
 public class WildcardManager {
     public static HashMap<Wildcards, Wildcard> activeWildcards = new HashMap<>();
@@ -70,6 +69,7 @@ public class WildcardManager {
         TaskScheduler.scheduleTask(20, () -> {
             Hunger.updateInventory(player);
         });
+        MORPH_COMPONENT.maybeGet(player).ifPresent(morphComponent -> morphComponent.setMorph(null));
     }
 
     public static void activateWildcards() {

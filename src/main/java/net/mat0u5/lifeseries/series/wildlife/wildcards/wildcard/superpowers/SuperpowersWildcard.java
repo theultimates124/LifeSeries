@@ -55,7 +55,7 @@ public class SuperpowersWildcard extends Wildcard {
         for (ServerPlayerEntity player : allPlayers) {
             Superpowers power = implemented.get(pos%implemented.size());
             Superpower instance = Superpowers.getInstance(player, power);
-            playerSuperpowers.put(player.getUuid(), instance);
+            if (instance != null) playerSuperpowers.put(player.getUuid(), instance);
             pos++;
         }
         PlayerUtils.playSoundToPlayers(allPlayers, SoundEvent.of(Identifier.of("minecraft","wildlife_superpowers")), 0.2f, 1);
@@ -72,7 +72,8 @@ public class SuperpowersWildcard extends Wildcard {
         if (playerSuperpowers.containsKey(player.getUuid())) {
             playerSuperpowers.get(player.getUuid()).turnOff();
         }
-        playerSuperpowers.put(player.getUuid(), Superpowers.getInstance(player, superpower));
+        Superpower instance = Superpowers.getInstance(player, superpower);
+        if (instance != null) playerSuperpowers.put(player.getUuid(), instance);
         PlayerUtils.playSoundToPlayers(List.of(player), SoundEvent.of(Identifier.of("minecraft","wildlife_superpowers")), 0.2f, 1);
     }
 

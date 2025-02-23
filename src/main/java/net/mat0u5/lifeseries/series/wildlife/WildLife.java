@@ -11,6 +11,7 @@ import net.mat0u5.lifeseries.series.wildlife.wildcards.WildcardManager;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.*;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.Superpowers;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.SuperpowersWildcard;
+import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.AnimalDisguise;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.Creaking;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.superpowers.superpower.PlayerDisguise;
 import net.mat0u5.lifeseries.series.wildlife.wildcards.wildcard.trivia.TriviaWildcard;
@@ -212,6 +213,11 @@ public class WildLife extends Series {
     public void onPlayerDamage(ServerPlayerEntity player, DamageSource source, float amount, CallbackInfo ci) {
         if (SuperpowersWildcard.hasActivatedPower(player, Superpowers.PLAYER_DISGUISE)) {
             if (SuperpowersWildcard.playerSuperpowers.get(player.getUuid()) instanceof PlayerDisguise power) {
+                power.onTakeDamage();
+            }
+        }
+        if (SuperpowersWildcard.hasActivatedPower(player, Superpowers.ANIMAL_DISGUISE)) {
+            if (SuperpowersWildcard.playerSuperpowers.get(player.getUuid()) instanceof AnimalDisguise power) {
                 power.onTakeDamage();
             }
         }
